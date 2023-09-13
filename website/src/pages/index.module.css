@@ -1,0 +1,94 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.terminal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* margin-top: 150px; */
+
+}
+
+.terminal2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+
+}
+
+.Title {
+  font-size: 96px;
+    letter-spacing: 0;
+    line-height: 110px;
+    text-align: center;
+}
+
+.Line {
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  
+}
+
+.important {
+  font-weight: bold;
+  color: #813eff; /* White text */
+}
+
+.fullsize {
+  
+}
+
+.SecondLine {
+  align-items: center;
+  
+  flex: 1;
+  flex-wrap: nowrap;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.TaglineBlock{
+  justify-content: flex-start;
+  display: flex;
+  flex-direction: row;
+  margin: 0px 50px 20px 0px;
+}
+
+.Tagline {
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: .005em;
+  line-height: 45px;
+  margin: 50px 50px 20px 80px;
+  max-width: 500px;
+  text-align: left;
+}
+
+

@@ -1,0 +1,154 @@
+---
+sidebar_position: 4
+---
+
+# Customize your Meeting UI
+
+cocmd provides a range of UI customizations for meetings, including defining participant interactions within a meeting room. The default values for these options are set to facilitate integration. However, you have the flexibility to override them at the client end to suit specific use cases or events.
+
+When configuring a cocmd meeting, you can pass the following configuration options.
+
+```kotlin
+val imarticusColors = ColorTokens(
+      brand = BrandColor(
+        shade300 = Color.parseColor("#ffea76"),
+        shade400 = Color.parseColor("#ffe865"),
+        shade500 = Color.parseColor("#ffe554"),
+        shade600 = Color.parseColor("#e6ce4c"),
+        shade700 = Color.parseColor("#ccb743"),
+      ),
+      background = BackgroundColor(
+        shade600 = Color.parseColor("#121212"),
+        shade700 = Color.parseColor("#454545"),
+        shade800 = Color.parseColor("#898989"),
+        shade900 = Color.parseColor("#b1b1b1"),
+        shade1000 = Color.parseColor("#e1e1e1")
+      ),
+      text = TextColor(
+        onBrand = TextColor.TextColorOnBrand(
+          shade1000 = Color.parseColor("#ff002b4c"),
+          shade900 = Color.parseColor("#e0002b4c"),
+          shade800 = Color.parseColor("#c2002b4c"),
+          shade700 = Color.parseColor("#a3002b4c"),
+          shade600 = Color.parseColor("#85002b4c")
+        ),
+        onBackground = TextColor.TextColorOnBackground(
+          shade1000 = Color.parseColor("#ff050505"),
+          shade900 = Color.parseColor("#e0050505"),
+          shade800 = Color.parseColor("#c2050505"),
+          shade700 = Color.parseColor("#a3050505"),
+          shade600 = Color.parseColor("#85050505")
+        )
+      )
+    )
+
+    val tokens = cocmdUITokens(colors = imarticusColors,
+      borderRadius = BorderRadiusToken.Circular,
+      borderWidth = BorderWidthToken.Thin)
+```
+
+```kotlin {7}
+val meetingInfo = = cocmdMeetingInfoV2(
+  authToken = state.authToken,
+)
+val config = cocmdUIKitConfig(
+  activity = this,
+  dyteMeetingInfo = meetingInfo,
+  designTokens = tokens
+)
+val dyteClient = cocmdUIKitBuilder.build(config)
+dyteClient.loadUi()
+```
+
+Here is a visual representation showcasing all the defined configuration options.
+
+![meeting UI screenshot with labeled parts](/static/mobile/0.x.x/mobile-opt1-setup.png)
+![meeting UI screenshot with labeled parts](/static/mobile/0.x.x/mobile-opt1-meeting.png)
+![meeting UI screenshot with labeled parts](/static/mobile/0.x.x/mobile-opt1-meeting-options.png)
+
+cocmd provides customization options for adjusting the color, border radius, and border width of your UI. Let's explore these customization options in more detail.
+
+## Customize color scheme to match your brand
+
+Customize the meeting's color scheme to match your brand and theme with cocmd. You can specify four sets of color values:
+
+- brandColor: Primary brand color.
+- backgroundColor: Primary background color.
+- textColor: The primary text color for both the brand color and background.
+
+### `brandColor`
+
+```kotlin
+BrandColor(
+    shade300 = Color.parseColor("#ffea76"),
+    shade400 = Color.parseColor("#ffe865"),
+    shade500 = Color.parseColor("#ffe554"),
+    shade600 = Color.parseColor("#e6ce4c"),
+    shade700 = Color.parseColor("#ccb743"),
+)
+```
+
+### `backgroundColor`
+
+```kotlin
+BackgroundColor(
+    shade600 = Color.parseColor("#121212"),
+    shade700 = Color.parseColor("#454545"),
+    shade800 = Color.parseColor("#898989"),
+    shade900 = Color.parseColor("#b1b1b1"),
+    shade1000 = Color.parseColor("#e1e1e1")
+)
+```
+
+### `textColor`
+
+```kotlin
+text = TextColor(
+    onBrand = TextColor.TextColorOnBrand(
+        shade1000 = Color.parseColor("#ff002b4c"),
+        shade900 = Color.parseColor("#e0002b4c"),
+        shade800 = Color.parseColor("#c2002b4c"),
+        shade700 = Color.parseColor("#a3002b4c"),
+        shade600 = Color.parseColor("#85002b4c")
+    ),
+    onBackground = TextColor.TextColorOnBackground(
+        shade1000 = Color.parseColor("#ff050505"),
+        shade900 = Color.parseColor("#e0050505"),
+        shade800 = Color.parseColor("#c2050505"),
+        shade700 = Color.parseColor("#a3050505"),
+        shade600 = Color.parseColor("#85050505")
+    )
+)
+```
+
+## Customize border radius of elements in the meeting
+
+To customize the border radius of elements in your cocmd meeting, follow these steps:
+
+1. Create the `cocmdUITokens` object:
+
+```kotlin
+val tokens = cocmdUITokens(colors = dyteColors, borderRadius = BorderRadiusToken.Rounded)
+```
+
+- `dyteColors`: Represents the color scheme for your meeting.
+- `borderRadius`: Defines the desired border radius. By specifying the desired border radius value in the borderRadius token, you can customize the border radius of elements in your cocmd meeting.
+
+2. Configure `cocmdUIKit` then build and load the cocmd UI.
+
+```kotlin {10}
+val meetingInfo = cocmdMeetingInfoV2(
+    // meeting info
+)
+val config = cocmdUIKitConfig(
+    activity = this,
+    dyteMeetingInfo = meetingInfo,
+    designTokens = tokens
+)
+val dyteUIKit = cocmdUIKitBuilder.build(config)
+dyteUIKit.loadUi()
+```
+
+![meeting UI screenshot with labeled parts](/static/mobile/0.x.x/mobile-opt2-setup.png)
+![meeting UI screenshot with labeled parts](/static/mobile/0.x.x/mobile-opt2-meeting.png)
+![meeting UI screenshot with labeled parts](/static/mobile/0.x.x/mobile-opt2-meeting-options.png)

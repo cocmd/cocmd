@@ -1,0 +1,110 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "externalConsole":true ,
+    "configurations": [
+        {
+            "name": "add source",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "add",
+                "source",
+                "demo",
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "run",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "run",
+                "docker.setup"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "profile-loader",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "profile-loader"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "show sources",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "show",
+                "sources"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "show source",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "show",
+                "source",
+                "docker"
+            ],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

@@ -1,0 +1,201 @@
+---
+title: 'React'
+sidebar_position: 1
+---
+
+## Quickstart
+
+<span>
+  This quickstart shows how to use cocmd's {props.product} in your{' '}
+  <a href="https://react.dev/">React</a> applications with a variety of meeting
+  UI customization options.
+</span>
+
+cocmd also offers the flexibility to build your own UI using various individual
+components. This offers limitless customization options to tailor the UI to fit
+your requirements. For more information, see the [Build your own UI section](/react-ui-kit/basics/components-basics).
+
+For getting started quickly, you can use our
+[sample code](https://github.com/dyte-io/react-samples). You can clone and run a
+sample application from the
+[React UI Kit GitHub repository](https://github.com/dyte-io/react-samples).
+
+## Objective
+
+You'll learn how to:
+
+- Install the cocmd client-side SDKs
+- Initialize cocmd client
+- Bringing up your UI
+- Go live!
+
+## Before Getting Started
+
+Make sure you've a mechanism to get `authToken` from your server-side, which you would have received as part of [Add Participant](/guides/live-video/build-live-video-app#step-5-add-participants) call.
+
+## Step 1: Install cocmd SDK packages
+
+To begin, install the following packages:
+
+- `@dytesdk/react-web-core`: This core package powers video, voice, livestream, and chat SDKs. This is a required package.
+- `@dytesdk/ui-kit`: This package includes cocmd UI components which can be used with core to easily build your own UI, including a prebuilt UI component. You can skip installing this package if you wish to build your own UI from scratch.
+
+`react-web-core` consists of hooks written on top of our `core` package, which makes it easy to use [`web-core`](https://npmjs.com/package/@dytesdk/web-core) in React applications.
+
+You can install the package using npm or Yarn.
+
+```bash npm2yarn
+npm install @dytesdk/react-web-core @dytesdk/react-ui-kit
+```
+
+:::tip Import Errors
+
+If you get errors when importing the `react-web-core` and `react-ui-kit`
+packages, try installing them separately.
+
+:::
+
+### Version
+
+|                         |                                                                                                                              |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| @dytesdk/react-web-core | [![npm version](https://badge.fury.io/js/@dytesdk%2Freact-web-core.svg)](https://badge.fury.io/js/@dytesdk%2Freact-web-core) |
+| @dytesdk/react-ui-kit   | [![npm version](https://badge.fury.io/js/@dytesdk%2Freact-ui-kit.svg)](https://badge.fury.io/js/@dytesdk%2Freact-ui-kit)     |
+
+## Step 2: Prepare meeting object
+
+Here's a series of steps that you need to perform:
+
+### Initialize the cocmd client
+
+- Use the `usecocmdClient()` hook and `initMeeting`
+- Provide the `authToken` that you fetched from your server-side
+
+```jsx
+import { useEffect } from 'react';
+import { usecocmdClient } from '@dytesdk/react-web-core';
+
+export default function Meeting({ authToken }) {
+  const [meeting, initMeeting] = usecocmdClient();
+
+  useEffect(() => {
+    initMeeting({
+      authToken: '<auth-token>',
+      defaults: {
+        audio: false,
+        video: false,
+      },
+    });
+  }, []);
+
+  return <></>; // TODO: render the UI
+}
+```
+
+### Set up `cocmdProvider`
+
+You need it to import the `cocmdProvider` from the `dytesdk/react-web-core`. `cocmdProvider` basically is a hook wrapper on `dytesdk/web-core`. This provides a meeting object to child components.
+
+```jsx {2,17-21}
+import { useEffect } from 'react';
+import { usecocmdClient, cocmdProvider } from '@dytesdk/react-web-core';
+
+export default function App() {
+  const [meeting, initMeeting] = usecocmdClient();
+
+  useEffect(() => {
+    initMeeting({
+      authToken: '<auth-token>',
+      defaults: {
+        audio: false,
+        video: false,
+      },
+    });
+  }, []);
+
+  return (
+    <cocmdProvider value={meeting} fallback={<i>Loading...</i>}>
+      {/* Render your UI here. Subcomponents can now use the `usecocmdMeeting` and `usecocmdSelector` hooks */}
+    </cocmdProvider>
+  );
+}
+```
+
+`fallback` can be used to add a loading indicator while the meeting is being initialized.
+
+## Step 3: Bring up the UI
+
+The `meeting` object serves as the link between web-core and UI Kit, allowing
+them to communicate with one another. Once the UI Kit has the meeting object,
+it can join and leave meetings, and so on.
+
+Create a `MyMeeting` component and render it within `cocmdProvider`.
+
+```jsx {3,21}
+import { useEffect } from 'react';
+import { usecocmdClient, cocmdProvider } from '@dytesdk/react-web-core';
+import MyMeeting from './my-meeting';
+
+export default function App() {
+  const [meeting, initMeeting] = usecocmdClient();
+
+  useEffect(() => {
+    initMeeting({
+      authToken: '<auth-token>',
+      defaults: {
+        audio: false,
+        video: false,
+      },
+    });
+  }, []);
+
+  return (
+    <cocmdProvider value={meeting} fallback={<i>Loading...</i>}>
+      {/* Render your UI here. Subcomponents can now use the `usecocmdMeeting` and `usecocmdSelector` hooks */}
+      <MyMeeting />
+    </cocmdProvider>
+  );
+}
+```
+
+### UI Kit
+
+`cocmdMeeting` renders the entire meeting UI. It loads your preset and renders
+the UI based on it. With this component, you don't have to handle all the
+states, dialogs, and other smaller bits of managing the application.
+
+For more information on the other props of `cocmdMeeting`, see [cocmdMeeting](/react-ui-kit/components/dyte-meeting).
+
+```jsx
+import { cocmdMeeting } from '@dytesdk/react-ui-kit';
+function MyMeeting() {
+  const { meeting } = usecocmdMeeting();
+
+  return (
+    <div style={{ height: '480px' }}>
+      <cocmdMeeting mode="fill" meeting={meeting} />
+    </div>
+  );
+}
+```
+
+### Build your own UI
+
+If you require additional customizations, you can choose specific components and utilize the low-level APIs offered by our [core SDK](/web-core/introduction) to construct the rest of the UI according to your specific needs.
+
+```jsx
+import { cocmdGrid, cocmdMicToggle } from '@dytesdk/react-ui-kit';
+
+function MyMeeting() {
+  const { meeting } = usecocmdMeeting();
+
+  return (
+    <div style={{ height: '480px' }}>
+      <cocmdGrid meeting={meeting} />
+      <div className="controlbar">
+        <cocmdMicToggle meeting={meeting} />
+      </div>
+    </div>
+  );
+}
+```

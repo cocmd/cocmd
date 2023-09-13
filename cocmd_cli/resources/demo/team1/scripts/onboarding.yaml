@@ -1,0 +1,29 @@
+description: Welcome to the team!
+name: onboarding
+spec:
+  alias: null
+  globals:
+  - content: "\n# Welcome to Team1\n## happy to have you on the team!\n\nThis will\
+      \ take you through the onboarding\n\nWe value the talents and ideas of everyone\
+      \ on our team, especially our new hires. We can\u2019t wait to see what you\u2019\
+      ll make happen\n\nWelcome! We choose our new team members carefully and we\u2019\
+      re proud to welcome you, with all of your talents and ideas and faults. Yes,\
+      \ faults \u2014 making mistakes is an important part of growth, and we hope\
+      \ you\u2019ll never worry about trying to be perfect on the job. We sure aren\u2019\
+      t\n\n                    "
+    description: ''
+    id: welcome_md
+    runner: markdown
+    title: Welcome
+  variations:
+  - depends: []
+    env: any
+    label: null
+    steps:
+    - ref: welcome_md
+    - ref: osx.devmachine
+    - ref: zsh.setup
+    - ref: docker.setup
+    - ref: k8s.setup
+    - ref: awscli.setup
+title: 'New Developer onboarding '

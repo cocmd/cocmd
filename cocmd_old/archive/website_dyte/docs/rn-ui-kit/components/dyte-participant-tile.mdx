@@ -1,0 +1,45 @@
+---
+image: /static/ui-kit/1.x.x/components/dyte-participant-tile.svg
+---
+
+# cocmdParticipantTile
+
+A component which plays a participants video and allows for placement of
+components like `dyte-name-tag`, `dyte-audio-visualizer` or any other component.
+
+```jsx
+<cocmdParticipantTile participant={meeting.self}>
+  <cocmdNameTag participant={meeting.self}>
+    <cocmdAudioVisualizer slot="start" />
+  </cocmdNameTag>
+</cocmdParticipantTile>
+```
+
+You can change the `name-tag-position` to any of the supported values and change
+the placement of audio-visualizer in name-tag as well.
+
+```jsx
+<cocmdParticipantTile participant={meeting.self} nameTagPosition="bottom-center">
+  <cocmdNameTag participant={meeting.self}>
+    <cocmdAudioVisualizer slot="end" />
+  </cocmdNameTag>
+</cocmdParticipantTile>
+```
+
+It also has a few variants.
+
+```jsx
+<cocmdParticipantTile
+  participant={meeting.self}
+  nameTagPosition="bottom-center"
+  variant="gradient"
+>
+  <cocmdNameTag participant={meeting.self}>
+    <cocmdAudioVisualizer slot="start" />
+  </cocmdNameTag>
+</cocmdParticipantTile>
+```
+
+## Props
+
+<PropsTable of="dyte-participant-tile" />

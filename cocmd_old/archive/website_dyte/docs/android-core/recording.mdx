@@ -1,0 +1,69 @@
+---
+title: Recording
+description: Control recordings in a meeting.
+sidebar_position: 10
+tags: [mobile-core, recording]
+---
+
+# Recording
+
+The `meeting.recording` object can be used start and stop recordings in a
+meeting. You can also get the current status of a recording using this API.
+
+The `meeting.recording` object has the following properties:
+
+- `recordingState`: Indicates the current recording state of the meeting.
+
+## Start a recording
+
+To start a recording, you can call the `start` method in the `meeting.recording`
+object. The valid states are `IDLE`, `STARTING`, `RECORDING`, and `STOPPING`.
+
+```kotlin
+meeting.recording.start();
+```
+
+## Stop a recording
+
+Call `meeting.recording.stop()` to stop the active recording.
+
+```kotlin
+meeting.recording.stop();
+```
+
+## Get active recording state
+
+The `meeting.recording.recordingState` property describes the current state of
+the recording. The valid states are `IDLE`, `STARTING`, `RECORDING`, and
+`STOPPING`.
+
+## Listen to recording state changes
+
+The changes to `meeting.recording.recordingState` can be listened by
+implementing `onMeetingRecordingStateUpdated` from
+`cocmdMeetingRoomEventsListener`. You can attach this observer by calling
+`meeting.addMeetingRoomEventsListener(listener)`.
+
+```kotlin
+meeting.addMeetingRoomEventsListener(object : cocmdMeetingRoomEventsListener {
+    override fun onMeetingRecordingStarted() {
+      super.onMeetingRecordingStarted()
+      // on recording started
+    }
+
+    override fun onMeetingRecordingEnded() {
+      super.onMeetingRecordingEnded()
+      // on recording ended
+    }
+
+    override fun onMeetingRecordingStateUpdated(state: cocmdRecordingState) {
+      super.onMeetingRecordingStateUpdated(state)
+      // on recording state update
+    }
+
+    override fun onMeetingRecordingStopError(e: Exception) {
+      super.onMeetingRecordingStopError(e)
+      // when local user tried to end recording but it fails
+    }
+  })
+```

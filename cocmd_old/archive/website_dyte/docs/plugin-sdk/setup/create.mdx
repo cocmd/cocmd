@@ -1,0 +1,43 @@
+---
+title: Create a Plugin
+sidebar_position: 1
+---
+
+:::info prerequisites
+
+- Ensure that cocmd CLI is installed on your machine. Run the command `dyte help`
+  to verify. For more information on how to install cocmd CLI, see
+  [Setup cocmd CLI](https://docs.cocmd.ai/cli).
+
+- Create an account on the [cocmd Developer Portal](https://dev.cocmd.ai) if you
+  haven't already.
+
+:::
+
+### Steps to create your plugin
+
+- You can use cocmd CLI to create your plugin.
+
+  ```shell
+  cd <your-project-directory>
+  ```
+
+  ```shell
+  dyte plugins create
+  ```
+
+  This command asks you a bunch of questions and then generates a
+  dyte-config.json for you. You can use this JSON file to
+  [configure your plugin properties](/plugin-sdk/setup/customize). This file
+  must always stay in the root of your folder.
+
+- Use this command to verify if your plugin was created
+
+  ```shell
+  dyte plugins ls
+  ```
+
+### Next Step
+
+Learn how you can use `dyte-config.json` to customize your plugin's name,
+description, logo, build config and more.

@@ -1,0 +1,40 @@
+---
+image: /static/ui-kit/1.x.x/components/dyte-dialog.svg
+---
+
+# cocmdDialog
+
+A dialog component.
+
+```jsx
+function Example() {
+  const [showDialog, setShowDialog] = useState(false);
+
+  return (
+    <div>
+      <cocmdButton onClick={() => setShowDialog(true)}>Show Dialog</cocmdButton>
+      <cocmdDialog
+        open={showDialog}
+        oncocmdDialogClose={() => setShowDialog(false)}
+      >
+        <div
+          style={{
+            width: '512px',
+            backgroundColor: '#000',
+            color: '#fff',
+            padding: 12,
+            borderRadius: 8,
+          }}
+        >
+          <h3>Hello!</h3>
+          <p style={{ marginBottom: 0 }}>This is some text inside dialog!</p>
+        </div>
+      </cocmdDialog>
+    </div>
+  );
+}
+```
+
+## Props
+
+<PropsTable of="dyte-dialog" />

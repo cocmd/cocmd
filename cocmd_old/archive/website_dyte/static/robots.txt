@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /tags/
+Sitemap: https://cocmd.ai/sitemap.xml
+Sitemap: https://cocmd.ai/blog/sitemap.xml
+Sitemap: https://docs.cocmd.ai/sitemap.xml

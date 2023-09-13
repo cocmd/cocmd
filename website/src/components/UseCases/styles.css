@@ -1,0 +1,57 @@
+.useCases-section {
+    text-align: center;
+    margin: 0 auto; /* Center the section */
+    /* padding-top: 5%; */
+    padding-bottom: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 50px;
+  }
+  
+  .useCases-section ul {
+    text-align: center;
+    justify-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 6px; /* Further reduced gap for more density */
+    list-style: none; /* Removes the bullet points */
+    padding: 0; /* Removes default padding */
+    /* margin: 0 auto; Centers the grid */
+    
+    padding-top: 15px;
+  }
+  
+  .useCases-section li a {
+    width: 200px;
+    text-align: center;
+    display: flex;
+    flex-direction: column; /* Stack logo and label vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+    font-size: 20px;
+  }
+  .useCases-section li a img {
+    height: 60px;
+    margin-bottom: 4px; /* Reduced space between image and label */
+    
+    transition: filter 0.1s, transform 0.1s; /* Transition effect for 0.3 seconds */
+  }
+  
+  .useCases-section li a img:hover {
+    filter: grayscale(0%); /* Show colors on hover */
+    transform: scale(1.4); /* Scale the image up to 110% */
+  }
+  
+  
+  .useCases-section li a span {
+    margin-top: 6px;
+    margin-bottom: 10px;
+    color: #808080; /* Gray text by default */
+  }
+
+  .create-own{
+    margin: 10%;
+  }
+  

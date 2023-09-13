@@ -1,0 +1,34 @@
+---
+image: /static/ui-kit/1.x.x/components/dyte-menu.svg
+---
+
+# cocmdMenu
+
+A menu component.
+
+```jsx
+<Row style={{ padding: '52px 0 0 0' }}>
+  <cocmdMenu placement="top">
+    <cocmdButton slot="trigger">Top Menu</cocmdButton>
+    <cocmdMenuList>
+      <cocmdMenuItem onClick={() => alert('You clicked: alert()')}>
+        alert()
+      </cocmdMenuItem>
+    </cocmdMenuList>
+  </cocmdMenu>
+
+  {/* This menu will be placed at top due to less space */}
+  <cocmdMenu placement="bottom">
+    <cocmdButton slot="trigger">Bottom Menu</cocmdButton>
+    <cocmdMenuList>
+      <cocmdMenuItem onClick={() => alert('You clicked: alert()')}>
+        alert()
+      </cocmdMenuItem>
+    </cocmdMenuList>
+  </cocmdMenu>
+</Row>
+```
+
+## Props
+
+<PropsTable of="dyte-menu" />

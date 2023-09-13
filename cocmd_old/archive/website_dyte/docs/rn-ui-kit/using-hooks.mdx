@@ -1,0 +1,170 @@
+---
+sidebar_position: 4
+---
+
+# Use React Native Core Hooks
+
+cocmd's React Native UI Kit provides multiple
+[Hooks](https://beta.reactjs.org/reference/react). Hooks let you use different
+React features from your components.
+
+This provides seamless developer experience when integrating cocmd’s UI Kit in
+your React native project. You can simply import the package from `dytesdk/react-native-core`.
+
+This page lists all the built-in Hooks in cocmd.
+
+- `<cocmdProvider />`
+- `<cocmdUIProvider />`
+- `usecocmdMeeting()`
+- `usecocmdSelector()`
+
+## `<cocmdProvider />`
+
+It is a simple context provider providing the meeting object to child
+components.
+
+```jsx
+import { usecocmdClient } from '@dytesdk/react-native-core';
+
+function App() {
+  const [client, initClient] = usecocmdClient();
+
+  useEffect(() => {
+    initClient({
+      authToken: '<auth-token>',
+      // set default values for user media
+      defaults: {
+        audio: false,
+        video: true,
+      },
+    });
+  }, []);
+
+  return (
+    <cocmdProvider value={client}>
+      <Meeting />
+    </cocmdProvider>
+  );
+}
+```
+
+## `<cocmdUIProvider />`
+
+It is a simple context provider providing the dyte design system to child
+components.
+
+```jsx
+import { usecocmdClient } from '@dytesdk/react-native-core';
+import { cocmdUIProvider, cocmdMeeting} from '@dytesdk/react-native-ui-kit';
+
+export default function App() {
+  const [meeting, initMeeting] = usecocmdClient();
+
+  useEffect(() => {
+    initMeeting({
+      authToken: '<auth-token>',
+      defaults: {
+        audio: false,
+        video: false,
+      },
+    });
+  }, []);
+
+  return (
+    <cocmdProvider value={meeting}>
+      <cocmdUIProvider>
+        <cocmdMeeting meeting={meeting} />
+      </cocmdUIProvider>
+    </cocmdProvider>
+  );
+}
+```
+
+And to consume the context value, we provide two more hooks, each serving a
+specific purpose.
+
+These are:
+
+- `usecocmdMeeting()`
+- `usecocmdSelector()`
+
+## `usecocmdMeeting()`
+
+This hook essentially returns the `meeting` object you passed to the
+`cocmdProvider`.
+
+The value returned doesn't re-render always whenever properties inside the
+object change.
+
+```jsx
+import { usecocmdSelector, usecocmdMeeting } from '@dytesdk/react-native-core';
+
+function Meeting() {
+  const { meeting } = usecocmdMeeting();
+
+  /*
+    use joinRoom() method or the setup screen component
+    to actually enter the meeting
+  */
+  useEffect(() => {
+    meeting.joinRoom();
+  }, [meeting]);
+
+  // show cocmdMeeting
+  return <cocmdMeeting meeting={meeting} />;
+}
+```
+
+## `usecocmdSelector()`
+
+If you're familiar with Redux's
+[useSelector](https://react-redux.js.org/api/hooks#useselector) hook, this hook
+works in a similar way.
+
+It allows you to extract data from the `meeting` object using a selector
+function.
+
+This hook will only cause a re-render when the actual data you returned for
+changes.
+
+Here is how you can get all the joined participants data:
+
+```jsx
+const joinedParticipants = usecocmdSelector(
+  (meeting) => meeting.participants.joined
+);
+```
+
+Refer to core [documentation for reference](/rn-core/reference/cocmdClient) on
+the various properties of the `meeting` object.
+
+### Example
+
+```jsx
+import React from 'react';
+import { View } from 'react-native';
+import { usecocmdMeeting, usecocmdSelector } from '@dytesdk/react-native-core';
+import { cocmdGrid, cocmdButton } from '@dytesdk/react-ui-kit';
+
+function Meeting() {
+  const { meeting } = usecocmdMeeting();
+  const roomJoined = usecocmdSelector((m) => m.self.roomJoined);
+
+  if (!roomJoined) {
+    return (
+      <div>
+        <p>You haven't joined the room yet.</p>
+        <cocmdButton onClick={() => meeting.joinRoom()}>Join Room</cocmdButton>
+      </div>
+    );
+  }
+
+  return (
+    <View style={{ height: '100', width: '100' }}>
+      <cocmdGrid meeting={meeting} />
+    </View>
+  );
+}
+
+export default Meeting;
+```

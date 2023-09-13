@@ -1,0 +1,18 @@
+---
+sidebar_position: 1
+---
+
+# cocmdMeeting (React component)
+
+cocmdMeeting is a React component that can be included in your React application
+to show the cocmd Meeting UI.
+
+## Props
+
+| Prop name     | Data type                      | Required | Use                                                                                                                                                       |
+| ------------- | ------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| onInit        | function(meeting: cocmdMeeting) | Yes      | On successful meeting creation, returns the meeting to the callback function provided (see [Meeting object](./meeting) for more details)                  |
+| onError       | function(error: Error)         | No       | On error during meeting creation, returns the relevant error to the callback function provided (see [Error handling](./../usage#errors) for more details) |
+| clientId      | string                         | Yes      | The `orgId` obtained from cocmd                                                                                                                            |
+| meetingConfig | ConnectionConfig               | Yes      | Meeting config object used to start the meeting (see [Connection config](./connection-config) for more details)                                           |
+| uiConfig      | cocmdUIConfig                   | No       | UI configuration options (see [UI layout](./dyte-ui-config) for more details)                                                                             |

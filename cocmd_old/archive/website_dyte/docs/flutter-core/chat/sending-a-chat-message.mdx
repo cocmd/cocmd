@@ -1,0 +1,46 @@
+---
+title: Sending a chat message
+description: Send a chat message in a meeting.
+sidebar_position: 2
+tags: [flutter-core, chat]
+---
+
+# Sending a chat message
+
+As mentioned in [introduction](./introduction), there are 3 types of chat
+messages - `text`, `images`, and `file`. There are methods in `cocmdChat` to send
+a message of each type.
+
+## Send a text message
+
+To send a text message, the `dyteClient.chat.sendTextMessage()` method can be
+used. It take a string `message` as an argument and sends it to the room.
+
+```dart
+final message = "Is this the real life?";
+dyteClient.chat.sendTextMessage(message);
+```
+
+## Send an image
+
+You can send an image with the help of `dyteClient.chat.sendImageMessage()` and
+sends it to the participants in the meeting.
+
+```dart
+final filePath = "file_path_of_image";
+final fileName = "file_name";
+dyteClient.chat.sendImageMessage(filePath, fileName);
+```
+
+## Send a file
+
+Sending a file is quite similar to sending an image. The only difference is that
+when you send an image, a preview will be shown in the meeting chat, which is
+not the case for sending files. That being said, an image can be sent as a file
+too using `dyteClient.chat.sendFileMessage()`.
+
+```dart
+final filePath = "file_path_of_image";
+final fileName = "file_name";
+dyteClient.chat.sendFileMessage(filePath, fileName);
+```

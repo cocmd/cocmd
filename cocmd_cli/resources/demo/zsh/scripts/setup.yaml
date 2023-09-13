@@ -1,0 +1,64 @@
+description: null
+name: setup
+spec:
+  alias: null
+  globals: []
+  variations:
+  - depends: []
+    env: linux
+    label: null
+    steps:
+    - content: "\n'''\n### Installation script ###\nhttps://gist.github.com/headrockz/8959b18d7ae69bb45e4b7421ace54fa0\n\
+        Shell -> zsh, oh-my-zsh\nTheme -> spaceship\nplugins -> git docker python\
+        \ zsh-syntax-highlighting zsh-autosuggstions web-search ssh-agent\n'''\n\n\
+        import os\n\n\ndef installZsh():\n    print(\"Installing zsh, git and curl\"\
+        )\n    os.system('sudo apt install zsh git curl -y && echo \"ZSH successfully\
+        \ installed\"')\n    print()\n\ndef installOhMyZsh():\n    print(\"installing\
+        \ oh-my-zsh\")\n    os.system('git clone https://github.com/ohmyzsh/ohmyzsh.git\
+        \ ~/.oh-my-zsh && echo \"oh-my-zsh successfully installed\"')\n    print()\n\
+        \n\ndef installZshSyntaxHighlighting():\n    print(\"Installing zsh-syntax-highlighting\"\
+        )\n    os.system(r'git clone https://github.com/zsh-users/zsh-syntax-highlighting.git\
+        \ ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && echo\
+        \ \"zsh-syntax-highlighting successfully installed\"')\n    print()\n\ndef\
+        \ installZshAutosuggestions():\n    print(\"Installing zsh-autosuggestions\"\
+        )\n    os.system(r'git clone https://github.com/zsh-users/zsh-autosuggestions\
+        \ ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && echo \"\
+        zsh-autosuggestions successfully installed\"')\n    print()\n\n\n\ndef installSpaceShip():\n\
+        \    print(\"Installing spaceship theme\")\n    os.system(r'git clone https://github.com/spaceship-prompt/spaceship-prompt.git\
+        \ ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship-prompt --depth=1')\n\
+        \    print(\"Creating symbolic link\")\n    os.system(r'ln -s ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship-prompt/spaceship.zsh-theme\
+        \ ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship.zsh-theme')\n    print()\n\
+        \ndef zshrc():\n    print(\"Cloning my .zshrc\")\n    os.system('git clone\
+        \ https://gist.github.com/28f52538d94785d737d852f938da7fde.git')\n    os.system('mv\
+        \ 28f52538d94785d737d852f938da7fde/.zshrc ~/')\n    os.system('sudo usermod\
+        \ --shell $(which zsh) $USER')\n\ninstallZsh()\ninstallOhMyZsh()\ninstallZshSyntaxHighlighting()\n\
+        installZshAutosuggestions()\ninstallSpaceShip()\nzshrc()\n\nprint('Close and\
+        \ reopen your terminal')\nprint('Have a nice day!')                    \n\
+        \                    "
+      description: install and setup zsh on your computer
+      runner: python
+      title: install-zsh
+  - depends: []
+    env: osx
+    label: null
+    steps:
+    - content: "\n\n    echo '\U0001F4BB Installing: zsh'\n    brew install zsh\n\
+        \    chsh -s $(which zsh)\n    curl -sS https://starship.rs/install.sh | sh\n\
+        \    touch ~/.zshrc\n                        "
+      description: install  zsh on your computer
+      runner: shell
+      title: install zsh
+    - content: "\n    echo '\U0001F4BB Installing: antigen'\n    mkdir ~/.antigen\n\
+        \    curl -L git.io/antigen > ~/.antigen/config.zsh\n\n    echo '\U0001F4BB\
+        \ Configuring: ZSH'\n    echo '\n    # antigen \n    source ~/.antigen/config.zsh\n\
+        \    antigen use oh-my-zsh\n    antigen bundle git\n    antigen bundle github\n\
+        \    antigen bundle git-flow\n    antigen bundle docker\n    antigen bundle\
+        \ docker-compose\n    antigen bundle asdf\n    antigen bundle node\n    antigen\
+        \ bundle npm\n    antigen bundle elixir\n    antigen bundle zsh-users/zsh-syntax-highlighting\n\
+        \    antigen bundle zsh-users/zsh-autosuggestions\n    antigen bundle zsh-users/zsh-completions\n\
+        \    antigen apply\n    # spaceship theme\n    eval \"$(starship init zsh)\"\
+        \n    ' >> ~/.zshrc"
+      description: configure  zsh on your computer
+      runner: shell
+      title: configure zsh
+title: Setup zsh

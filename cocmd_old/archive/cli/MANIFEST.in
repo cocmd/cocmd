@@ -1,0 +1,1 @@
+recursive-include cocmd_cli_app/ *

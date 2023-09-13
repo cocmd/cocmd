@@ -1,0 +1,49 @@
+description: setup
+name: devmachine
+spec:
+  alias: osx
+  globals: []
+  variations:
+  - depends: []
+    env: osx
+    label: null
+    steps:
+    - content: '
+
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+
+        echo ''# Set PATH, MANPATH, etc., for Homebrew.'' >> ~.zprofile
+
+        echo ''eval "$(/opt/homebrew/bin/brew shellenv)"'' >> ~/.zprofile
+
+
+
+
+        echo ''# Set PATH, MANPATH, etc., for Homebrew.'' >> ~.bash_profile
+
+        echo ''eval "$(/opt/homebrew/bin/brew shellenv)"'' >> ~/.bash_profile
+
+
+
+        '
+      description: '---'
+      runner: shell
+      title: install homebrew
+    - content: "\necho '\U0001F4BB Installing: basic'\nbrew install curl\nbrew install\
+        \ wget\nbrew install unzip\nbrew install tree\nbrew install neofetch\nbrew\
+        \ install wxwidgets\nbrew install libxslt fop\n\necho '\U0001F4BB Installing:\
+        \ CLI tools'\nbrew install git\n\n\necho '\U0001F4BB Configuring: git'\ngit\
+        \ config --global user.name \"$MY_NAME\"\ngit config --global user.email \"\
+        $MY_EMAIL\"\n\n"
+      description: '---'
+      runner: shell
+      title: install basics (curl, wget, unzip, git etc)
+    - content: "\n\nif ! pip3 help > /dev/null; then\n  echo \"installing python &\
+        \ pip ...\"\n  #brew install python2\n  brew install python3\nfi\n\n\nwget\
+        \ https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O\
+        \ ~/miniconda.sh\nbash ~/miniconda.sh -b -p $HOME/miniconda\n\n\n"
+      description: '---'
+      runner: shell
+      title: install python essentials
+title: setup osx dev machine

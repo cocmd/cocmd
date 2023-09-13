@@ -1,0 +1,87 @@
+description: setup Kubernetes for desktop
+name: setup
+spec:
+  alias: null
+  globals:
+  - content: "\n# Kubernetes is awesome\n## cheers\n### all good\n               \
+      \     "
+    description: ''
+    id: kube_instructions_md
+    runner: markdown
+    title: Instructions
+  variations:
+  - depends: []
+    env: linux
+    label: debian
+    steps:
+    - ref: kube_instructions_md
+    - content: '
+
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+        curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+
+        echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+        kubectl version --client
+
+        rm -rf kubectl kubectl.sha256
+
+        '
+      description: This will install kubectl on your machine
+      runner: shell
+      title: Install kubectl
+    - content: "\n                    sudo git clone https://github.com/ahmetb/kubectx\
+        \ /usr/local/kubectx\n                    sudo ln -s /usr/local/kubectx/kubectx\
+        \ /usr/local/bin/kubectx\n                    sudo ln -s /usr/local/kubectx/kubens\
+        \ /usr/local/bin/kubens\n                    "
+      description: ''
+      runner: shell
+      title: Install kubectx
+    - content: "\n                    \n                    sudo apt-get install -y\
+        \ conntrack\n\n                    # Download minikube\n                 \
+        \   wget https://github.com/kubernetes/minikube/releases/download/v0.24.0/minikube_0.24-0.deb\n\
+        \n                    # Install minikube\n                    sudo dpkg -i\
+        \ minikube_0.24-0.deb\n\n                    rm -rf minikube_0.24-0.deb\n\n\
+        \                    # Start minikube vm-driver=none option\n\n          \
+        \          sudo minikube start --vm-driver=none\n\n                    # Change\
+        \ permission\n                    sudo chown -R $USER $HOME/.kube\n      \
+        \              sudo chgrp -R $USER $HOME/.kube\n                    sudo chown\
+        \ -R $USER $HOME/.minikube\n                    sudo chgrp -R $USER $HOME/.minikube\n\
+        \n                    # Make sure that minikube is running\n             \
+        \       kubectl get pods --all-namespaces\n                    "
+      description: ''
+      runner: shell
+      title: Install Minikube
+  - depends:
+    - installed:brew
+    env: osx
+    label: '>10.x.x'
+    steps:
+    - content: 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+        curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+
+        echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+        kubectl version --client
+
+        rm -rf kubectl kubectl.sha256
+
+        '
+      description: This will install kubectl on your machine
+      runner: shell
+      title: Install kubectl
+    - content: brew install kubectx
+      description: ''
+      runner: shell
+      title: Install kubectx
+    - content: brew install minikube
+      description: ''
+      runner: shell
+      title: Install Minikube
+title: Setup Kubernetes

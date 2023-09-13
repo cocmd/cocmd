@@ -1,0 +1,165 @@
+---
+title: Participant Events
+description: Event handling for participants.
+sidebar_position: 3
+tags: [flutter-core, participants, self]
+---
+
+## Participant joined
+
+Trigger an event when any participant joins the meeting.
+
+```dart
+class ParticipantsEventListener extends cocmdPartcipantEventsListener {
+  ...
+  @override
+  void onParticipantJoin(cocmdMeetingParticipant participant) {
+    // your code here to handle new participant
+  }
+  ...
+}
+```
+
+## Participant updated
+
+Trigger an event when any participant update in meeting. For example, when a participant changes their name.
+
+```dart
+...
+
+@override
+void onParticipantUpdated(cocmdMeetingParticipant participant) {
+         // your code here to handle new participant
+}
+
+...
+```
+
+## Participant left
+
+Trigger an event when any participant leaves the meeting.
+
+```dart
+...
+
+@override
+void onParticipantLeave(cocmdMeetingParticipant participant) {
+         // your code here to handle participant left from meeting
+}
+
+...
+```
+
+## Video update
+
+Trigger an event when any participant starts or stops the video.
+
+```dart
+...
+
+@override
+void onVideoUpdate({
+ required bool videoEnabled,
+ required cocmdMeetingParticipant participant,
+}) {
+         // your code here to handle participant video toggle update
+}
+
+...
+```
+
+## Video view
+
+To access the video view of a participant, create an object of the `VideoView` class.
+
+```dart
+// To show the video of a participant
+final videoView = VideoView(meetingParticipant: participant);
+// To get video view for a local user
+final selfVideoView = VideoView(isSelfTrue: true);
+```
+
+## Audio update
+
+Triggers an event when a participant starts or stops the audio.
+
+```dart
+...
+
+@override
+void onAudioUpdate({
+ required bool audioEnabled,
+ required cocmdMeetingParticipant participant,
+}) {
+    // your code here to handle participant audio toggle update
+}
+
+...
+```
+
+## Screen share update
+
+Triggers an event when a participant starts or stops screen share.
+
+```dart
+...
+
+@override
+void onScreenShareStarted(cocmdMeetingParticipant participant) {
+  /// handle screen share started of `cocmdMeetingParticipant` participant
+}
+
+@override
+void onScreenShareEnded(cocmdMeetingParticipant participant) {
+  /// handle screen share ended of `cocmdMeetingParticipant` participant
+}
+
+...
+```
+
+## Screen share participants list
+
+Obtain the list of the screenshare participants, using the `participants.screenshares` function which returns a `cocmdRoomParticipants` object that maintains a record of participants who have joined, pinned, and screenshared. This object updates with each `onUpdate` call.
+
+## Screen share view
+
+To get the screenshare widget, create an object of the `ScreenshareView` class.
+
+```dart
+// To show screenshare of a participant
+final screenshareView = ScreenShareView(meetingParticipant);
+```
+
+## Active Participants changed
+
+This event is triggered when the active participant changes, for example, when the user moves to the next page of participants. It provides the list of participants on the current page.
+
+```dart
+...
+
+@override
+void onActiveParticipantsChanged(List<cocmdMeetingParticipant> active) {
+  /// handle active participants changed
+}
+
+...
+```
+
+Other callbacks:
+
+- <span style={{ fontSize: '1em', fontWeight: 'bold' }}>
+    onActiveSpeakerChanged(cocmdMeetingParticipant participant)
+  </span>
+  : Triggered when active speaker is changed to <code>participant</code>.
+- <span style={{ fontSize: '1em', fontWeight: 'bold' }}>
+    onNoActiveSpeaker()
+  </span>
+  : Triggered when there is no active participant.
+- <span style={{ fontSize: '1em', fontWeight: 'bold' }}>
+    onParticipantPinned(cocmdMeetingParticipant participant)
+  </span>
+  : Triggered when the <code>participant</code> is pinned.
+- <span style={{ fontSize: '1em', fontWeight: 'bold' }}>
+    onParticipantUnpinned(cocmdMeetingParticipant participant)
+  </span>
+  : Trigerred when participant is unpinned.
