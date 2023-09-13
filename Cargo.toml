@@ -1,5 +1,5 @@
 [workspace]
 members = [
-  "cocmd_cli",
+  "cocmd",
   "xtask",
 ]
