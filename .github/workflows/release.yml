@@ -1,195 +1,321 @@
+# Huge thanks to Alacritty, as their configuration served as a starting point for this one!
+# See: https://github.com/alacritty/alacritty
+
 name: Release
+
 on:
-  # schedule:
-  # - cron: '0 0 * * *' # midnight UTC
-
   push:
-    tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+'
-    ## - release
+    branches:
+      - master
+      - dev
 
-# 1. set up:
-# secrets.COMMITTER_TOKEN - for pushing update to brew tap
-# first placeholder formula in brew tap - for updating
-
-# 2. fill these in and you're done.
 env:
-  BIN_NAME: cocmd
-  PROJECT_NAME: cocmd
-  REPO_NAME: mzsrtgzr2/cocmd
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CARGO_TERM_COLOR: always
 
 jobs:
-  dist:
-    name: Dist
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # don't fail other jobs if one fails
-      matrix:
-        build: [x86_64-linux, x86_64-macos, aarch64-macos, x86_64-windows] #, x86_64-win-gnu, win32-msvc aarch64-linux, 
-        include:
-        - build: x86_64-linux
-          os: ubuntu-20.04
-          rust: stable
-          target: x86_64-unknown-linux-gnu
-          cross: false
-
-        # - build: aarch64-linux # this fails on openssl
-        #   os: ubuntu-20.04
-        #   rust: stable
-        #   target: aarch64-unknown-linux-gnu
-        #   cross: true
-
-        - build: x86_64-macos
-          os: macos-latest
-          rust: stable
-          target: x86_64-apple-darwin
-          cross: false
-        - build: x86_64-windows
-          os: windows-2019
-          rust: stable
-          target: x86_64-pc-windows-msvc
-          cross: false
-        - build: aarch64-macos
-          os: macos-latest
-          rust: stable
-          target: aarch64-apple-darwin
-        # - build: aarch64-macos
-        #   os: macos-latest
-        #   rust: stable
-        #   target: aarch64-apple-darwin
-        # - build: x86_64-win-gnu
-        #   os: windows-2019
-        #   rust: stable-x86_64-gnu
-        #   target: x86_64-pc-windows-gnu
-        # - build: win32-msvc
-        #   os: windows-2019
-        #   rust: stable
-        #   target: i686-pc-windows-msvc
-
+  extract-version:
+    name: extract-version
+    runs-on: ubuntu-latest
+    outputs:
+      cocmd_version: ${{ steps.version.outputs.version }}
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-
-      - name: Install ${{ matrix.rust }} toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
-          override: true
-
-      - name: Install OpenSSL
-        if: matrix.build == 'aarch64-linux'
-        run: sudo apt-get install libssl-dev pkg-config
-
-      - name: Run cargo test
-        if: matrix.build != 'aarch64-macos'
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: ${{ matrix.cross }}
-          command: test
-          args: --release --locked --target ${{ matrix.target }}
-
-      - name: Build release binary
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: ${{ matrix.cross }}
-          command: build
-          args: --release --locked --target ${{ matrix.target }}
-
-      - name: Strip release binary (linux and macos)
-        if: matrix.build == 'x86_64-linux' || matrix.build == 'x86_64-macos'
-        run: strip "target/${{ matrix.target }}/release/$BIN_NAME"
-
-      - name: Strip release binary (arm)
-        if: matrix.build == 'aarch64-linux'
+      - uses: actions/checkout@v2
+      - name: "Extract version"
+        id: "version"
         run: |
-          docker run --rm -v \
-            "$PWD/target:/target:Z" \
-            rustembedded/cross:${{ matrix.target }} \
-            aarch64-linux-gnu-strip \
-            /target/${{ matrix.target }}/release/$BIN_NAME
+          ESPANSO_VERSION=$(grep '^version' cocmd/Cargo.toml | awk -F '"' '{ print $2 }')
+          echo version: $ESPANSO_VERSION
+          echo "::set-output name=version::v$ESPANSO_VERSION"
 
-      - name: Build archive
-        shell: bash
-        run: |
-          rm -rf dist
-          mkdir dist
-          if [ "${{ matrix.os }}" = "windows-2019" ]; then
-            cp "target/${{ matrix.target }}/release/$BIN_NAME.exe" "dist/"
-          else
-            cp "target/${{ matrix.target }}/release/$BIN_NAME" "dist/"
-          fi
-
-      - uses: actions/upload-artifact@v2.2.4
-        with:
-          name: bins-${{ matrix.build }}
-          path: dist
-
-  publish:
-    name: Publish
-    needs: [dist]
+  create-release:
+    name: create-release
+    needs: ["extract-version"]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
-        with:
-          submodules: false
-
-      - uses: actions/download-artifact@v2
-        # with:
-        #   path: dist
-      # - run: ls -al ./dist
-      - run: ls -al bins-*
-
-      - name: Calculate tag name
+      - uses: actions/checkout@v2
+      - name: Create new release (only on master)
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          name=dev
-          if [[ $GITHUB_REF == refs/tags/v* ]]; then
-            name=${GITHUB_REF:10}
-          fi
-          echo ::set-output name=val::$name
-          echo TAG=$name >> $GITHUB_ENV
-        id: tagname
+          COMMIT_HASH=$(git rev-list --max-count=1 HEAD)
+          echo "Creating release: ${{ needs.extract-version.outputs.cocmd_version }}"
+          echo "for hash: $COMMIT_HASH"
+          gh release create ${{ needs.extract-version.outputs.cocmd_version }} \
+            -t ${{ needs.extract-version.outputs.cocmd_version }} \
+            --notes "Automatically released by CI" \
+            --prerelease \
+            --target $COMMIT_HASH
 
-      - name: Build archive
+  windows:
+    needs: ["extract-version", "create-release"]
+    runs-on: windows-latest
+
+    defaults:
+      run:
         shell: bash
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
         run: |
-          set -ex
-
-          rm -rf tmp
-          mkdir tmp
-          rm -rf dist
-          mkdir dist
-
-          for dir in bins-* ; do
-              platform=${dir#"bins-"}
-              if [[ $platform =~ "windows" ]]; then
-                  exe=".exe"
-              fi
-              pkgname=$PROJECT_NAME-$platform
-              mkdir tmp/$pkgname
-              # cp LICENSE README.md tmp/$pkgname
-              mv bins-$platform/$BIN_NAME$exe tmp/$pkgname
-              chmod +x tmp/$pkgname/$BIN_NAME$exe
-
-              if [ "$exe" = "" ]; then
-                  tar cJf dist/$pkgname.tar.xz -C tmp $pkgname
-              else
-                  (cd tmp && 7z a -r ../dist/$pkgname.zip $pkgname)
-              fi
-          done
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+      - name: Install rust-script and cargo-make
+        run: |
+          cargo install rust-script --version "0.7.0"
+          cargo install --force cargo-make --version 0.34.0
+      - name: Test
+        run: cargo make test-binary --profile release
+      - name: Build resources
+        run: cargo make build-windows-resources --profile release
+      - name: Sign resources
+        run: cargo make sign-windows-resources
+        env:
+          CODESIGN_PWD: ${{ secrets.WIN_CODESIGN_PWD }}
+          CODESIGN_CROSS_SIGNED_B64: ${{ secrets.WIN_CODESIGN_INTERMEDIATE_B64 }}
+          CODESIGN_CERTIFICATE_B64: ${{ secrets.WIN_CODESIGN_CERTIFICATE_B64 }}
+      - name: Build installer
+        run: cargo make build-windows-installer --profile release --skip-tasks build-windows-resources
+      - name: Sign installer
+        run: cargo make sign-windows-installer
+        env:
+          CODESIGN_PWD: ${{ secrets.WIN_CODESIGN_PWD }}
+          CODESIGN_CROSS_SIGNED_B64: ${{ secrets.WIN_CODESIGN_INTERMEDIATE_B64 }}
+          CODESIGN_CERTIFICATE_B64: ${{ secrets.WIN_CODESIGN_CERTIFICATE_B64 }}
+      - name: Build portable mode archive 
+        run: cargo make build-windows-portable --profile release --skip-tasks build-windows-resources
+      - name: Create portable mode archive
+        shell: powershell
+        run: |
+          Rename-Item target/windows/portable cocmd-portable
+          Compress-Archive target/windows/cocmd-portable target/windows/Cocmd-Win-Portable-x86_64.zip
+      - name: Calculate hashes
+        shell: powershell
+        run: |
+          Get-FileHash target/windows/Cocmd-Win-Portable-x86_64.zip -Algorithm SHA256 | select-object -ExpandProperty Hash > target/windows/Cocmd-Win-Portable-x86_64.zip.sha256.txt
+          Get-FileHash target/windows/installer/Cocmd-Win-Installer-x86_64.exe -Algorithm SHA256 | select-object -ExpandProperty Hash > target/windows/installer/Cocmd-Win-Installer-x86_64.exe.sha256.txt
+      - uses: actions/upload-artifact@v2
+        name: "Upload artifacts"
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/*
-          file_glob: true
-          tag: ${{ steps.tagname.outputs.val }}
-          overwrite: true
+          name: Windows Artifacts
+          path: |
+            target/windows/installer/Cocmd-Win-Installer-x86_64.exe
+            target/windows/Cocmd-Win-Portable-x86_64.zip
+            target/windows/installer/Cocmd-Win-Installer-x86_64.exe.sha256.txt
+            target/windows/Cocmd-Win-Portable-x86_64.zip.sha256.txt
+      - name: Upload artifacts to Github Releases (if master)
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} target/windows/installer/Cocmd-Win-Installer-x86_64.exe target/windows/Cocmd-Win-Portable-x86_64.zip target/windows/installer/Cocmd-Win-Installer-x86_64.exe.sha256.txt target/windows/Cocmd-Win-Portable-x86_64.zip.sha256.txt
+  
+  linux-x11:
+    needs: ["extract-version", "create-release"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+      - name: Build docker image
+        run: |
+          sudo docker build -t cocmd-ubuntu . -f .github/scripts/ubuntu/Dockerfile
+      - name: Build AppImage
+        run: |
+          sudo docker run --rm -v "$(pwd):/shared" cocmd-ubuntu cocmd/.github/scripts/ubuntu/build_appimage.sh
+      - uses: actions/upload-artifact@v2
+        name: "Upload artifacts"
+        with:
+          name: Linux X11 Artifacts
+          path: |
+            Cocmd-X11.AppImage
+            Cocmd-X11.AppImage.sha256.txt
+      - name: Upload artifacts to Github Releases (if master)
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} Cocmd-X11.AppImage Cocmd-X11.AppImage.sha256.txt
+  
+  linux-deb:
+    needs: ["extract-version", "create-release"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+      - name: Build docker image
+        run: |
+          sudo docker build -t cocmd-ubuntu . -f .github/scripts/ubuntu/Dockerfile
+      - name: Build Deb packages
+        run: |
+          sudo docker run --rm -v "$(pwd):/shared" cocmd-ubuntu cocmd/.github/scripts/ubuntu/build_deb.sh
+      - uses: actions/upload-artifact@v2
+        name: "Upload artifacts"
+        with:
+          name: Ubuntu-Debian Artifacts
+          path: |
+            cocmd-debian-x11-amd64.deb
+            cocmd-debian-wayland-amd64.deb
+      - name: Upload artifacts to Github Releases (if master)
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} cocmd-debian-x11-amd64.deb cocmd-debian-wayland-amd64.deb cocmd-debian-x11-amd64-sha256.txt cocmd-debian-wayland-amd64-sha256.txt 
 
 
-      # homebrew: see rustwrap.yaml
+  macos-intel:
+    needs: ["extract-version", "create-release"]
+    runs-on: macos-11
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+      - name: Install rust-script and cargo-make
+        run: |
+          cargo install rust-script --version "0.7.0"
+          cargo install --force cargo-make --version 0.34.0
+      - name: Test
+        run: cargo make test-binary --profile release
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "10.13"
+      - name: Build
+        run: cargo make create-bundle --profile release
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "10.13"
+      - name: Codesign executable
+        env: 
+          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
+        run: |
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" buildcocmd.keychain 
+          security default-keychain -s buildcocmd.keychain
+          security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" buildcocmd.keychain
+          security import certificate.p12 -k buildcocmd.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" buildcocmd.keychain
+          /usr/bin/codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime target/mac/Cocmd.app -v
+      - name: "Notarize executable"
+        env:
+          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
+          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+        run: |
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "cocmd-notarytool-profile" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
+
+          echo "Creating temp notarization archive"
+          ditto -c -k --keepParent "target/mac/Cocmd.app" "notarization.zip"
+
+          echo "Notarize app"
+          xcrun notarytool submit "notarization.zip" --keychain-profile "cocmd-notarytool-profile" --wait
+
+          echo "Attach staple"
+          xcrun stapler staple "target/mac/Cocmd.app"
+      - name: Create ZIP archive
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent target/mac/Cocmd.app Cocmd-Mac-Intel.zip
+      - name: Calculate hashes
+        run: |
+          shasum -a 256 Cocmd-Mac-Intel.zip > Cocmd-Mac-Intel.zip.sha256.txt
+      - uses: actions/upload-artifact@v2
+        name: "Upload artifacts"
+        with:
+          name: Mac Intel Artifacts
+          path: |
+            Cocmd-Mac-Intel.zip
+            Cocmd-Mac-Intel.zip.sha256.txt
+      - name: Upload artifacts to Github Releases (if master)
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} Cocmd-Mac-Intel.zip Cocmd-Mac-Intel.zip.sha256.txt
+  
+  macos-m1:
+    needs: ["extract-version", "create-release"]
+    runs-on: macos-11
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+      - name: Install rust target
+        run: rustup update && rustup target add aarch64-apple-darwin
+      - name: Install rust-script and cargo-make
+        run: |
+          cargo install rust-script --version "0.7.0"
+          cargo install --force cargo-make --version 0.34.0
+      - name: Build
+        run: cargo make create-bundle --profile release --env BUILD_ARCH=aarch64-apple-darwin
+      - name: Codesign executable
+        env: 
+          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
+        run: |
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" buildcocmd.keychain 
+          security default-keychain -s buildcocmd.keychain
+          security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" buildcocmd.keychain
+          security import certificate.p12 -k buildcocmd.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" buildcocmd.keychain
+          /usr/bin/codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime target/mac/Cocmd.app -v
+      - name: "Notarize executable"
+        env:
+          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
+          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+        run: |
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "cocmd-notarytool-profile" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
+
+          echo "Creating temp notarization archive"
+          ditto -c -k --keepParent "target/mac/Cocmd.app" "notarization.zip"
+
+          echo "Notarize app"
+          xcrun notarytool submit "notarization.zip" --keychain-profile "cocmd-notarytool-profile" --wait
+
+          echo "Attach staple"
+          xcrun stapler staple "target/mac/Cocmd.app"
+      - name: Create ZIP archive
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent target/mac/Cocmd.app Cocmd-Mac-M1.zip
+      - name: Calculate hashes
+        run: |
+          shasum -a 256 Cocmd-Mac-M1.zip > Cocmd-Mac-M1.zip.sha256.txt
+      - uses: actions/upload-artifact@v2
+        name: "Upload artifacts"
+        with:
+          name: Mac M1 Artifacts
+          path: |
+            Cocmd-Mac-M1.zip
+            Cocmd-Mac-M1.zip.sha256.txt
+      - name: Upload artifacts to Github Releases (if master)
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} Cocmd-Mac-M1.zip Cocmd-Mac-M1.zip.sha256.txt
+
+  macos-publish-homebrew:
+    needs: ["extract-version", "create-release", "macos-m1", "macos-intel"]
+    runs-on: macos-11
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+
+      - name: "Setup SSH deploy key"
+        uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: ${{ secrets.HOMEBREW_CASK_SSH_PRIVATE_KEY }}
+      
+      - name: Create and Publish Homebrew Cask
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
+
+          echo "Cask formula has been published here: "
