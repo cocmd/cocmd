@@ -1,35 +1,9 @@
-use crate::consts;
 use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
-/// Recursively scan all files in the specified directory and its subdirectories up to a given depth.
-/// It looks for files with a name matching `source_label` and returns a list of paths to those files.
-///
-/// # Arguments
-///
-/// * `source_label` - The name of the file to search for in the directory and subdirectories.
-/// * `scan_depth` - The maximum depth to recursively search for files.
-///
-/// # Returns
-///
-/// A vector of strings representing the paths to files that match `source_label`.
-///
-/// # Example
-///
-/// ```rust
-/// let source_label = "/.../....";
-/// let scan_depth = 2;
-///
-/// let paths = find_cocmd_files(source_label, scan_depth);
-///
-/// for path in paths {
-///     println!("{}", path);
-/// }
-/// ```
-///
-/// This function is used to locate files with a specific name within a directory and its subdirectories.
-///
-/// Note: This function assumes that the current working directory is the starting point for the search.
+
+use crate::consts;
+
 pub fn find_cocmd_files(source_label: &Path, scan_depth: usize) -> Vec<String> {
     let mut result = Vec::new();
     let mut visited = HashSet::new();
