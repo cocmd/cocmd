@@ -1,10 +1,11 @@
+use std::path::Path;
+
 use anyhow::Result;
 use cocmd::core::source::Source;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::utils::repository::find_cocmd_files;
 use console::Style;
 use dialoguer::Confirm;
-use std::path::Path;
 use tracing::info;
 
 pub fn add_source(sources_manager: &mut SourcesManager, source: &str) -> Result<cocmd::CmdExit> {
