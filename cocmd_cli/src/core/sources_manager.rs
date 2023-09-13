@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::Settings;
 use crate::core::source::Source;
-use crate::utils::io::{file_write_lines, file_read_lines};
+use crate::utils::io::{file_read_lines, file_write_lines};
+use crate::Settings;
 
 use crate::core::models::source_config_model::Automation;
 use tracing::error;
@@ -39,7 +39,8 @@ impl SourcesManager {
     }
 
     fn save_sources(sources_file: &str, sources: &HashMap<String, Source>) {
-        let source_strings: Vec<String> = sources.values().map(|s| s.location.to_string()).collect();
+        let source_strings: Vec<String> =
+            sources.values().map(|s| s.location.to_string()).collect();
         let _ = file_write_lines(sources_file, &source_strings);
     }
 

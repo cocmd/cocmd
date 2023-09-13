@@ -1,6 +1,6 @@
+use crate::utils::sys::get_os;
 use crate::{consts, utils::sys::OS};
 use std::fs::{self, OpenOptions};
-use crate::utils::sys::get_os;
 
 #[derive(PartialEq, Eq)]
 pub struct Settings {
@@ -16,7 +16,6 @@ pub struct Settings {
 
 impl Settings {
     pub fn new(home: Option<&str>, terminal: Option<&str>) -> Self {
-
         let home = home.unwrap_or(&consts::HOME);
         let terminal = terminal.unwrap_or(&consts::DEFAULT_TERMINAL);
 
@@ -38,9 +37,8 @@ impl Settings {
             config_file,
             sources_file,
             scan_depth: 2,
-            os: get_os()
-            // sources_manager: SourcesManager::new(), // Initialize this
-            // credentials: CredsConfigModel::new(), // Initialize this
+            os: get_os(), // sources_manager: SourcesManager::new(), // Initialize this
+                          // credentials: CredsConfigModel::new(), // Initialize this
         }
     }
 

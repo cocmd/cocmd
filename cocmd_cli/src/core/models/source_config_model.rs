@@ -1,7 +1,7 @@
-use crate::utils::sys::OS;
-use crate::utils::io::{normalize_path, from_yaml_file, from_file};
-use serde_derive::{Serialize as Se, Deserialize as De};
 use super::script_model::{ScriptModel, StepModel};
+use crate::utils::io::{from_file, from_yaml_file, normalize_path};
+use crate::utils::sys::OS;
+use serde_derive::{Deserialize as De, Serialize as Se};
 use tracing::error;
 
 #[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
@@ -12,13 +12,12 @@ pub struct Automation {
 }
 
 impl Automation {
-    pub fn load_content(&self, location: &str)->Automation {
+    pub fn load_content(&self, location: &str) -> Automation {
         let mut automation_clone = self.clone();
         if let Some(file) = &self.file {
             let normalized_path = normalize_path(file, Some(location));
 
             match from_yaml_file::<ScriptModel>(&normalized_path) {
-
                 Ok(script_model) => {
                     let updated_steps: Vec<StepModel> = script_model
                         .steps
@@ -69,7 +68,6 @@ impl Automation {
     }
 }
 
-
 #[derive(Debug, Se, De, PartialEq, Eq, Hash)]
 pub struct SourceConfigModel {
     pub name: String,
@@ -77,4 +75,3 @@ pub struct SourceConfigModel {
     pub paths: Option<Vec<String>>,
     pub automations: Option<Vec<Automation>>,
 }
-

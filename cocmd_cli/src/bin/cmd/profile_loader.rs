@@ -1,8 +1,7 @@
-use cocmd::core::sources_manager::SourcesManager;
 use anyhow::Result;
+use cocmd::core::sources_manager::SourcesManager;
 
 pub fn run_profile_loader(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdExit> {
-
     for source in sources_manager.sources.values().into_iter() {
         println!("#cocmd aliases for source {}", source.name());
 
@@ -14,7 +13,13 @@ pub fn run_profile_loader(sources_manager: &mut SourcesManager) -> Result<cocmd:
 
         // Apply automations as aliases
         for automation in &source.automations(&sources_manager.settings) {
-            println!(r#"alias {}.{}="cocmd run {}.{}""#, source.name(), automation.name, source.name(), automation.name);
+            println!(
+                r#"alias {}.{}="cocmd run {}.{}""#,
+                source.name(),
+                automation.name,
+                source.name(),
+                automation.name
+            );
         }
 
         println!("# cocmd paths for source {}", source.name());
@@ -23,7 +28,6 @@ pub fn run_profile_loader(sources_manager: &mut SourcesManager) -> Result<cocmd:
             println!(r#"export PATH="{}:$PATH""#, p);
         }
     }
-    
 
     Ok(cocmd::CmdExit {
         code: exitcode::OK,

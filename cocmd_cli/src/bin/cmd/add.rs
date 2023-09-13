@@ -1,6 +1,6 @@
 use anyhow::Result;
-use cocmd::core::sources_manager::SourcesManager;
 use cocmd::core::source::Source;
+use cocmd::core::sources_manager::SourcesManager;
 use cocmd::utils::repository::find_cocmd_files;
 use console::Style;
 use dialoguer::Confirm;
@@ -26,11 +26,14 @@ pub fn add_source(sources_manager: &mut SourcesManager, source: &str) -> Result<
         locations.len(),
         lst_locs
     );
-    
-    if Confirm::new().with_prompt("Do you want to continue?").interact()? {
+
+    if Confirm::new()
+        .with_prompt("Do you want to continue?")
+        .interact()?
+    {
         for loc in locations {
             let source = Source::new(&loc, &sources_manager.settings);
-            if let Ok(source_res) = source{
+            if let Ok(source_res) = source {
                 sources_manager.add_source(source_res);
                 println!("{}", style.apply_to(format!("Source '{:?}' added", loc)));
             }

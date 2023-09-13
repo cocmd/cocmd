@@ -1,13 +1,12 @@
-use std::fs;
-use std::io::{Write, BufRead};
-use std::os::unix::prelude::PermissionsExt;
-use std::path::{Path, PathBuf};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::error::Error;
+use std::fs;
 use std::fs::File;
 use std::io::Read;
-
+use std::io::{BufRead, Write};
+use std::os::unix::prelude::PermissionsExt;
+use std::path::{Path, PathBuf};
 
 /// Normalizes a path by joining it with a base path if provided and resolving to an absolute path.
 ///
@@ -145,9 +144,6 @@ pub fn get_tmp() -> PathBuf {
 pub fn chmod_x(file: &str) {
     fs::set_permissions(file, fs::Permissions::from_mode(0o755)).unwrap();
 }
-
-
-
 
 // Function to serialize a value to YAML and write it to a file
 pub fn to_yaml_file<T>(data: &T, file: &str) -> Result<(), Box<dyn Error>>

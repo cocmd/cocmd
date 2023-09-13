@@ -1,10 +1,10 @@
-use std::path::Path;
-use std::fs;
 use crate::consts;
-use crate::core::models::source_config_model::SourceConfigModel;
-use crate::utils::io::{from_yaml_file, exists, normalize_path};
-use crate::Settings;
 use crate::core::models::source_config_model::Automation;
+use crate::core::models::source_config_model::SourceConfigModel;
+use crate::utils::io::{exists, from_yaml_file, normalize_path};
+use crate::Settings;
+use std::fs;
+use std::path::Path;
 use tracing::error;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -26,13 +26,12 @@ impl Source {
                 .to_str()
                 .unwrap_or("")
                 .to_string();
-            
-            let config_file_path = Path::new(&source.location)
-                .join(consts::SOURCE_CONFIG_FILE);
-            
+
+            let config_file_path = Path::new(&source.location).join(consts::SOURCE_CONFIG_FILE);
+
             if config_file_path.exists() {
-                let config: Result<SourceConfigModel, String> = from_yaml_file(&config_file_path.to_str().unwrap())
-    .map_err(|e| e.to_string());
+                let config: Result<SourceConfigModel, String> =
+                    from_yaml_file(&config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
                 match config {
                     Ok(config_res) => {
                         // Successfully loaded the configuration
@@ -47,7 +46,10 @@ impl Source {
                     }
                 }
             } else {
-                return Err(format!("Config Path {:?} does not exist.", config_file_path));    
+                return Err(format!(
+                    "Config Path {:?} does not exist.",
+                    config_file_path
+                ));
             }
         } else {
             return Err(format!("Source Path {} does not exist.", source.location));
@@ -75,10 +77,11 @@ impl Source {
     pub fn paths(&self) -> Vec<String> {
         match &self.cocmd_config {
             Some(config) => {
-                match &config.paths{
-                    Some(paths) => {
-                        paths.iter().map(|p| normalize_path(p, Some(&self.location))).collect()
-                    }
+                match &config.paths {
+                    Some(paths) => paths
+                        .iter()
+                        .map(|p| normalize_path(p, Some(&self.location)))
+                        .collect(),
                     None => vec![], // or any other default behavior
                 }
             }
@@ -87,15 +90,14 @@ impl Source {
     }
 
     pub fn automations(&self, settings: &Settings) -> Vec<Automation> {
-
         let mut result = vec![];
 
         if let Some(source_config) = &self.cocmd_config {
-            if let Some(automations) = &source_config.automations{
+            if let Some(automations) = &source_config.automations {
                 for automation in automations.iter() {
                     let automation_loaded = automation.load_content(&self.location);
                     if automation_loaded.supports_os(&settings.os) {
-                        result.push( automation_loaded );
+                        result.push(automation_loaded);
                     }
                 }
             }

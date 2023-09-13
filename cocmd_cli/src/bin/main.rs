@@ -1,12 +1,12 @@
 mod cmd;
-use cocmd::Settings;
 use clap::{Parser, Subcommand};
 use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;
+use cocmd::Settings;
 
-use crate::cmd::run::run_automation;
 use crate::cmd::profile_loader::run_profile_loader;
+use crate::cmd::run::run_automation;
 use crate::cmd::show::{show_source, show_sources};
 
 #[derive(Parser)]
@@ -23,45 +23,34 @@ struct Cli {
 enum Commands {
     ProfileLoader,
     Refresh,
-    Run {
-        name: Option<String>
-    },
+    Run { name: Option<String> },
     Show(ShowArgs),
     Add(AddArgs),
     Remove,
 }
 
-
-
 #[derive(Parser)]
 struct AddArgs {
     #[command(subcommand)]
-    add_commands: AddCommands
+    add_commands: AddCommands,
 }
-
 
 #[derive(Subcommand)]
 enum AddCommands {
-    Source{
-        name: String
-    }
+    Source { name: String },
 }
 
 #[derive(Parser)]
 struct ShowArgs {
     #[command(subcommand)]
-    show_commands: ShowCommands
+    show_commands: ShowCommands,
 }
-
 
 #[derive(Subcommand)]
 enum ShowCommands {
-    Source{
-        name: String
-    },
-    Sources
+    Source { name: String },
+    Sources,
 }
-
 
 #[derive(Subcommand)]
 enum Remove {
@@ -97,7 +86,7 @@ fn main() {
         Commands::Refresh => {
             println!("'cocmd refresh' was used");
         }
-        Commands::Run {name} => {
+        Commands::Run { name } => {
             let _ = run_automation(&mut sources_manager, name);
         }
         Commands::Show(args) => match args.show_commands {
@@ -110,7 +99,7 @@ fn main() {
         },
         Commands::Add(args) => match args.add_commands {
             AddCommands::Source { name } => {
-                add::add_source(&mut sources_manager,&name);
+                add::add_source(&mut sources_manager, &name);
             }
         },
         Commands::Remove => {
@@ -118,4 +107,3 @@ fn main() {
         }
     }
 }
-

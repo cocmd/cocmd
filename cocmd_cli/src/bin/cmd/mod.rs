@@ -1,18 +1,17 @@
 pub mod add;
-pub mod run;
 pub mod profile_loader;
+pub mod run;
 pub mod show;
 use std::process::exit;
 
 use anyhow::Result;
-use console::Style;
 use cocmd::CmdExit;
+use console::Style;
 use tracing::debug;
 use tracing::metadata::LevelFilter;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Registry};
-
 
 pub fn tracing(verbose: bool) {
     let level = if verbose {
@@ -52,4 +51,3 @@ pub fn result_exit(res: Result<CmdExit>) {
     };
     exit(exit_with)
 }
-

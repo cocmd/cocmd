@@ -1,15 +1,15 @@
-use serde_derive::{Serialize, Deserialize};
 use crate::utils::sys::OS;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub enum StepRunnerType {
-    #[serde(alias="shell", alias="SHELL")]
+    #[serde(alias = "shell", alias = "SHELL")]
     SHELL,
-    #[serde(alias="markdown", alias="MARKDOWN")]
+    #[serde(alias = "markdown", alias = "MARKDOWN")]
     MARKDOWN,
-    #[serde(alias="python", alias="PYTHON")]
+    #[serde(alias = "python", alias = "PYTHON")]
     PYTHON,
-    #[serde(alias="link", alias="LINK")]
+    #[serde(alias = "link", alias = "LINK")]
     LINK,
 }
 

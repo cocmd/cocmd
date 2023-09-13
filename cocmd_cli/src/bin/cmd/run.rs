@@ -1,17 +1,23 @@
 use std::process;
 
 use anyhow::Result;
-use cocmd::core::{sources_manager::SourcesManager, models::script_model::{StepModel, StepRunnerType, ScriptModel}};
+use cocmd::core::{
+    models::script_model::{ScriptModel, StepModel, StepRunnerType},
+    sources_manager::SourcesManager,
+};
 use dialoguer::{theme::ColorfulTheme, Select};
 
-use std::process::{Command, Stdio};
-use execute::{Execute, shell};
 use cocmd::utils::sys::OS;
+use execute::{shell, Execute};
+use std::process::{Command, Stdio};
 
-use tracing::{info, error};
 use termimad;
+use tracing::{error, info};
 
-pub fn run_automation(sources_manager: &mut SourcesManager, specific_name: Option<String>) -> Result<cocmd::CmdExit> {
+pub fn run_automation(
+    sources_manager: &mut SourcesManager,
+    specific_name: Option<String>,
+) -> Result<cocmd::CmdExit> {
     let available_automations = sources_manager.automations();
 
     let selected_name = match specific_name {
@@ -33,11 +39,13 @@ pub fn run_automation(sources_manager: &mut SourcesManager, specific_name: Optio
     };
 
     if let Some(automation) = available_automations.get(&selected_name) {
-        
         // let output = ScriptRunner::run(script, &settings.os, &script_args, &settings, auto_yes);
         // info!("{:?}", script);
         // let output = script.content;
-        handle_script(&automation.content.as_ref().unwrap(), sources_manager.settings.os);
+        handle_script(
+            &automation.content.as_ref().unwrap(),
+            sources_manager.settings.os,
+        );
         // info!("[blue] Script executed:");
         // for line in output {
         //     info!(" - {}", line);
@@ -73,7 +81,6 @@ fn handle_step(step: &StepModel, env: OS) {
         StepRunnerType::SHELL => {
             skin.print_text(&format!("# running step - {}", &step.title));
             interactive_shell(step);
-            
         }
         StepRunnerType::MARKDOWN => {
             // Print Markdown content
@@ -116,7 +123,6 @@ fn handle_step(step: &StepModel, env: OS) {
                 OS::Other => todo!(),
                 OS::ANY => todo!(),
             }
-        
         }
     }
 }
