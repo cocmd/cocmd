@@ -17,7 +17,7 @@ pub struct Settings {
 impl Settings {
     pub fn new(home: Option<&str>, terminal: Option<&str>) -> Self {
         let home = home.unwrap_or(&consts::HOME);
-        let terminal = terminal.unwrap_or(&consts::DEFAULT_TERMINAL);
+        let terminal = terminal.unwrap_or(consts::DEFAULT_TERMINAL);
 
         let config_file = format!("{}/{}", home, consts::CONFIG_FILE);
         let sources_file = format!("{}/{}", home, consts::SOURCES_FILE);

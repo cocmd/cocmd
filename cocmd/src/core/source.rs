@@ -1,11 +1,13 @@
+use std::path::Path;
+use std::{fmt, fs};
+
+use tracing::error;
+
 use crate::consts;
 use crate::core::models::source_config_model::Automation;
 use crate::core::models::source_config_model::SourceConfigModel;
 use crate::utils::io::{exists, from_yaml_file, normalize_path};
 use crate::Settings;
-use std::fs;
-use std::path::Path;
-use tracing::error;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct Source {
@@ -31,7 +33,7 @@ impl Source {
 
             if config_file_path.exists() {
                 let config: Result<SourceConfigModel, String> =
-                    from_yaml_file(&config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
                 match config {
                     Ok(config_res) => {
                         // Successfully loaded the configuration
@@ -46,13 +48,13 @@ impl Source {
                     }
                 }
             } else {
-                return Err(format!(
+                Err(format!(
                     "Config Path {:?} does not exist.",
                     config_file_path
-                ));
+                ))
             }
         } else {
-            return Err(format!("Source Path {} does not exist.", source.location));
+            Err(format!("Source Path {} does not exist.", source.location))
         }
     }
 
@@ -108,8 +110,10 @@ impl Source {
     pub fn location(&self) -> &str {
         &self.location
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.location.to_string()
+impl fmt::Display for Source {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.location.to_string())
     }
 }

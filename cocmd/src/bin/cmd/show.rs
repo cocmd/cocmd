@@ -51,17 +51,17 @@ pub fn show_source(sources_manager: &SourcesManager, name: String) -> Result<coc
     skin.print_text(&format!("- location: {}", source.location()));
 
     if let Some(alias) = &source.aliases() {
-        skin.print_text(&format!("## aliases"));
+        skin.print_text("## aliases");
         skin.print_text(&format!("```{}```", alias));
     }
 
-    skin.print_text(&format!("## automations"));
+    skin.print_text("## automations");
     // Apply automations as aliases
     for automation in &source.automations(&sources_manager.settings) {
         skin.print_text(&format!("- `{}.{}`", name, automation.name));
     }
 
-    skin.print_text(&format!("## paths"));
+    skin.print_text("## paths");
 
     for p in &source.paths() {
         skin.print_text(&format!("- `{}`", p));

@@ -43,7 +43,7 @@ pub fn run_automation(
         // info!("{:?}", script);
         // let output = script.content;
         handle_script(
-            &automation.content.as_ref().unwrap(),
+            automation.content.as_ref().unwrap(),
             sources_manager.settings.os,
         );
         // info!("[blue] Script executed:");
@@ -63,7 +63,7 @@ pub fn run_automation(
 }
 
 fn interactive_shell(step: &StepModel) {
-    let mut command = shell(&step.content.as_ref().unwrap());
+    let mut command = shell(step.content.as_ref().unwrap());
 
     command.stdout(Stdio::piped());
     command.stdin(Stdio::piped());
