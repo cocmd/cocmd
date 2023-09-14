@@ -3,16 +3,16 @@
 targets:
   - platform: win32
     arch: x64
-    url_template: https://github.com/mzsrtgzr2/releases/download/v__VERSION__/cocmd-x86_64-windows.zip
+    url_template: https://github.com/cocmd/releases/download/v__VERSION__/cocmd-x86_64-windows.zip
   - platform: linux
     arch: x64
-    url_template: https://github.com/mzsrtgzr2/releases/download/v__VERSION__/cocmd-x86_64-linux.tar.xz
+    url_template: https://github.com/cocmd/releases/download/v__VERSION__/cocmd-x86_64-linux.tar.xz
   - platform: darwin
     arch: x64
-    url_template: https://github.com/mzsrtgzr2/releases/download/v__VERSION__/cocmd-x86_64-macos.tar.xz
+    url_template: https://github.com/cocmd/releases/download/v__VERSION__/cocmd-x86_64-macos.tar.xz
   - platform: darwin
     arch: arm64
-    url_template: https://github.com/mzsrtgzr2/releases/download/v__VERSION__/cocmd-aarch64-macos.tar.xz
+    url_template: https://github.com/cocmd/releases/download/v__VERSION__/cocmd-aarch64-macos.tar.xz
 
 brew:
   name: cocmd 
@@ -22,7 +22,7 @@ brew:
   recipe_template: |
     class __V_PROJECT_FORMULA__ < Formula
       desc "desc"
-      homepage "http://github.com/mzsrtgzr2"
+      homepage "http://github.com/cocmd"
       url "__URL__"
       version "__VERSION__"
       sha256 "__SHA__"

@@ -12,7 +12,7 @@ The easiest way to install Cocmd's CLI is using the install script:
 
 ```
 # Copy and run command to install the CLI.
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/mzsrtgzr2/cocmd/main/cli/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/cocmd/cocmd/main/cli/install.sh)"
 ```
 
 

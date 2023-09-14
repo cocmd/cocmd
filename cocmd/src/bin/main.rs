@@ -1,3 +1,4 @@
+#![allow(unused_must_use)]
 mod cmd;
 use clap::{Parser, Subcommand};
 use cmd::add;

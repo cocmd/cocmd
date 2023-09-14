@@ -2,12 +2,12 @@ pub mod add;
 pub mod profile_loader;
 pub mod run;
 pub mod show;
-use std::process::exit;
+// use std::process::exit;
 
-use anyhow::Result;
-use cocmd::CmdExit;
-use console::Style;
-use tracing::debug;
+// use anyhow::Result;
+// use cocmd::CmdExit;
+// use console::Style;
+// use tracing::debug;
 use tracing::metadata::LevelFilter;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -30,24 +30,24 @@ pub fn tracing(verbose: bool) {
         .init();
 }
 
-const DEFAULT_ERR_EXIT_CODE: i32 = 1;
-pub fn result_exit(res: Result<CmdExit>) {
-    let exit_with = match res {
-        Ok(cmd) => {
-            if let Some(message) = cmd.message {
-                let style = if exitcode::is_success(cmd.code) {
-                    Style::new().green()
-                } else {
-                    Style::new().red()
-                };
-                eprintln!("{}", style.apply_to(message));
-            }
-            cmd.code
-        }
-        Err(e) => {
-            debug!("{:?}", e);
-            DEFAULT_ERR_EXIT_CODE
-        }
-    };
-    exit(exit_with)
-}
+// const DEFAULT_ERR_EXIT_CODE: i32 = 1;
+// pub fn result_exit(res: Result<CmdExit>) {
+//     let exit_with = match res {
+//         Ok(cmd) => {
+//             if let Some(message) = cmd.message {
+//                 let style = if exitcode::is_success(cmd.code) {
+//                     Style::new().green()
+//                 } else {
+//                     Style::new().red()
+//                 };
+//                 eprintln!("{}", style.apply_to(message));
+//             }
+//             cmd.code
+//         }
+//         Err(e) => {
+//             debug!("{:?}", e);
+//             DEFAULT_ERR_EXIT_CODE
+//         }
+//     };
+//     exit(exit_with)
+// }

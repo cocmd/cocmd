@@ -2,7 +2,7 @@ use anyhow::Result;
 use cocmd::core::sources_manager::SourcesManager;
 use termimad;
 
-pub fn show_sources(sources_manager: &SourcesManager) -> Result<cocmd::CmdExit> {
+pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdExit> {
     let mut table = String::new();
     let skin = termimad::MadSkin::default();
 
@@ -43,7 +43,7 @@ pub fn show_sources(sources_manager: &SourcesManager) -> Result<cocmd::CmdExit> 
     })
 }
 
-pub fn show_source(sources_manager: &SourcesManager, name: String) -> Result<cocmd::CmdExit> {
+pub fn show_source(sources_manager: &mut SourcesManager, name: String) -> Result<cocmd::CmdExit> {
     let source = &sources_manager.sources[&name];
     let skin = termimad::MadSkin::default();
 

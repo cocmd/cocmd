@@ -20,7 +20,7 @@ setup(
     long_description='bla bla',
     author="Moshe Ro",
     author_email='mzsrtgzr2@gmail.com',
-    url='https://github.com/mzsrtgzr2/cocmd',
+    url='https://github.com/cocmd/cocmd',
     packages=['cocmd_cli_app'],
     entry_points={
         'console_scripts': [
