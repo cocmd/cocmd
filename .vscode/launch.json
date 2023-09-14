@@ -105,6 +105,26 @@
                 "docker"
             ],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "setup",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "setup",
+                
+            ],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
