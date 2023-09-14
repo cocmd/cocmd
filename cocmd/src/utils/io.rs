@@ -1,5 +1,3 @@
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -7,6 +5,9 @@ use std::io::Read;
 use std::io::{BufRead, Write};
 use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
+
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 /// Normalizes a path by joining it with a base path if provided and resolving to an absolute path.
 ///
@@ -55,7 +56,7 @@ pub fn exists(path: &str) -> bool {
 ///
 /// - `dir`: The directory path to create.
 pub fn mkdir(dir: &str) {
-    if let Err(_) = fs::create_dir_all(dir) {
+    if fs::create_dir_all(dir).is_err() {
         eprintln!("Failed to create directory: {}", dir);
     }
 }
@@ -66,7 +67,7 @@ pub fn mkdir(dir: &str) {
 ///
 /// - `file`: The file path to create.
 pub fn touch(file: &str) {
-    if let Err(_) = fs::File::create(file) {
+    if fs::File::create(file).is_err() {
         eprintln!("Failed to create file: {}", file);
     }
 }

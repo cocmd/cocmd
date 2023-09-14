@@ -114,6 +114,6 @@ impl Source {
 
 impl fmt::Display for Source {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.location.to_string())
+        write!(f, "{}", self.location)
     }
 }
