@@ -3,7 +3,7 @@
 
 #define MyAppName "Cocmd"
 #define MyAppVersion "{{{app_version}}}"
-#define MyAppPublisher "Federico Terzi"
+#define MyAppPublisher "Moshe Roth"
 #define MyAppURL "{{{app_url}}}"
 #define MyAppExeName "cocmdd.exe"
 #define MyAppUserModelID "{{5E3B6C0F-1A4D-45C4-8872-D8174702101A}"

@@ -1,5 +1,6 @@
 [workspace]
 members = [
   "cocmd",
-  "xtask",
+  "cocmd-package",
+  "cocmd-path"
 ]

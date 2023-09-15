@@ -3,6 +3,8 @@ name = "cocmd"
 version = "1.0.4"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
+license = "GPL-3.0"
+homepage = "https:/cocmd.org"
 
 
 
@@ -29,7 +31,8 @@ pkg-fmt = "txz"
 # </cargo binstall>
 
 [dependencies]
-
+cocmd-package = { path = "../cocmd-package"}
+cocmd-path = { path = "../cocmd-path"}
 clap = { version = "4", features = ["cargo", "derive"], optional = true }
 serde = "1"
 serde_json = "1"
