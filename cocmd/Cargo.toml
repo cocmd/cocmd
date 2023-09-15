@@ -58,6 +58,6 @@ cli = ["clap"]
 
 [[bin]]
 name = "cocmd"
-path = "src/bin/main.rs"
+path = "src/main.rs"
 
 required-features = ["cli"]
