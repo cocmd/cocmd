@@ -1,19 +1,25 @@
 #![allow(unused_must_use)]
 mod cmd;
 use clap::{Parser, Subcommand};
+use clap_markdown;
 use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::Settings;
 use tracing::error;
 
+use crate::cmd::docs::run_docs;
 use crate::cmd::profile_loader::run_profile_loader;
 use crate::cmd::run::run_automation;
 use crate::cmd::setup::run_setup;
 use crate::cmd::show::{show_source, show_sources};
 
 #[derive(Parser)]
-#[command(author = "Your Name", version = "1.0", about = "CoCmd CLI")]
+#[command(
+    author = "Moshe Roth",
+    version = "1.1.0",
+    about = "Cocmd is a cli utility to collaborate on anything in the CMD in the community and internal teams. Use it so sync Aliases, Scripts and Workflows that otherwise would go lost."
+)]
 struct Cli {
     #[arg(short, long)]
     verbose: bool,
@@ -26,6 +32,7 @@ struct Cli {
 enum Commands {
     ProfileLoader,
     Refresh,
+    Docs { name: Option<String> },
     Run { name: Option<String> },
     Show(ShowArgs),
     Add(AddArgs),
@@ -101,6 +108,11 @@ fn main() {
         }
         Commands::Refresh => {
             println!("'cocmd refresh' was used");
+        }
+        Commands::Docs { name } => {
+            let markdown: String = clap_markdown::help_markdown::<Cli>();
+            println!("{}", markdown);
+            res = run_docs(&mut sources_manager, name);
         }
         Commands::Run { name } => {
             res = run_automation(&mut sources_manager, name);

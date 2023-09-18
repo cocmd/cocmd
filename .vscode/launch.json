@@ -125,6 +125,26 @@
                 
             ],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "docs",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "docs",
+                
+            ],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
