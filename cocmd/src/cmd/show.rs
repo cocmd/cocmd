@@ -1,5 +1,10 @@
+#[cfg(feature = "howto")]
+use std::collections::HashMap;
+
 use anyhow::Result;
 use cocmd::core::sources_manager::SourcesManager;
+#[cfg(feature = "howto")]
+use levenshtein::levenshtein;
 use termimad;
 
 pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdExit> {
@@ -66,6 +71,37 @@ pub fn show_source(sources_manager: &mut SourcesManager, name: String) -> Result
     for p in &source.paths() {
         skin.print_text(&format!("- `{}`", p));
     }
+
+    Ok(cocmd::CmdExit {
+        code: exitcode::OK,
+        message: None,
+    })
+}
+
+#[cfg(feature = "howto")]
+pub fn howto(sources_manager: &mut SourcesManager, query: String) -> Result<cocmd::CmdExit> {
+    // lookup in all descriptions of automation for what matches best to query variable
+    // use tokenization and levenshtein distance to find best match
+
+    let mut best_match = String::new();
+    let mut best_match_score = usize::MAX;
+
+    // clean query with tfidf algorithm, call it query_clean
+    let query_clean = query.clone();
+
+    for (name, a) in sources_manager.automations().iter() {
+        let score = levenshtein(
+            &query,
+            a.content.as_ref().unwrap().description.as_ref().unwrap(),
+        );
+        if score < best_match_score {
+            best_match = name.clone();
+            best_match_score = score;
+        }
+    }
+
+    let skin = termimad::MadSkin::default();
+    skin.print_text(&best_match);
 
     Ok(cocmd::CmdExit {
         code: exitcode::OK,

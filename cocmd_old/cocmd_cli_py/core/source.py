@@ -1,7 +1,7 @@
 import os
-from cocmd_cli.consts import Consts
-from cocmd_cli.core.models.source_config_model import SourceConfigModel
-from cocmd_cli.utils.io import YamlIO, exists, normalize_path
+from cocmd.consts import Consts
+from cocmd.core.models.source_config_model import SourceConfigModel
+from cocmd.utils.io import YamlIO, exists, normalize_path
 
 
 class Source:

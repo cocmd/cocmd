@@ -1,14 +1,9 @@
 description: Monitor Docker resources
+env: any
 steps:
 - content: |
     # List all containers (including stopped)
     docker ps -a
-
-    # List all images
-    docker images
-
-    # Show real-time resource usage of containers
-    docker stats
   description: This will monitor Docker resources
   runner: shell
   title: Monitor Docker

@@ -1,12 +1,12 @@
 import click
 
-from cocmd_cli.core.source import Source
-from cocmd_cli.utils.repository import find_cocmd_files
+from cocmd.core.source import Source
+from cocmd.utils.repository import find_cocmd_files
 from ..groups import add
-from cocmd_cli.settings import click_pass_settings
+from cocmd.settings import click_pass_settings
 import inquirer
-from cocmd_cli.utils.console import console
-from cocmd_cli import resources
+from cocmd.utils.console import console
+from cocmd import resources
 import os
 
 

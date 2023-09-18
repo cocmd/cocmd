@@ -1,7 +1,7 @@
 import click
-from cocmd_cli.settings import click_pass_settings
-from cocmd_cli.commands.groups import remove
-from cocmd_cli.core.source import Source
+from cocmd.settings import click_pass_settings
+from cocmd.commands.groups import remove
+from cocmd.core.source import Source
 
 
 

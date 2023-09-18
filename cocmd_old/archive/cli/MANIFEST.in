@@ -1,1 +1,1 @@
-recursive-include cocmd_cli_app/ *
+recursive-include cocmd_app/ *

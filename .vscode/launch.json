@@ -145,6 +145,35 @@
                 
             ],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "howto",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                },
+                "env": {
+                    "LIBTORCH": "/opt/homebrew/Cellar/pytorch/2.0.1",
+                    "LD_LIBRARY_PATH": "/opt/homebrew/Cellar/pytorch/2.0.1/lib:"
+                }
+            },
+            "args": [
+                "howto",
+                "how to clean my docker env?"
+                
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "LIBTORCH": "/opt/homebrew/Cellar/pytorch/2.0.1",
+                "LD_LIBRARY_PATH": "/opt/homebrew/Cellar/pytorch/2.0.1/lib:"
+            }
         }
     ]
 }

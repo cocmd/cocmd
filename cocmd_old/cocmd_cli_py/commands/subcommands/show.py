@@ -1,6 +1,6 @@
-from cocmd_cli.settings import click_pass_settings
-from cocmd_cli.commands.groups import show
-from cocmd_cli.utils.console import console
+from cocmd.settings import click_pass_settings
+from cocmd.commands.groups import show
+from cocmd.utils.console import console
 
 
 @show.command()

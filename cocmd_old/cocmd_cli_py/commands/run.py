@@ -1,8 +1,8 @@
 import click
-from cocmd_cli.settings import click_pass_settings
-from cocmd_cli.core.script_runner import ScriptRunner
+from cocmd.settings import click_pass_settings
+from cocmd.core.script_runner import ScriptRunner
 import inquirer
-from cocmd_cli.utils.console import console, error_console
+from cocmd.utils.console import console, error_console
 
 
 @click.command(

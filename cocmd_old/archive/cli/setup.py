@@ -21,10 +21,10 @@ setup(
     author="Moshe Ro",
     author_email='mzsrtgzr2@gmail.com',
     url='https://github.com/cocmd/cocmd',
-    packages=['cocmd_cli_app'],
+    packages=['cocmd_app'],
     entry_points={
         'console_scripts': [
-            'cocmd=cocmd_cli_app:cli'
+            'cocmd=cocmd_app:cli'
         ]
     },
     include_package_data=True,

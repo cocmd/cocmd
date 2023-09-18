@@ -14,6 +14,13 @@ DEBUG = false
 RELEASE = true
 EXEC_PATH = "target/release/cocmd"
 
+# Helpers
+[tasks.update-cli-docs]
+script_runner = "@shell"
+script = '''
+cargo install --path cocmd && cocmd docs > ../cocmd-website/docs/cli-docs.md
+'''
+
 # Build variants
 
 # This one was written in Rust instead of bash because it has to run on Windows as well

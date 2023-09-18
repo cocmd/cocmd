@@ -4,10 +4,10 @@ version = "0.1.1"
 description = ""
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 readme = "README.md"
-packages = [{include = "cocmd_cli"}]
+packages = [{include = "cocmd"}]
 
 [tool.poetry.scripts]
-cocmd = "cocmd_cli:app"
+cocmd = "cocmd:app"
 
 [tool.poetry.dependencies]
 python = "^3.8"

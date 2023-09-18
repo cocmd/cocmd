@@ -8,7 +8,7 @@
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/cocmd_cli/target/debug/cocmd_cli",
+            "program": "${workspaceRoot}/cocmd/target/debug/cocmd",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
@@ -20,7 +20,7 @@
             "name": "add source demo",
             "type": "python",
             "request": "launch",
-            "module": "cocmd_cli",
+            "module": "cocmd",
             "justMyCode": false,
             "args": ["add", "source", "demo"]
         },
@@ -28,7 +28,7 @@
             "name": "run",
             "type": "python",
             "request": "launch",
-            "module": "cocmd_cli",
+            "module": "cocmd",
             "justMyCode": false,
             "args": ["run"]
         },
@@ -36,7 +36,7 @@
             "name": "profile-loader",
             "type": "python",
             "request": "launch",
-            "module": "cocmd_cli",
+            "module": "cocmd",
             "justMyCode": false,
             "args": ["profile-loader"]
         },
@@ -47,7 +47,7 @@
             "program": "/Users/morot/workspace/md-click/md_click/main.py",
             "args": [
                 "dumps",
-                "--baseModule=cocmd_cli",
+                "--baseModule=cocmd",
                 "--baseCommand=cli",
                 "--docsPath=./website/docs/cli"
             ],

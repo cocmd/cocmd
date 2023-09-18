@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from cocmd_cli.utils.io import DictLoader
+from cocmd.utils.io import DictLoader
 from typing import Optional
 
 

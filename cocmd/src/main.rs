@@ -12,79 +12,109 @@ use crate::cmd::docs::run_docs;
 use crate::cmd::profile_loader::run_profile_loader;
 use crate::cmd::run::run_automation;
 use crate::cmd::setup::run_setup;
+#[cfg(feature = "howto")]
+use crate::cmd::show::howto;
 use crate::cmd::show::{show_source, show_sources};
 
+/// Main CLI struct with meta-information
 #[derive(Parser)]
 #[command(
-    author = "Moshe Roth",
-    version = "1.1.0",
-    about = "Cocmd is a cli utility to collaborate on anything in the CMD in the community and internal teams. Use it so sync Aliases, Scripts and Workflows that otherwise would go lost."
+    author = "Moshe Roth",                             // Author of the CLI tool
+    version = "1.1.0",                               // Version of the CLI tool
+    about = "
+    Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
+    Use it to sync Aliases, Scripts, and Workflows."
 )]
 struct Cli {
+    /// Verbose flag for extra output
     #[arg(short, long)]
     verbose: bool,
 
+    /// Subcommands
     #[command(subcommand)]
     command: Commands,
 }
 
+/// Subcommands enum with meta-information
 #[derive(Subcommand)]
 enum Commands {
+    /// Profile Loader command - Loads profiles
     ProfileLoader,
+
+    /// Refresh command - Refreshes something (add a description here)
     Refresh,
-    Docs { name: Option<String> },
-    Run { name: Option<String> },
+
+    /// Docs command with a name argument - Generates and displays documentation
+    Docs {
+        /// Optional name argument for specific documentation generation
+        name: Option<String>,
+    },
+
+    /// Run command with a name argument - Runs a specific automation
+    Run {
+        /// Optional name argument for specifying which automation to run
+        name: Option<String>,
+    },
+    #[cfg(feature = "howto")]
+    Howto { query: String },
+
+    /// Show command with subcommands
     Show(ShowArgs),
+
+    /// Add command with subcommands
     Add(AddArgs),
+
+    /// Remove command (no subcommands) - Removes something (add a description here)
     Remove,
+
+    /// Setup command with a shell argument - Set up the CLI tool, specify shell
     Setup(SetupArgs),
 }
 
+/// Arguments for the 'add' subcommand with meta-information
 #[derive(Parser)]
 struct AddArgs {
+    /// Subcommands for 'add' command
     #[command(subcommand)]
     add_commands: AddCommands,
 }
 
+/// Subcommands enum for 'add' with meta-information
 #[derive(Subcommand)]
 enum AddCommands {
-    Source { name: String },
+    /// Source subcommand with a 'name' argument - Adds a source with a specified name
+    Source {
+        /// Name argument for 'add source' subcommand - Specifies the name of the source to add
+        name: String,
+    },
 }
 
+/// Arguments for the 'show' subcommand with meta-information
 #[derive(Parser)]
 struct ShowArgs {
+    /// Subcommands for 'show' command
     #[command(subcommand)]
     show_commands: ShowCommands,
 }
 
+/// Subcommands enum for 'show' with meta-information
 #[derive(Subcommand)]
 enum ShowCommands {
-    Source { name: String },
+    /// Source subcommand with a 'name' argument - Shows information about a specific source
+    Source {
+        /// Name argument for 'show source' subcommand - Specifies the name of the source to show
+        name: String,
+    },
+
+    /// Sources subcommand - Shows information about all sources
     Sources,
 }
 
-#[derive(Subcommand)]
-enum Remove {
-    Source(RemoveSourceArgs),
-}
-
-#[derive(Parser)]
-struct AddSourceArgs {
-    source: String,
-}
-
-#[derive(Parser)]
-struct RemoveSourceArgs {
-    source: String,
-}
-
-#[derive(Parser)]
-struct ShowSourceArgs {
-    source: String,
-}
-
+/// Arguments for the 'setup' subcommand with meta-information
 #[derive(Parser)]
 struct SetupArgs {
+    /// Optional shell argument for 'setup' command - Specifies the shell to set up
+    #[arg(short, long)]
     shell: Option<String>,
 }
 
@@ -116,6 +146,10 @@ fn main() {
         }
         Commands::Run { name } => {
             res = run_automation(&mut sources_manager, name);
+        }
+        #[cfg(feature = "howto")]
+        Commands::Howto { query } => {
+            res = howto(&mut sources_manager, query);
         }
         Commands::Show(args) => match args.show_commands {
             ShowCommands::Source { name } => {

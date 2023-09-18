@@ -1,4 +1,5 @@
 description: Cleanup Docker environment
+env: any
 steps:
 - content: |
     # Stop all running containers

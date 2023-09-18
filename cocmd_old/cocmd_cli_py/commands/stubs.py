@@ -1,12 +1,12 @@
 import click
-from cocmd_cli.settings import click_pass_settings
+from cocmd.settings import click_pass_settings
 
 
 @click.command()
 @click_pass_settings
 def profile_loader(settings):
     # apply it in bashrc with
-    # cd /workspaces/cocmd/ && eval "$(python -m cocmd_cli profile-loader)"
+    # cd /workspaces/cocmd/ && eval "$(python -m cocmd profile-loader)"
 
     # apply aliases
     sources = settings.sources_manager.sources
