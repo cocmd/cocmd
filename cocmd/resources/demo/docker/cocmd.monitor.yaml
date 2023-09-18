@@ -1,9 +1,0 @@
-description: Monitor Docker resources
-env: any
-steps:
-- content: |
-    # List all containers (including stopped)
-    docker ps -a
-  description: This will monitor Docker resources
-  runner: shell
-  title: Monitor Docker
