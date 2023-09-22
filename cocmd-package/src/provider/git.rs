@@ -17,18 +17,29 @@
  * along with cocmd.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::{path::Path, process::Command};
+use std::{path::Path, path::PathBuf, process::Command};
 
 use anyhow::{anyhow, bail, Context, Result};
 
 use super::PackageProvider;
-use crate::{package::DefaultPackage, resolver::resolve_package, Package, PackageSpecifier};
+use crate::util::git::GitParts;
 
-pub struct GitPackageProvider {}
+pub struct GitPackageProvider {
+    source: String,
+    local_path: PathBuf,
+    git_parts: GitParts,
+}
 
 impl GitPackageProvider {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(source: &String, git_parts: &GitParts, runtime_dir: &Path) -> Self {
+        // localpath is in runtime_dir with the name of the repo
+        let binding = runtime_dir.join(&format!("{}.{}", git_parts.author, git_parts.name));
+        let local_path = binding.as_path();
+        Self {
+            source: source.clone(),
+            git_parts: git_parts.clone(),
+            local_path: local_path.to_path_buf(),
+        }
     }
 
     fn is_git_installed() -> bool {
@@ -41,17 +52,12 @@ impl GitPackageProvider {
         false
     }
 
-    fn clone_repo(dest_dir: &Path, repo_url: &str, repo_branch: Option<&str>) -> Result<()> {
+    fn clone_repo(&self) -> Result<()> {
         let mut args = vec!["clone"];
 
-        if let Some(branch) = repo_branch {
-            args.push("-b");
-            args.push(branch);
-        }
+        args.push(self.source.as_str());
 
-        args.push(repo_url);
-
-        let dest_dir_str = dest_dir.to_string_lossy().to_string();
+        let dest_dir_str = self.local_path.to_str().unwrap();
         args.push(&dest_dir_str);
 
         let output = Command::new("git")
@@ -73,30 +79,17 @@ impl PackageProvider for GitPackageProvider {
         "git".to_string()
     }
 
-    fn download(&self, package: &PackageSpecifier) -> Result<Box<dyn Package>> {
+    fn source(&self) -> String {
+        self.source.clone()
+    }
+
+    fn download(&self) -> Result<PathBuf> {
         if !Self::is_git_installed() {
             bail!("unable to invoke 'git' command, please make sure it is installed and visible in PATH");
         }
 
-        let repo_url = package
-            .git_repo_url
-            .as_deref()
-            .ok_or_else(|| anyhow!("missing git repository url"))?;
-        let repo_branch = package.git_branch.as_deref();
+        self.clone_repo()?;
 
-        let temp_dir = tempdir::TempDir::new("cocmd-package-download")?;
-
-        Self::clone_repo(temp_dir.path(), repo_url, repo_branch)?;
-
-        let resolved_package =
-            resolve_package(temp_dir.path(), &package.name, package.version.as_deref())?;
-
-        let package = DefaultPackage::new(
-            resolved_package.manifest,
-            temp_dir,
-            resolved_package.base_dir,
-        );
-
-        Ok(Box::new(package))
+        Ok(self.local_path.clone())
     }
 }

@@ -31,8 +31,6 @@ pkg-fmt = "txz"
 # </cargo binstall>
 
 [dependencies]
-cocmd-package = { path = "../cocmd-package"}
-cocmd-path = { path = "../cocmd-path"}
 clap = { version = "4", features = ["cargo", "derive"], optional = true }
 serde = "1"
 serde_json = "1"

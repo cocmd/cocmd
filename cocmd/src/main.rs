@@ -61,32 +61,17 @@ enum Commands {
     /// Show command with subcommands
     Show(ShowArgs),
 
-    /// Add command with subcommands
-    Add(AddArgs),
+    /// Install command with subcommands
+    Install {
+        /// Name argument for 'install' - Specifies the name of the source to add
+        names: Vec<String>,
+    },
 
     /// Remove command (no subcommands) - Removes something (add a description here)
     Remove,
 
     /// Setup command with a shell argument - Set up the CLI tool, specify shell
     Setup(SetupArgs),
-}
-
-/// Arguments for the 'add' subcommand with meta-information
-#[derive(Parser)]
-struct AddArgs {
-    /// Subcommands for 'add' command
-    #[command(subcommand)]
-    add_commands: AddCommands,
-}
-
-/// Subcommands enum for 'add' with meta-information
-#[derive(Subcommand)]
-enum AddCommands {
-    /// Source subcommand with a 'name' argument - Adds a source with a specified name
-    Source {
-        /// Name argument for 'add source' subcommand - Specifies the name of the source to add
-        name: String,
-    },
 }
 
 /// Arguments for the 'show' subcommand with meta-information
@@ -159,11 +144,11 @@ fn main() {
                 res = show_sources(&mut sources_manager);
             }
         },
-        Commands::Add(args) => match args.add_commands {
-            AddCommands::Source { name } => {
-                res = add::add_source(&mut sources_manager, &name);
+        Commands::Install { names } => {
+            for name in names {
+                res = add::install_source(&mut sources_manager, &name);
             }
-        },
+        }
         Commands::Remove => {
             println!("'cocmd remove' was used");
         }

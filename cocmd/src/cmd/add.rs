@@ -8,8 +8,11 @@ use console::Style;
 use dialoguer::Confirm;
 use tracing::info;
 
-pub fn add_source(sources_manager: &mut SourcesManager, source: &str) -> Result<cocmd::CmdExit> {
-    info!("Add source {:?}", source);
+pub fn install_source(
+    sources_manager: &mut SourcesManager,
+    source: &str,
+) -> Result<cocmd::CmdExit> {
+    info!("Installing source {:?}", source);
 
     let source_label = if source == "demo" {
         let resources_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("resources");

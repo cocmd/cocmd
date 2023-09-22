@@ -17,35 +17,17 @@
  * along with cocmd.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+use std::path::PathBuf;
+
 use anyhow::Result;
-
-use crate::Package;
-
 pub(crate) mod git;
-pub(crate) mod github;
-pub(crate) mod gitlab;
+
 pub(crate) mod hub;
-
-#[derive(Debug, Default)]
-pub struct PackageSpecifier {
-    pub name: String,
-    pub version: Option<String>,
-
-    // Source information
-    pub git_repo_url: Option<String>,
-    pub git_branch: Option<String>,
-
-    // Resolution options
-    pub use_native_git: bool,
-}
+pub(crate) mod local;
 
 pub trait PackageProvider {
     fn name(&self) -> String;
-    fn download(&self, package: &PackageSpecifier) -> Result<Box<dyn Package>>;
+    fn source(&self) -> String;
+    fn download(&self) -> Result<PathBuf>;
     // TODO: fn check update available? (probably should be only available in the hub)
-}
-
-#[derive(Debug, Default)]
-pub struct ProviderOptions {
-    pub force_index_update: bool,
 }

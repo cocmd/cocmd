@@ -17,31 +17,36 @@
  * along with cocmd.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
-use serde::{Deserialize, Serialize};
+use anyhow::Result;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Eq)]
-pub struct Manifest {
-    pub name: String,
-    pub title: String,
-    pub description: String,
-    pub version: String,
-    pub author: String,
+use super::PackageProvider;
+
+pub struct LocalPackageProvider {
+    source: String,
+    local_path: PathBuf,
 }
 
-impl Manifest {
-    pub fn parse(manifest_path: &Path) -> Result<Self> {
-        let manifest_str = std::fs::read_to_string(manifest_path)?;
-
-        serde_yaml::from_str(&manifest_str).with_context(|| {
-            format!(
-                "Failed manifest parsing for path: {}",
-                manifest_path.display()
-            )
-        })
+impl LocalPackageProvider {
+    pub fn new(source: &String, path: &Path) -> Self {
+        Self {
+            source: source.clone(),
+            local_path: path.to_path_buf(),
+        }
     }
 }
 
-// TODO: test
+impl PackageProvider for LocalPackageProvider {
+    fn name(&self) -> String {
+        "local".to_string()
+    }
+
+    fn download(&self) -> Result<PathBuf> {
+        Ok(self.local_path)
+    }
+
+    fn source(&self) -> String {
+        self.source.clone()
+    }
+}

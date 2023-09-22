@@ -5,8 +5,8 @@
  *
  * cocmd is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, either VERSION 3 of the License, or
+ * (at your option) any later VERSION.
  *
  * cocmd is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,10 +26,7 @@ use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
-use crate::{
-    package::DefaultPackage, resolver::resolve_package, util::download::read_string_from_url,
-    Package, PackageSpecifier,
-};
+use crate::util::download::read_string_from_url;
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
     "https://github.com/cocmd/hub/releases/latest/download/package_index.json";
@@ -37,16 +34,21 @@ pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
 const PACKAGE_INDEX_CACHE_FILE: &str = "package_index_cache.json";
 const PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS: u64 = 60 * 60;
 
+const VERSION: &str = "0.0.0.0";
+
 pub struct CocmdHubPackageProvider {
+    source: String,
+    local_path: PathBuf,
     runtime_dir: PathBuf,
-    force_index_update: bool,
 }
 
 impl CocmdHubPackageProvider {
-    pub fn new(runtime_dir: &Path, force_index_update: bool) -> Self {
+    pub fn new(source: &String, runtime_dir: &Path) -> Self {
+        let local_path = runtime_dir.join(source).as_path();
         Self {
+            source: (*source.clone()).to_string(),
+            local_path: local_path.to_path_buf(),
             runtime_dir: runtime_dir.to_path_buf(),
-            force_index_update,
         }
     }
 }
@@ -56,42 +58,35 @@ impl PackageProvider for CocmdHubPackageProvider {
         "cocmd-hub".to_string()
     }
 
-    fn download(&self, package: &PackageSpecifier) -> Result<Box<dyn Package>> {
+    fn download(&self) -> Result<PathBuf> {
         let index = self
-            .get_index(self.force_index_update)
+            .get_index(true)
             .context("unable to get package index from cocmd hub")?;
 
         let package_info = index
-            .get_package(&package.name, package.version.as_deref())
+            .get_package(&self.source, Some(VERSION))
             .ok_or_else(|| {
                 anyhow!(
                     "unable to find package '{}@{}' in the cocmd hub",
-                    package.name,
-                    package.version.as_deref().unwrap_or("latest")
+                    &self.source,
+                    &VERSION
                 )
             })?;
 
         let archive_sha256 = read_string_from_url(&package_info.archive_sha256_url)
             .context("unable to read archive sha256 signature")?;
 
-        let temp_dir = tempdir::TempDir::new("cocmd-package-download")?;
-
         crate::util::download::download_and_extract_zip_verify_sha256(
             &package_info.archive_url,
-            temp_dir.path(),
+            &self.local_path,
             Some(&archive_sha256),
         )?;
 
-        let resolved_package =
-            resolve_package(temp_dir.path(), &package.name, package.version.as_deref())?;
+        Ok(self.local_path)
+    }
 
-        let package = DefaultPackage::new(
-            resolved_package.manifest,
-            temp_dir,
-            resolved_package.base_dir,
-        );
-
-        Ok(Box::new(package))
+    fn source(&self) -> String {
+        self.source.clone()
     }
 }
 
@@ -186,10 +181,10 @@ impl PackageIndex {
 
         matching_packages.sort_by(|a, b| natord::compare(&a.version, &b.version));
 
-        if let Some(explicit_version) = version {
+        if let Some(explicit_VERSION) = version {
             matching_packages
                 .into_iter()
-                .find(|package| package.version == explicit_version)
+                .find(|package| package.version == explicit_VERSION)
         } else {
             matching_packages.into_iter().last()
         }
