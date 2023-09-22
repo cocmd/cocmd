@@ -43,11 +43,10 @@ pub fn download_and_extract_zip_verify_sha256(
 }
 
 pub fn read_string_from_url(url: &str) -> Result<String> {
-    let client = reqwest::blocking::Client::builder();
-    let client = client.build()?;
-
-    let response = client.get(url).send()?;
-
+    let response = reqwest::blocking::get(url)?;
+    if !response.status().is_success() {
+        bail!("error downloading url: {}", response.status());
+    }
     Ok(response.text()?)
 }
 

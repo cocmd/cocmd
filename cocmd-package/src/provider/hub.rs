@@ -64,9 +64,8 @@ impl PackageProvider for CocmdHubPackageProvider {
     }
 
     fn download(&self) -> Result<PathBuf> {
-        let index = self
-            .get_index(true)
-            .context("unable to get package index from cocmd hub")?;
+        let index = self.get_index(true)?;
+        // .context("unable to get package index from cocmd hub")?;
 
         let package_info = index
             .get_package(&self.source, Some(VERSION))
