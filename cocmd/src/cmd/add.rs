@@ -1,9 +1,10 @@
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use cocmd::core::source::Source;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::utils::repository::find_cocmd_files;
+use cocmd_package::get_provider;
 use console::Style;
 use dialoguer::Confirm;
 use tracing::info;
@@ -14,14 +15,24 @@ pub fn install_source(
 ) -> Result<cocmd::CmdExit> {
     info!("Installing source {:?}", source);
 
-    let source_label = if source == "demo" {
-        let resources_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("resources");
-        resources_path.join(source)
-    } else {
-        Path::new(source).to_owned()
-    };
+    let settings = &sources_manager.settings;
 
-    let locations = find_cocmd_files(&source_label, sources_manager.settings.scan_depth);
+    let provider = get_provider(&source.to_string(), &settings.runtime_dir).unwrap();
+    let localpath = provider.local_path();
+
+    if !provider.is_exists_locally() {
+        info!("Source not found locally. Downloading...");
+        match provider.download() {
+            Ok(downloaded_path) => {
+                info!("Downloaded source to {:?}", downloaded_path);
+            }
+            Err(e) => {
+                bail!("Failed to download source: {}", e);
+            }
+        }
+    }
+
+    let locations = find_cocmd_files(&localpath, sources_manager.settings.scan_depth);
 
     let lst_locs = locations.join("\n  - ");
     let style = Style::new().bold().green();

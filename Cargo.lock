@@ -195,6 +195,7 @@ dependencies = [
  "anyhow",
  "clap",
  "clap-markdown",
+ "cocmd-package",
  "console",
  "dialoguer",
  "dirs 5.0.1",

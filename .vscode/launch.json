@@ -6,7 +6,7 @@
     "externalConsole":true ,
     "configurations": [
         {
-            "name": "add source",
+            "name": "install source",
             "type": "lldb",
             "request": "launch",
             "cargo": {
@@ -20,9 +20,8 @@
                 }
             },
             "args": [
-                "add",
-                "source",
-                "demo",
+                "install",
+                "docker",
             ],
             "cwd": "${workspaceFolder}"
         },
