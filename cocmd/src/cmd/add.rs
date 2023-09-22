@@ -40,15 +40,18 @@ pub fn install_source(
 
     let lst_locs = locations.join("\n  - ");
     let style = Style::new().bold().green();
-    println!(
-        "found {} cocmd sources in this path:\n  - {}",
-        locations.len(),
-        lst_locs
-    );
+    if provider.name() == LOCAL_PROVIDER {
+        println!(
+            "found {} cocmd sources in this path:\n  - {}",
+            locations.len(),
+            lst_locs
+        );
+    }
 
-    if Confirm::new()
-        .with_prompt("Do you want to continue?")
-        .interact()?
+    if provider.name() != LOCAL_PROVIDER
+        || Confirm::new()
+            .with_prompt("Do you want to continue?")
+            .interact()?
     {
         for loc in locations {
             let source = Source::new(
@@ -56,10 +59,9 @@ pub fn install_source(
                 &Path::new(&loc).to_path_buf(),
                 &sources_manager.settings,
             );
-            if let Ok(source_res) = source {
-                sources_manager.add_source(source_res);
-                println!("{}", style.apply_to(format!("Source '{:?}' added", loc)));
-            }
+
+            sources_manager.add_source(source);
+            println!("{}", style.apply_to(format!("Source '{:?}' added", loc)));
         }
     } else {
         println!("{}", style.apply_to("Skipped. you answered 'NO'"));

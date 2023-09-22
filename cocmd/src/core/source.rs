@@ -18,7 +18,7 @@ pub struct Source {
 }
 
 impl Source {
-    pub fn new(uri: &String, location: &PathBuf, _settings: &Settings) -> Result<Self, String> {
+    pub fn new(uri: &String, location: &PathBuf, _settings: &Settings) -> Self {
         let mut source = Source {
             uri: uri.clone(),
             location: location.to_path_buf(),
@@ -36,30 +36,45 @@ impl Source {
                         // Successfully loaded the configuration
                         // You can use 'config' here
                         source.cocmd_config = Some(config_res);
-                        Ok(source)
                     }
                     Err(err) => {
                         // Handle the error, for example, log it
                         error!("{}", err);
-                        Err(err)
                     }
-                }
+                };
             } else {
-                Err(format!(
-                    "Config Path {:?} does not exist.",
-                    config_file_path
-                ))
+                error!("Config Path {:?} does not exist.", config_file_path);
             }
         } else {
-            Err(format!(
+            error!(
                 "Source Path {} does not exist.",
                 source.location.to_str().unwrap()
-            ))
+            )
         }
+        source
     }
 
     pub fn is_exists_locally(&self) -> bool {
         self.location.exists()
+    }
+
+    pub fn is_legit_cocmd_source(&self) -> bool {
+        if self.location.exists() {
+            let config_file_path = Path::new(&self.location).join(consts::SOURCE_CONFIG_FILE);
+
+            if config_file_path.exists() {
+                let config: Result<SourceConfigModel, String> =
+                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                match config {
+                    Ok(_) => true,
+                    Err(_) => false,
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
     pub fn aliases(&self) -> Option<String> {
@@ -72,7 +87,7 @@ impl Source {
     pub fn name(&self) -> &str {
         match &self.cocmd_config {
             Some(config) => &config.name,
-            None => "", // or any other default behavior
+            None => &self.uri.as_str(),
         }
     }
 

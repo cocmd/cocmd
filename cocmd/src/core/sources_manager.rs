@@ -57,12 +57,8 @@ impl SourcesManager {
                         continue;
                     }
                     let source = Source::new(&uri, &provider.unwrap().local_path(), settings);
-                    match source {
-                        Ok(source_obj) => {
-                            sources.insert(String::from(source_obj.name()), source_obj);
-                        }
-                        Err(msg) => error!(msg),
-                    }
+
+                    sources.insert(String::from(source.name()), source);
                 }
                 sources
             }

@@ -21,7 +21,7 @@
             },
             "args": [
                 "install",
-                "docker",
+                "git@github.com:cocmd/hub.git",
             ],
             "cwd": "${workspaceFolder}"
         },
