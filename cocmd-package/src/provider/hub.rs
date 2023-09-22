@@ -26,10 +26,11 @@ use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
-use crate::util::download::read_string_from_url;
+use crate::util::download::{read_json_from_url, read_string_from_url};
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
     "https://github.com/cocmd/hub/releases/latest/download/package_index.json";
+// "http://www.google.com";
 
 const PACKAGE_INDEX_CACHE_FILE: &str = "package_index_cache.json";
 const PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS: u64 = 60 * 60;
@@ -120,9 +121,7 @@ impl CocmdHubPackageProvider {
     fn download_index(&self) -> Result<PackageIndex> {
         info_println!("fetching package index...");
         let json_body = read_string_from_url(COCMD_HUB_PACKAGE_INDEX_URL)?;
-
         let index: PackageIndex = serde_json::from_str(&json_body)?;
-
         Ok(index)
     }
 

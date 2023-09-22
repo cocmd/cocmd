@@ -43,11 +43,15 @@ pub fn download_and_extract_zip_verify_sha256(
 }
 
 pub fn read_string_from_url(url: &str) -> Result<String> {
+    let buffer = download(url)?;
+    let text = String::from_utf8(buffer)?;
+    Ok(text)
+}
+
+pub fn read_json_from_url(url: &str) -> Result<String> {
     let response = reqwest::blocking::get(url)?;
-    if !response.status().is_success() {
-        bail!("error downloading url: {}", response.status());
-    }
-    Ok(response.text()?)
+    let text = response.json()?;
+    Ok(text)
 }
 
 fn download(url: &str) -> Result<Vec<u8>> {
