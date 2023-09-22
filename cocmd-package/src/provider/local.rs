@@ -42,6 +42,10 @@ impl PackageProvider for LocalPackageProvider {
         "local".to_string()
     }
 
+    fn local_path(&self) -> PathBuf {
+        self.local_path.to_path_buf()
+    }
+
     fn download(&self) -> Result<PathBuf> {
         Ok(self.local_path.to_path_buf())
     }

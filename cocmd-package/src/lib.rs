@@ -62,18 +62,31 @@ mod tests {
         let git_url = "git@github.com:mzsrtgzt2/cocmd.git";
         let git_url2 = "https://github.com/mzsrtgzr2/cocmd";
         let hub_url = "cocmd-hub";
-        let local_url = "/tmp/test";
+        let local_url = "/tmp/test/no-existing";
 
         // let provider = get_provider(&git_url.to_string(), &runtime_dir).unwrap();
         // assert_eq!(provider.name(), "git");
+        // assert_eq!(
+        //     provider.local_path(),
+        //     Path::new("/tmp/mzsrtgzt2.cocmd").to_path_buf()
+        // );
 
-        // let provider = get_provider(&git_url2.to_string(), &runtime_dir).unwrap();
-        // assert_eq!(provider.name(), "git");
+        let provider = get_provider(&git_url2.to_string(), &runtime_dir).unwrap();
+        assert_eq!(provider.name(), "git");
+        assert_eq!(
+            provider.local_path(),
+            Path::new("/tmp/mzsrtgzt2.cocmd").to_path_buf()
+        );
 
-        // let provider = get_provider(&hub_url.to_string(), &runtime_dir).unwrap();
-        // assert_eq!(provider.name(), "cocmd-hub");
+        let provider = get_provider(&hub_url.to_string(), &runtime_dir).unwrap();
+        assert_eq!(provider.name(), "cocmd-hub");
+        assert_eq!(
+            provider.local_path(),
+            Path::new("/tmp/cocmd-hub").to_path_buf()
+        );
 
         let provider = get_provider(&local_url.to_string(), &runtime_dir).unwrap();
         assert_eq!(provider.name(), "local");
+        assert_eq!(provider.local_path(), Path::new(local_url).to_path_buf());
     }
 }

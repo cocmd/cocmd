@@ -28,6 +28,14 @@ pub(crate) mod local;
 pub trait PackageProvider {
     fn name(&self) -> String;
     fn source(&self) -> String;
+    fn local_path(&self) -> PathBuf;
+    fn is_exists_locally(&self) -> Option<PathBuf> {
+        // check for existsance of the local path
+        if self.local_path().exists() {
+            return Some(self.local_path().to_path_buf());
+        }
+        None
+    }
     fn download(&self) -> Result<PathBuf>;
     // TODO: fn check update available? (probably should be only available in the hub)
 }

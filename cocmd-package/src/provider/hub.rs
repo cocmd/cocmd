@@ -58,6 +58,11 @@ impl PackageProvider for CocmdHubPackageProvider {
     fn name(&self) -> String {
         "cocmd-hub".to_string()
     }
+
+    fn local_path(&self) -> PathBuf {
+        self.local_path.to_path_buf()
+    }
+
     fn download(&self) -> Result<PathBuf> {
         let index = self
             .get_index(true)
