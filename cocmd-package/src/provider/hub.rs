@@ -35,7 +35,7 @@ pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
 const PACKAGE_INDEX_CACHE_FILE: &str = "package_index_cache.json";
 const PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS: u64 = 60 * 60;
 
-const VERSION: &str = "0.0.0.0";
+const VERSION: &str = "0.0.0";
 
 pub struct CocmdHubPackageProvider {
     source: String,
@@ -186,10 +186,10 @@ impl PackageIndex {
 
         matching_packages.sort_by(|a, b| natord::compare(&a.version, &b.version));
 
-        if let Some(explicit_VERSION) = version {
+        if let Some(explicit_version) = version {
             matching_packages
                 .into_iter()
-                .find(|package| package.version == explicit_VERSION)
+                .find(|package| package.version == explicit_version)
         } else {
             matching_packages.into_iter().last()
         }
