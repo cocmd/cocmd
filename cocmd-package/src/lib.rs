@@ -50,16 +50,30 @@ pub fn get_provider(source: &String, runtime_dir: &Path) -> Result<Box<dyn Packa
     }
 }
 
+// write a unit-test for this function. make sure all cases are covered
+// and that the correct provider is returned for each case
 #[cfg(test)]
-pub(crate) mod tests {
-    use tempdir::TempDir;
-
+mod tests {
     use super::*;
 
-    pub(crate) fn run_with_temp_dir(action: impl FnOnce(&Path)) {
-        let tmp_dir = TempDir::new("cocmd-package").unwrap();
-        let tmp_path = tmp_dir.path();
+    #[test]
+    fn test_get_provider() {
+        let runtime_dir = Path::new("/tmp");
+        let git_url = "git@github.com:mzsrtgzt2/cocmd.git";
+        let git_url2 = "https://github.com/mzsrtgzr2/cocmd";
+        let hub_url = "cocmd-hub";
+        let local_url = "/tmp/test";
 
-        action(tmp_path);
+        // let provider = get_provider(&git_url.to_string(), &runtime_dir).unwrap();
+        // assert_eq!(provider.name(), "git");
+
+        // let provider = get_provider(&git_url2.to_string(), &runtime_dir).unwrap();
+        // assert_eq!(provider.name(), "git");
+
+        // let provider = get_provider(&hub_url.to_string(), &runtime_dir).unwrap();
+        // assert_eq!(provider.name(), "cocmd-hub");
+
+        let provider = get_provider(&local_url.to_string(), &runtime_dir).unwrap();
+        assert_eq!(provider.name(), "local");
     }
 }

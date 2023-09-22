@@ -43,7 +43,7 @@ impl PackageProvider for LocalPackageProvider {
     }
 
     fn download(&self) -> Result<PathBuf> {
-        Ok(self.local_path)
+        Ok(self.local_path.to_path_buf())
     }
 
     fn source(&self) -> String {

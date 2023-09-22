@@ -37,7 +37,7 @@ impl GitPackageProvider {
         let local_path = binding.as_path();
         Self {
             source: source.clone(),
-            git_parts: git_parts.clone(),
+            git_parts: (*git_parts).clone(),
             local_path: local_path.to_path_buf(),
         }
     }

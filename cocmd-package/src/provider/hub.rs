@@ -44,7 +44,8 @@ pub struct CocmdHubPackageProvider {
 
 impl CocmdHubPackageProvider {
     pub fn new(source: &String, runtime_dir: &Path) -> Self {
-        let local_path = runtime_dir.join(source).as_path();
+        let binding = runtime_dir.join(source);
+        let local_path = binding.as_path();
         Self {
             source: (*source.clone()).to_string(),
             local_path: local_path.to_path_buf(),
@@ -57,7 +58,6 @@ impl PackageProvider for CocmdHubPackageProvider {
     fn name(&self) -> String {
         "cocmd-hub".to_string()
     }
-
     fn download(&self) -> Result<PathBuf> {
         let index = self
             .get_index(true)
@@ -76,13 +76,15 @@ impl PackageProvider for CocmdHubPackageProvider {
         let archive_sha256 = read_string_from_url(&package_info.archive_sha256_url)
             .context("unable to read archive sha256 signature")?;
 
+        let local_path = self.local_path.clone(); // Clone the PathBuf
+
         crate::util::download::download_and_extract_zip_verify_sha256(
             &package_info.archive_url,
-            &self.local_path,
+            &local_path,
             Some(&archive_sha256),
         )?;
 
-        Ok(self.local_path)
+        Ok(local_path)
     }
 
     fn source(&self) -> String {
