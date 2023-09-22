@@ -22,6 +22,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 
 use super::PackageProvider;
+use crate::LOCAL_PROVIDER;
 
 pub struct LocalPackageProvider {
     source: String,
@@ -39,7 +40,7 @@ impl LocalPackageProvider {
 
 impl PackageProvider for LocalPackageProvider {
     fn name(&self) -> String {
-        "local".to_string()
+        LOCAL_PROVIDER.to_string()
     }
 
     fn local_path(&self) -> PathBuf {

@@ -26,7 +26,10 @@ use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
-use crate::util::download::{read_json_from_url, read_string_from_url};
+use crate::{
+    util::download::{read_json_from_url, read_string_from_url},
+    COCMDHUB_PROVIDER,
+};
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
     "https://github.com/cocmd/hub/releases/latest/download/package_index.json";
@@ -57,7 +60,7 @@ impl CocmdHubPackageProvider {
 
 impl PackageProvider for CocmdHubPackageProvider {
     fn name(&self) -> String {
-        "cocmd-hub".to_string()
+        COCMDHUB_PROVIDER.to_string()
     }
 
     fn local_path(&self) -> PathBuf {

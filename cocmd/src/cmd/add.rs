@@ -1,10 +1,10 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Result};
 use cocmd::core::source::Source;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::utils::repository::find_cocmd_files;
-use cocmd_package::get_provider;
+use cocmd_package::{get_provider, LOCAL_PROVIDER};
 use console::Style;
 use dialoguer::Confirm;
 use tracing::info;
@@ -32,7 +32,11 @@ pub fn install_source(
         }
     }
 
-    let locations = find_cocmd_files(&localpath, sources_manager.settings.scan_depth);
+    let locations = if provider.name() == LOCAL_PROVIDER {
+        find_cocmd_files(&localpath, sources_manager.settings.scan_depth)
+    } else {
+        vec![localpath.to_str().unwrap().to_string()]
+    };
 
     let lst_locs = locations.join("\n  - ");
     let style = Style::new().bold().green();
@@ -47,7 +51,11 @@ pub fn install_source(
         .interact()?
     {
         for loc in locations {
-            let source = Source::new(&loc, &sources_manager.settings);
+            let source = Source::new(
+                &source.to_string(),
+                &Path::new(&loc).to_path_buf(),
+                &sources_manager.settings,
+            );
             if let Ok(source_res) = source {
                 sources_manager.add_source(source_res);
                 println!("{}", style.apply_to(format!("Source '{:?}' added", loc)));

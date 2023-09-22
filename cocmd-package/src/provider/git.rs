@@ -22,7 +22,7 @@ use std::{path::Path, path::PathBuf, process::Command};
 use anyhow::{anyhow, bail, Context, Result};
 
 use super::PackageProvider;
-use crate::util::git::GitParts;
+use crate::{util::git::GitParts, GIT_PROVIDER};
 
 pub struct GitPackageProvider {
     source: String,
@@ -76,7 +76,7 @@ impl GitPackageProvider {
 
 impl PackageProvider for GitPackageProvider {
     fn name(&self) -> String {
-        "git".to_string()
+        GIT_PROVIDER.to_string()
     }
 
     fn local_path(&self) -> PathBuf {

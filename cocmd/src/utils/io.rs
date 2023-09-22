@@ -19,13 +19,11 @@ use serde::Serialize;
 /// # Returns
 ///
 /// A normalized absolute path as a `String`.
-pub fn normalize_path(relative_path: &str, base_path: Option<&str>) -> String {
-    if let Some(base) = base_path {
-        // Join the base path with the relative path and then resolve to an absolute path
-        let abs_path = Path::new(base).join(relative_path).canonicalize();
-        if let Ok(path) = abs_path {
-            return path.to_string_lossy().into_owned();
-        }
+pub fn normalize_path(relative_path: &str, base: &PathBuf) -> String {
+    // Join the base path with the relative path and then resolve to an absolute path
+    let abs_path = base.join(relative_path).canonicalize();
+    if let Ok(path) = abs_path {
+        return path.to_string_lossy().into_owned();
     }
 
     // Resolve the relative path to an absolute path using the current working directory
@@ -35,19 +33,6 @@ pub fn normalize_path(relative_path: &str, base_path: Option<&str>) -> String {
 
     // Return the original path if normalization fails
     relative_path.to_owned()
-}
-
-/// Checks if a file or directory exists.
-///
-/// # Arguments
-///
-/// - `path`: The path to check for existence.
-///
-/// # Returns
-///
-/// `true` if the path exists, otherwise `false`.
-pub fn exists(path: &str) -> bool {
-    Path::new(path).exists()
 }
 
 /// Creates a directory and its parents if necessary.

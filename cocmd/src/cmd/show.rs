@@ -33,7 +33,7 @@ pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdEx
                 aliases_count,
                 automations_count,
                 paths_count,
-                source.location()
+                source.location().to_str().unwrap()
             ));
         }
     } else {
@@ -53,7 +53,10 @@ pub fn show_source(sources_manager: &mut SourcesManager, name: String) -> Result
     let skin = termimad::MadSkin::default();
 
     skin.print_text(&format!("# {}", name));
-    skin.print_text(&format!("- location: {}", source.location()));
+    skin.print_text(&format!(
+        "- location: {}",
+        source.location().to_str().unwrap()
+    ));
 
     if let Some(alias) = &source.aliases() {
         skin.print_text("## aliases");
