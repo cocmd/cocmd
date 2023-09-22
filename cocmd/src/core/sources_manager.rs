@@ -26,12 +26,12 @@ impl SourcesManager {
     }
 
     pub fn remove_source(&mut self, source: Source) {
-        self.sources.remove(source.name());
+        self.sources.remove(source.uri.as_str());
         self.save();
     }
 
     pub fn add_source(&mut self, source: Source) {
-        self.sources.insert(String::from(source.name()), source);
+        self.sources.insert(source.uri.clone(), source);
         self.save();
     }
 
@@ -56,9 +56,10 @@ impl SourcesManager {
                         error!("failed to get location for {} - {}", uri, err);
                         continue;
                     }
-                    let source = Source::new(&uri, &provider.unwrap().local_path(), settings);
+                    let source =
+                        Source::new(uri.clone(), &provider.unwrap().local_path(), settings);
 
-                    sources.insert(String::from(source.name()), source);
+                    sources.insert(source.uri.clone(), source);
                 }
                 sources
             }
@@ -73,7 +74,7 @@ impl SourcesManager {
         let mut automations = HashMap::new();
         for (name, source) in self.sources.iter() {
             for automation in source.automations(&self.settings) {
-                let key = format!("{}.{}", name, automation.name);
+                let key = format!("{}.{}", source.name(), automation.name);
                 automations.insert(key, automation);
             }
         }

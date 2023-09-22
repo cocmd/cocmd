@@ -54,14 +54,19 @@ pub fn install_source(
             .interact()?
     {
         for loc in locations {
-            let source = Source::new(
-                &source.to_string(),
+            let source: Source = Source::new(
+                if provider.name() == LOCAL_PROVIDER {
+                    loc.clone()
+                } else {
+                    let source_label = source.to_string();
+                    source_label.clone()
+                },
                 &Path::new(&loc).to_path_buf(),
                 &sources_manager.settings,
             );
-
+            let uri = source.uri.clone();
             sources_manager.add_source(source);
-            println!("{}", style.apply_to(format!("Source '{:?}' added", loc)));
+            println!("{}", style.apply_to(format!("Source '{}' added", uri)));
         }
     } else {
         println!("{}", style.apply_to("Skipped. you answered 'NO'"));

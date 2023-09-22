@@ -1,7 +1,7 @@
 #[cfg(feature = "howto")]
 use std::collections::HashMap;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use cocmd::core::sources_manager::SourcesManager;
 #[cfg(feature = "howto")]
 use levenshtein::levenshtein;
@@ -20,16 +20,28 @@ pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdEx
 
         // Iterate through sources and append rows to the table
         for source in sources {
-            let aliases_count = match source.aliases() {
-                Some(aliases_str) => aliases_str.split('\n').count(),
-                _ => 0,
+            let aliases_count = if source.is_legit_cocmd_source() {
+                match source.aliases() {
+                    Some(aliases_str) => aliases_str.split('\n').count(),
+                    _ => 0,
+                }
+            } else {
+                0
             };
-            let automations_count = source.automations(&sources_manager.settings).len();
-            let paths_count = source.paths().len();
+            let automations_count = if source.is_legit_cocmd_source() {
+                source.automations(&sources_manager.settings).len()
+            } else {
+                0
+            };
+            let paths_count = if source.is_legit_cocmd_source() {
+                source.paths().len()
+            } else {
+                0
+            };
 
             table.push_str(&format!(
                 "| {} | {} | {} | {} | {} |\n",
-                source.name(),
+                source.uri,
                 aliases_count,
                 automations_count,
                 paths_count,
@@ -48,11 +60,15 @@ pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdEx
     })
 }
 
-pub fn show_source(sources_manager: &mut SourcesManager, name: String) -> Result<cocmd::CmdExit> {
-    let source = &sources_manager.sources[&name];
+pub fn show_source(sources_manager: &mut SourcesManager, uri: String) -> Result<cocmd::CmdExit> {
+    let source = &sources_manager.sources[&uri];
     let skin = termimad::MadSkin::default();
 
-    skin.print_text(&format!("# {}", name));
+    if !source.is_legit_cocmd_source() {
+        bail!("Source {} is not a legit cocmd source", uri);
+    }
+
+    skin.print_text(&format!("# {}", uri));
     skin.print_text(&format!(
         "- location: {}",
         source.location().to_str().unwrap()
@@ -66,7 +82,7 @@ pub fn show_source(sources_manager: &mut SourcesManager, name: String) -> Result
     skin.print_text("## automations");
     // Apply automations as aliases
     for automation in &source.automations(&sources_manager.settings) {
-        skin.print_text(&format!("- `{}.{}`", name, automation.name));
+        skin.print_text(&format!("- `{}.{}`", source.name(), automation.name));
     }
 
     skin.print_text("## paths");

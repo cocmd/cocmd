@@ -2,6 +2,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::{fmt, fs};
 
+use anyhow::bail;
 use tracing::error;
 
 use crate::consts;
@@ -18,7 +19,7 @@ pub struct Source {
 }
 
 impl Source {
-    pub fn new(uri: &String, location: &PathBuf, _settings: &Settings) -> Self {
+    pub fn new(uri: String, location: &PathBuf, _settings: &Settings) -> Self {
         let mut source = Source {
             uri: uri.clone(),
             location: location.to_path_buf(),
@@ -87,7 +88,12 @@ impl Source {
     pub fn name(&self) -> &str {
         match &self.cocmd_config {
             Some(config) => &config.name,
-            None => &self.uri.as_str(),
+            None => {
+                panic!(
+                    "Unable to get name for {}",
+                    &self.location.to_str().unwrap()
+                );
+            }
         }
     }
 
