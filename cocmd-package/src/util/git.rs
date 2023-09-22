@@ -33,10 +33,9 @@ pub fn is_private_repo(url: &str) -> bool {
 }
 lazy_static! {
     static ref GIT_REGEX: Regex =
-        Regex::new(r"((https://|git@)(?P<host>[^:/]+)(:?|:))(?P<author>.*?)/(?P<name>.*?)(/|\.|$)")
+        Regex::new(r"^(https://|git@)(?P<host>[^:/]+)([/|:])(?P<author>.*?)/(?P<name>.*?)(/|\.|$)")
             .unwrap();
 }
-
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct GitParts {
     pub host: String,
