@@ -67,7 +67,7 @@ impl Automation {
                 return *content_env == *os || *content_env == OS::ANY;
             }
         }
-        false
+        true
     }
 }
 

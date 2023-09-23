@@ -41,7 +41,7 @@
             },
             "args": [
                 "run",
-                "docker.setup"
+                "example-repo.automation-inline-example"
             ],
             "cwd": "${workspaceFolder}"
         },
@@ -101,7 +101,7 @@
             "args": [
                 "show",
                 "source",
-                "docker"
+                "/Users/mosher/workspace/example-repo-template"
             ],
             "cwd": "${workspaceFolder}"
         },

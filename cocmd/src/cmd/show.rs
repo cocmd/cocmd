@@ -61,6 +61,10 @@ pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdEx
 }
 
 pub fn show_source(sources_manager: &mut SourcesManager, uri: String) -> Result<cocmd::CmdExit> {
+    // check if uri is in sources_manager.sources. if not print error and exit
+    if !sources_manager.sources.contains_key(&uri) {
+        bail!("Source \"{}\" not found", uri);
+    }
     let source = &sources_manager.sources[&uri];
     let skin = termimad::MadSkin::default();
 
@@ -75,8 +79,7 @@ pub fn show_source(sources_manager: &mut SourcesManager, uri: String) -> Result<
     ));
 
     if let Some(alias) = &source.aliases() {
-        skin.print_text("## aliases");
-        skin.print_text(&format!("```{}```", alias));
+        skin.print_text(&format!("## aliases\n```\n{}\n```", alias));
     }
 
     skin.print_text("## automations");
