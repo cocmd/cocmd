@@ -2,5 +2,4 @@
 members = [
   "cocmd",
   "cocmd-package",
-  "cocmd-path"
 ]
