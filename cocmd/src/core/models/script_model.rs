@@ -1,5 +1,6 @@
-use crate::utils::sys::OS;
 use serde_derive::{Deserialize, Serialize};
+
+use crate::utils::sys::OS;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub enum StepRunnerType {
@@ -11,6 +12,8 @@ pub enum StepRunnerType {
     PYTHON,
     #[serde(alias = "link", alias = "LINK")]
     LINK,
+    #[serde(alias = "cocmd", alias = "COCMD")]
+    COCMD,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]

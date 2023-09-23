@@ -1,16 +1,14 @@
 use std::process;
+use std::process::{Command, Stdio};
 
 use anyhow::Result;
 use cocmd::core::{
     models::script_model::{ScriptModel, StepModel, StepRunnerType},
     sources_manager::SourcesManager,
 };
-use dialoguer::{theme::ColorfulTheme, Select};
-
 use cocmd::utils::sys::OS;
+use dialoguer::{theme::ColorfulTheme, Select};
 use execute::{shell, Execute};
-use std::process::{Command, Stdio};
-
 use termimad;
 use tracing::{error, info};
 
@@ -68,7 +66,7 @@ fn interactive_shell(step: &StepModel) {
     command.stdout(Stdio::piped());
     command.stdin(Stdio::piped());
 
-    print!("{:?}", step.content);
+    print!("{}", &step.content.as_ref().unwrap());
     let output = command.execute_output().unwrap();
 
     println!("{}", String::from_utf8(output.stdout).unwrap());
@@ -79,14 +77,22 @@ fn handle_step(step: &StepModel, env: OS) {
     let skin = termimad::MadSkin::default();
     match &step.runner {
         StepRunnerType::SHELL => {
-            skin.print_text(&format!("# running step - {}", &step.title));
+            skin.print_text(&format!("# running shell step - {}", &step.title));
             interactive_shell(step);
+        }
+        StepRunnerType::COCMD => {
+            skin.print_text(&format!("# running cocmd step - {}", &step.title));
+            interactive_shell(&StepModel {
+                content: Some(format!("cocmd run {}", &content)),
+                ..step.clone()
+            });
         }
         StepRunnerType::MARKDOWN => {
             // Print Markdown content
             skin.print_text(content);
         }
         StepRunnerType::PYTHON => {
+            skin.print_text(&format!("# running python step - {}", &step.title));
             // Execute Python script
             let output = Command::new("python")
                 .arg("-c")
