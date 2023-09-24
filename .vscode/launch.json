@@ -41,7 +41,7 @@
             },
             "args": [
                 "run",
-                "example-repo.automation-inline-example"
+                "omega.oncall"
             ],
             "cwd": "${workspaceFolder}"
         },

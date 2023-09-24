@@ -60,7 +60,7 @@ pub fn run_automation(
     })
 }
 
-fn interactive_shell(step: &StepModel) {
+fn interactive_shell(step: &StepModel) -> Result<bool, String> {
     let mut command = shell(step.content.as_ref().unwrap());
 
     command.stdout(Stdio::piped());
@@ -69,16 +69,24 @@ fn interactive_shell(step: &StepModel) {
     print!("{}", &step.content.as_ref().unwrap());
     let output = command.execute_output().unwrap();
 
-    println!("{}", String::from_utf8(output.stdout).unwrap());
+    if output.status.success() {
+        println!("{}", String::from_utf8(output.stdout).unwrap());
+        Ok(true)
+    } else {
+        Err("Shell command failed: ".to_string() + &String::from_utf8(output.stderr).unwrap())
+    }
 }
 
-fn handle_step(step: &StepModel, env: OS) {
+fn handle_step(step: &StepModel, env: OS) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
     let skin = termimad::MadSkin::default();
     match &step.runner {
         StepRunnerType::SHELL => {
             skin.print_text(&format!("# running shell step - {}", &step.title));
-            interactive_shell(step);
+            if let Err(err) = interactive_shell(step) {
+                error!(err);
+                return false;
+            }
         }
         StepRunnerType::COCMD => {
             skin.print_text(&format!("# running cocmd step - {}", &step.title));
@@ -131,10 +139,23 @@ fn handle_step(step: &StepModel, env: OS) {
             }
         }
     }
+    return true;
 }
 
 fn handle_script(script: &ScriptModel, env: OS) {
+    let mut step_statuses = Vec::new();
+
     for step in &script.steps {
-        handle_step(step, env);
+        let success = handle_step(step, env);
+        step_statuses.push((step.title.clone(), success));
+    }
+
+    info!("Automation completed. Summary:");
+    for (title, success) in &step_statuses {
+        if *success {
+            info!("Step '{}' completed successfully.", title);
+        } else {
+            error!("Step '{}' failed.", title);
+        }
     }
 }
