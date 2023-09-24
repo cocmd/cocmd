@@ -9,7 +9,8 @@ use cocmd::core::{
 use cocmd::utils::sys::OS;
 use dialoguer::{theme::ColorfulTheme, Select};
 use execute::{shell, Execute};
-use termimad;
+use inline_colorization::*;
+use termimad::{self, MadSkin};
 use tracing::{error, info};
 
 pub fn run_automation(
@@ -60,40 +61,53 @@ pub fn run_automation(
     })
 }
 
-fn interactive_shell(step: &StepModel) -> Result<bool, String> {
+fn interactive_shell(step: &StepModel, skin: &mut MadSkin) -> Result<bool, String> {
     let mut command = shell(step.content.as_ref().unwrap());
 
     command.stdout(Stdio::piped());
+    command.stderr(Stdio::piped());
     command.stdin(Stdio::piped());
 
-    print!("{}", &step.content.as_ref().unwrap());
+    // print!("{}", &step.content.as_ref().unwrap());
     let output = command.execute_output().unwrap();
 
+    let stdout_str = String::from_utf8(output.stdout).unwrap();
+    let stderr_str = String::from_utf8(output.stderr).unwrap();
+
+    // Format stdout as a code block
+    skin.print_text("## Output (stdout):\n");
+    skin.print_text(&format!("```shell\n{}\n```", stdout_str));
+
     if output.status.success() {
-        println!("{}", String::from_utf8(output.stdout).unwrap());
         Ok(true)
     } else {
-        Err("Shell command failed: ".to_string() + &String::from_utf8(output.stderr).unwrap())
+        // Format stderr as a code block in red
+        skin.print_text("## Output (stderr):\n");
+        skin.print_text(&format!("```shell\n{}\n```", stderr_str));
+        Err("Shell command failed.".to_string())
     }
 }
 
-fn handle_step(step: &StepModel, env: OS) -> bool {
+fn handle_step(step: &StepModel, env: OS, skin: &mut MadSkin) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
-    let skin = termimad::MadSkin::default();
     match &step.runner {
         StepRunnerType::SHELL => {
             skin.print_text(&format!("# running shell step - {}", &step.title));
-            if let Err(err) = interactive_shell(step) {
-                error!(err);
+            if let Err(err) = interactive_shell(step, skin) {
                 return false;
             }
         }
         StepRunnerType::COCMD => {
             skin.print_text(&format!("# running cocmd step - {}", &step.title));
-            interactive_shell(&StepModel {
-                content: Some(format!("cocmd run {}", &content)),
-                ..step.clone()
-            });
+            if let Err(err) = interactive_shell(
+                &StepModel {
+                    content: Some(format!("cocmd run {}", &content)),
+                    ..step.clone()
+                },
+                skin,
+            ) {
+                return false;
+            }
         }
         StepRunnerType::MARKDOWN => {
             // Print Markdown content
@@ -143,19 +157,20 @@ fn handle_step(step: &StepModel, env: OS) -> bool {
 }
 
 fn handle_script(script: &ScriptModel, env: OS) {
+    let mut skin: MadSkin = MadSkin::default();
     let mut step_statuses = Vec::new();
 
     for step in &script.steps {
-        let success = handle_step(step, env);
+        let success = handle_step(step, env, &mut skin);
         step_statuses.push((step.title.clone(), success));
     }
 
-    info!("Automation completed. Summary:");
+    println!();
+    println!("# Automation completed. Summary:");
     for (title, success) in &step_statuses {
-        if *success {
-            info!("Step '{}' completed successfully.", title);
-        } else {
-            error!("Step '{}' failed.", title);
-        }
+        let status_str = if *success { "✅" } else { "❌" };
+        println!("{} {}", status_str, title);
     }
+
+    println!(); // Add a newline after the summary
 }

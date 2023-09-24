@@ -201,6 +201,7 @@ dependencies = [
  "dirs",
  "execute",
  "exitcode",
+ "inline_colorization",
  "lazy_static",
  "levenshtein",
  "serde",
@@ -825,6 +826,12 @@ dependencies = [
  "autocfg",
  "hashbrown",
 ]
+
+[[package]]
+name = "inline_colorization"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fe264857e08559df9a1dfde1a43388129c9629fe4db630ded669a8c59e887a1"
 
 [[package]]
 name = "instant"
