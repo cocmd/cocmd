@@ -40,11 +40,14 @@ impl Source {
                     }
                     Err(err) => {
                         // Handle the error, for example, log it
-                        error!("{}", err);
+                        error!("{}: {}", config_file_path.to_str().unwrap(), err);
                     }
                 };
             } else {
-                error!("Config Path {:?} does not exist.", config_file_path);
+                error!(
+                    "Config Path {:?} does not exist.",
+                    config_file_path.to_str().unwrap(),
+                );
             }
         } else {
             error!(

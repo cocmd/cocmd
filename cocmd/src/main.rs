@@ -105,10 +105,11 @@ struct SetupArgs {
 
 fn main() {
     let cli = Cli::parse();
+    tracing(cli.verbose);
 
     let settings = Settings::new(None, None);
     let mut sources_manager = SourcesManager::new(settings);
-    tracing(cli.verbose);
+
     let mut res = Ok(cocmd::CmdExit {
         code: exitcode::OK,
         message: None,
