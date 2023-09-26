@@ -2,7 +2,6 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::{fmt, fs};
 
-use anyhow::bail;
 use tracing::error;
 
 use crate::consts;

@@ -3,6 +3,7 @@ use std::process;
 use std::process::{Command, Stdio};
 
 use anyhow::Result;
+use cocmd::core::models::script_model::StepParamModel;
 use cocmd::core::{
     models::script_model::{ScriptModel, StepModel, StepRunnerType},
     sources_manager::SourcesManager,
@@ -10,9 +11,10 @@ use cocmd::core::{
 use cocmd::utils::sys::OS;
 use dialoguer::{theme::ColorfulTheme, Select};
 use execute::{shell, Execute};
-use inline_colorization::*;
 use termimad::{self, MadSkin};
 use tracing::{error, info};
+
+use crate::Settings;
 
 pub fn run_automation(
     sources_manager: &mut SourcesManager,
@@ -45,6 +47,7 @@ pub fn run_automation(
         handle_script(
             automation.content.as_ref().unwrap(),
             sources_manager.settings.os,
+            &mut sources_manager.settings,
         );
         // info!("[blue] Script executed:");
         // for line in output {
@@ -62,8 +65,43 @@ pub fn run_automation(
     })
 }
 
-fn interactive_shell(step: &StepModel, skin: &mut MadSkin) -> Result<bool, String> {
-    let mut command = shell(step.content.as_ref().unwrap());
+fn interactive_shell(
+    step: &StepModel,
+    skin: &mut MadSkin,
+    params: Vec<StepParamModel>,
+    settings: &mut Settings,
+) -> Result<bool, String> {
+    let command = step.content.as_ref().unwrap();
+
+    // replace all {...} occurences in the command with the values from the params
+    // get the value of the param by param.name and the function settings.get_param
+    // if param.save == true, call save_param with the param.name and the value
+
+    let mut cmd = command.clone();
+    for param in params {
+        let param_value = settings.get_param(&param.name);
+        // if param_value is None, get it from STDIN with some nice prompt
+        let param_value = match param_value {
+            Some(value) => value,
+            None => {
+                let prompt = format!("Enter value for parameter '{}'", param.name);
+                let param_value = dialoguer::Input::with_theme(&ColorfulTheme::default())
+                    .with_prompt(&prompt)
+                    .interact_text()
+                    .unwrap_or_else(|_e| {
+                        error!("No value entered for parameter '{}'.", param.name);
+                        process::exit(1)
+                    });
+                param_value
+            }
+        };
+        cmd = cmd.replace(&format!("{{{}}}", param.name), &param_value);
+        if param.save {
+            settings.save_param(&param.name, &param_value);
+        }
+    }
+
+    let mut command = shell(cmd);
 
     command.stdout(Stdio::piped());
     command.stderr(Stdio::piped());
@@ -115,12 +153,19 @@ fn interactive_shell(step: &StepModel, skin: &mut MadSkin) -> Result<bool, Strin
     }
 }
 
-fn handle_step(step: &StepModel, env: OS, skin: &mut MadSkin) -> bool {
+fn handle_step(
+    step: &StepModel,
+    env: OS,
+    skin: &mut MadSkin,
+    script_params: Option<Vec<StepParamModel>>,
+    settings: &mut Settings,
+) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
+    let params = step.get_params(script_params);
     match &step.runner {
         StepRunnerType::SHELL => {
             skin.print_text(&format!("# running shell step - {}", &step.title));
-            if let Err(err) = interactive_shell(step, skin) {
+            if let Err(err) = interactive_shell(step, skin, params.clone(), settings) {
                 return false;
             }
         }
@@ -132,6 +177,8 @@ fn handle_step(step: &StepModel, env: OS, skin: &mut MadSkin) -> bool {
                     ..step.clone()
                 },
                 skin,
+                params.clone(),
+                settings,
             ) {
                 return false;
             }
@@ -183,12 +230,12 @@ fn handle_step(step: &StepModel, env: OS, skin: &mut MadSkin) -> bool {
     return true;
 }
 
-fn handle_script(script: &ScriptModel, env: OS) {
+fn handle_script(script: &ScriptModel, env: OS, settings: &mut Settings) {
     let mut skin: MadSkin = MadSkin::default();
     let mut step_statuses = Vec::new();
-
+    let script_params = script.params.clone();
     for step in &script.steps {
-        let success = handle_step(step, env, &mut skin);
+        let success = handle_step(step, env, &mut skin, script_params.clone(), settings);
         step_statuses.push((step.title.clone(), success));
     }
 

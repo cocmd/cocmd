@@ -1,6 +1,10 @@
+use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
 use std::path::{Path, PathBuf};
 
+use tracing::error;
+
+use crate::utils::io::from_yaml_file;
 use crate::utils::sys::get_os;
 use crate::{consts, utils::sys::OS};
 
@@ -13,6 +17,7 @@ pub struct Settings {
     pub runtime_dir: PathBuf,
     pub scan_depth: usize,
     pub os: OS,
+    pub params: HashMap<String, String>,
     // sources_manager: SourcesManager, // You'll need to define this
     // credentials: CredsConfigModel, // You'll need to define this
 }
@@ -43,11 +48,46 @@ impl Settings {
             sources_file,
             scan_depth: 2,
             os: get_os(), // sources_manager: SourcesManager::new(), // Initialize this
-                          // credentials: CredsConfigModel::new(), // Initialize this
+            // credentials: CredsConfigModel::new(), // Initialize this
+            params: Settings::read_params(home.to_string()),
         }
     }
 
-    // fn read_creds(&self) -> CredsConfigModel {
-    //     // Implement this function
-    // }
+    // create function 'read_params' that read from home/consts::PARAMS_FILE path yaml file and return a map of params
+    // from params, should return HashMap<String, String>
+    pub fn read_params(home: String) -> HashMap<String, String> {
+        let params_file_path = Path::new(&home).join(consts::PARAMS_FILE);
+        let params: Result<HashMap<String, String>, String> =
+            from_yaml_file(params_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+        match params {
+            Ok(params_res) => {
+                // Successfully loaded the configuration
+                // You can use 'config' here
+                params_res
+            }
+            Err(err) => {
+                // Handle the error, for example, log it
+                error!("{}: {}", params_file_path.to_str().unwrap(), err);
+                HashMap::new()
+            }
+        }
+    }
+
+    // get a specific param from self.params
+    pub fn get_param(&self, param_name: &str) -> Option<String> {
+        self.params.get(param_name).cloned()
+    }
+
+    // create a function save_param that save a param to self.params and to home/consts::PARAMS_FILE
+    pub fn save_param(&mut self, param_name: &str, param_value: &str) {
+        self.params
+            .insert(param_name.to_string(), param_value.to_string());
+        let params_file_path = Path::new(&self.home).join(consts::PARAMS_FILE);
+        let _ = fs::remove_file(&params_file_path);
+        let _ = fs::File::create(&params_file_path);
+        let _ = fs::write(
+            &params_file_path,
+            serde_yaml::to_string(&self.params).unwrap(),
+        );
+    }
 }
