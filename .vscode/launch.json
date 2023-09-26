@@ -41,7 +41,7 @@
             },
             "args": [
                 "run",
-                "omega.oncall"
+                "omega.devmachine"
             ],
             "cwd": "${workspaceFolder}"
         },

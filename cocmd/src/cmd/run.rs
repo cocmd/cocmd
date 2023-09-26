@@ -1,16 +1,23 @@
+use std::collections::HashMap;
 use std::io::{self, BufRead};
+use std::path::Path;
 use std::process;
 use std::process::{Command, Stdio};
 
 use anyhow::Result;
 use cocmd::core::models::script_model::StepParamModel;
+use cocmd::core::source::Source;
+use cocmd::core::sources_manager;
 use cocmd::core::{
     models::script_model::{ScriptModel, StepModel, StepRunnerType},
     sources_manager::SourcesManager,
 };
 use cocmd::utils::sys::OS;
+use cocmd_package::get_provider;
+use dialoguer::Confirm;
 use dialoguer::{theme::ColorfulTheme, Select};
 use execute::{shell, Execute};
+use minijinja::{context, Environment, Value};
 use termimad::{self, MadSkin};
 use tracing::{error, info};
 
@@ -45,16 +52,17 @@ pub fn run_automation(
         // info!("{:?}", script);
         // let output = script.content;
         handle_script(
+            &selected_name,
             automation.content.as_ref().unwrap(),
             sources_manager.settings.os,
-            &mut sources_manager.settings,
+            sources_manager,
         );
         // info!("[blue] Script executed:");
         // for line in output {
         //     info!(" - {}", line);
         // }
 
-        info!("Script {} completed", automation.name);
+        // info!("Script {} completed", automation.name);
     } else {
         error!("I don't know this script");
     }
@@ -69,7 +77,7 @@ fn interactive_shell(
     step: &StepModel,
     skin: &mut MadSkin,
     params: Vec<StepParamModel>,
-    settings: &mut Settings,
+    sources_manager: &mut SourcesManager,
 ) -> Result<bool, String> {
     let command = step.content.as_ref().unwrap();
 
@@ -78,8 +86,12 @@ fn interactive_shell(
     // if param.save == true, call save_param with the param.name and the value
 
     let mut cmd = command.clone();
+
+    let env = Environment::new();
+    let mut params_map: HashMap<String, String> = HashMap::new();
+
     for param in params {
-        let param_value = settings.get_param(&param.name);
+        let param_value = sources_manager.settings.get_param(&param.name);
         // if param_value is None, get it from STDIN with some nice prompt
         let param_value = match param_value {
             Some(value) => value,
@@ -96,11 +108,17 @@ fn interactive_shell(
             }
         };
 
-        cmd = cmd.replace(&format!("{{{{{}}}}}", param.name), &param_value);
+        params_map.insert(param.name.clone(), param_value.clone());
+
         if param.save {
-            settings.save_param(&param.name, &param_value);
+            sources_manager
+                .settings
+                .save_param(&param.name, &param_value);
         }
     }
+
+    let ctx = Value::from_serializable(&params_map);
+    cmd = env.render_str(&cmd, ctx).unwrap();
 
     let mut command = shell(cmd);
 
@@ -159,19 +177,49 @@ fn handle_step(
     env: OS,
     skin: &mut MadSkin,
     script_params: Option<Vec<StepParamModel>>,
-    settings: &mut Settings,
+    sources_manager: &mut SourcesManager,
 ) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
     let params = step.get_params(script_params);
     match &step.runner {
         StepRunnerType::SHELL => {
             skin.print_text(&format!("# running shell step - {}", &step.title));
-            if let Err(err) = interactive_shell(step, skin, params.clone(), settings) {
+            if let Err(err) = interactive_shell(step, skin, params.clone(), sources_manager) {
                 return false;
             }
         }
         StepRunnerType::COCMD => {
             skin.print_text(&format!("# running cocmd step - {}", &step.title));
+
+            let provider_name = content.split('.').next().unwrap();
+
+            let available_automations = sources_manager.automations();
+            if !available_automations.contains_key(content) {
+                if !Confirm::new()
+                    .with_prompt(format!(
+                        "Cocmd Source {} not found. Download?",
+                        &provider_name
+                    ))
+                    .interact()
+                    .unwrap()
+                {
+                    return false;
+                }
+
+                // ask the user if he wants to download the source. get yes/no approval
+                // if yes, download the source
+                if let Err(err) = interactive_shell(
+                    &StepModel {
+                        content: Some(format!("cocmd install {}", &provider_name)),
+                        ..step.clone()
+                    },
+                    skin,
+                    params.clone(),
+                    sources_manager,
+                ) {
+                    return false;
+                }
+            }
             if let Err(err) = interactive_shell(
                 &StepModel {
                     content: Some(format!("cocmd run {}", &content)),
@@ -179,7 +227,7 @@ fn handle_step(
                 },
                 skin,
                 params.clone(),
-                settings,
+                sources_manager,
             ) {
                 return false;
             }
@@ -231,21 +279,32 @@ fn handle_step(
     return true;
 }
 
-fn handle_script(script: &ScriptModel, env: OS, settings: &mut Settings) {
+fn handle_script(
+    automation_name: &String,
+    script: &ScriptModel,
+    env: OS,
+    sources_manager: &mut SourcesManager,
+) {
     let mut skin: MadSkin = MadSkin::default();
     let mut step_statuses = Vec::new();
     let script_params = script.params.clone();
     for step in &script.steps {
-        let success = handle_step(step, env, &mut skin, script_params.clone(), settings);
-        step_statuses.push((step.title.clone(), success));
+        let success = handle_step(step, env, &mut skin, script_params.clone(), sources_manager);
+        // check if step runner is executable shell/cmd/python add it
+        if step.runner == StepRunnerType::SHELL
+            || step.runner == StepRunnerType::COCMD
+            || step.runner == StepRunnerType::PYTHON
+        {
+            step_statuses.push((step.title.clone(), success));
+        }
     }
 
-    println!();
-    println!("# Automation completed. Summary:");
+    skin.print_text(&format!(
+        "\n\n\n## 🚀🚀🚀 {} completed 🚀🚀🚀",
+        automation_name
+    ));
     for (title, success) in &step_statuses {
         let status_str = if *success { "✅" } else { "❌" };
-        println!("{} {}", status_str, title);
+        skin.print_text(&format!("{} {}", status_str, title));
     }
-
-    println!(); // Add a newline after the summary
 }
