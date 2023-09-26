@@ -95,7 +95,7 @@ fn interactive_shell(
                 param_value
             }
         };
-        cmd = cmd.replace(&format!("{{{}}}", param.name), &param_value);
+        cmd = cmd.replace(&format!("{{{{{}}}}}", param.name), &param_value);
         if param.save {
             settings.save_param(&param.name, &param_value);
         }
