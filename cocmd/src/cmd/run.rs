@@ -1,3 +1,4 @@
+use std::io::{self, BufRead};
 use std::process;
 use std::process::{Command, Stdio};
 
@@ -68,22 +69,48 @@ fn interactive_shell(step: &StepModel, skin: &mut MadSkin) -> Result<bool, Strin
     command.stderr(Stdio::piped());
     command.stdin(Stdio::piped());
 
-    // print!("{}", &step.content.as_ref().unwrap());
-    let output = command.execute_output().unwrap();
+    let mut child = command
+        .spawn()
+        .map_err(|e| format!("Failed to start shell command: {}", e))?;
 
-    let stdout_str = String::from_utf8(output.stdout).unwrap();
-    let stderr_str = String::from_utf8(output.stderr).unwrap();
+    // Create separate threads to read and print stdout and stderr
+    let stdout = child.stdout.take().expect("Failed to open stdout");
+    let stderr = child.stderr.take().expect("Failed to open stderr");
 
-    // Format stdout as a code block
-    skin.print_text("## Output (stdout):\n");
-    skin.print_text(&format!("```shell\n{}\n```", stdout_str));
+    let stdout_thread = std::thread::spawn(move || {
+        let stdout_reader = io::BufReader::new(stdout);
+        for line in stdout_reader.lines() {
+            if let Ok(line) = line {
+                println!("{}", line); // You can customize the output format here
+            }
+        }
+    });
 
-    if output.status.success() {
+    let stderr_thread = std::thread::spawn(move || {
+        let stderr_reader = io::BufReader::new(stderr);
+        for line in stderr_reader.lines() {
+            if let Ok(line) = line {
+                eprintln!("{}", line); // You can customize the output format here
+            }
+        }
+    });
+
+    // Wait for the command to finish and get its exit status
+    let status = child
+        .wait()
+        .map_err(|e| format!("Failed to wait for shell command: {}", e))?;
+
+    let success = status.success();
+
+    // Wait for the stdout and stderr threads to finish
+    stdout_thread.join().expect("stdout thread panicked");
+    stderr_thread.join().expect("stderr thread panicked");
+
+    if success {
+        skin.print_text("## ✅ Success");
         Ok(true)
     } else {
-        // Format stderr as a code block in red
-        skin.print_text("## Output (stderr):\n");
-        skin.print_text(&format!("```shell\n{}\n```", stderr_str));
+        skin.print_text("## ❌ Failed (stderr):\n");
         Err("Shell command failed.".to_string())
     }
 }
