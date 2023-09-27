@@ -39,11 +39,12 @@ jobs:
           COMMIT_HASH=$(git rev-list --max-count=1 HEAD)
           echo "Creating release: ${{ needs.extract-version.outputs.cocmd_version }}"
           echo "for hash: $COMMIT_HASH"
+
           gh release create ${{ needs.extract-version.outputs.cocmd_version }} \
             -t ${{ needs.extract-version.outputs.cocmd_version }} \
             --notes "Automatically released by CI" \
             --prerelease \
-            --target $COMMIT_HASH
+            --target $COMMIT_HASH || true
 
   # windows:
   #   needs: ["extract-version", "create-release"]
@@ -318,7 +319,7 @@ jobs:
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
 
   update-website:
-    needs: ["extract-version", "create-release", "macos-m1", "macos-intel"]
+    needs: ["macos-publish-homebrew"]
     runs-on: ubuntu-latest
 
     steps:
@@ -332,7 +333,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.COCMD_WEBSITE_SSH_PRIVATE_KEY }}
       
+      - uses: peaceiris/actions-gh-pages@v3
       - name: Update version in website
+        
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
