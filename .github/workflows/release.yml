@@ -105,7 +105,7 @@ jobs:
   #     - name: Upload artifacts to Github Releases (if master)
   #       if: ${{ github.ref == 'refs/heads/master' }}
   #       run: |
-  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} target/windows/installer/Cocmd-Win-Installer-x86_64.exe target/windows/Cocmd-Win-Portable-x86_64.zip target/windows/installer/Cocmd-Win-Installer-x86_64.exe.sha256.txt target/windows/Cocmd-Win-Portable-x86_64.zip.sha256.txt
+  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber target/windows/installer/Cocmd-Win-Installer-x86_64.exe target/windows/Cocmd-Win-Portable-x86_64.zip target/windows/installer/Cocmd-Win-Installer-x86_64.exe.sha256.txt target/windows/Cocmd-Win-Portable-x86_64.zip.sha256.txt
   
   # linux-x11:
   #   needs: ["extract-version", "create-release"]
@@ -132,7 +132,7 @@ jobs:
   #     - name: Upload artifacts to Github Releases (if master)
   #       if: ${{ github.ref == 'refs/heads/master' }}
   #       run: |
-  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} Cocmd-X11.AppImage Cocmd-X11.AppImage.sha256.txt
+  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber Cocmd-X11.AppImage Cocmd-X11.AppImage.sha256.txt
   
   # linux-deb:
   #   needs: ["extract-version", "create-release"]
@@ -159,7 +159,7 @@ jobs:
   #     - name: Upload artifacts to Github Releases (if master)
   #       if: ${{ github.ref == 'refs/heads/master' }}
   #       run: |
-  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} cocmd-debian-x11-amd64.deb cocmd-debian-wayland-amd64.deb cocmd-debian-x11-amd64-sha256.txt cocmd-debian-wayland-amd64-sha256.txt 
+  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber cocmd-debian-x11-amd64.deb cocmd-debian-wayland-amd64.deb cocmd-debian-x11-amd64-sha256.txt cocmd-debian-wayland-amd64-sha256.txt 
 
 
   macos-intel:
@@ -230,7 +230,7 @@ jobs:
       - name: Upload artifacts to Github Releases (if master)
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} Cocmd-Mac-Intel.zip Cocmd-Mac-Intel.zip.sha256.txt
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber Cocmd-Mac-Intel.zip Cocmd-Mac-Intel.zip.sha256.txt
   
   macos-m1:
     needs: ["extract-version", "create-release"]
@@ -296,7 +296,7 @@ jobs:
       - name: Upload artifacts to Github Releases (if master)
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} Cocmd-Mac-M1.zip Cocmd-Mac-M1.zip.sha256.txt
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber Cocmd-Mac-M1.zip Cocmd-Mac-M1.zip.sha256.txt
 
   macos-publish-homebrew:
     needs: ["extract-version", "create-release", "macos-m1", "macos-intel"]
