@@ -41,7 +41,7 @@
             },
             "args": [
                 "run",
-                "omega.devmachine"
+                "omega.onboarding"
             ],
             "cwd": "${workspaceFolder}"
         },

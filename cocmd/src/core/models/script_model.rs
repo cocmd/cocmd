@@ -38,6 +38,7 @@ pub struct StepModel {
     pub file: Option<String>,
     pub title: String,
     pub params: Option<Vec<StepParamModel>>,
+    pub approval_message: Option<String>,
 }
 
 impl StepModel {

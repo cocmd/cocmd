@@ -181,9 +181,16 @@ fn handle_step(
 ) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
     let params = step.get_params(script_params);
+
+    skin.print_text(&format!("# running shell step - {}", &step.title));
+    if let Some(msg) = step.approval_message.clone() {
+        if !Confirm::new().with_prompt(msg).interact().unwrap() {
+            return false;
+        }
+    }
+
     match &step.runner {
         StepRunnerType::SHELL => {
-            skin.print_text(&format!("# running shell step - {}", &step.title));
             if let Err(err) = interactive_shell(step, skin, params.clone(), sources_manager) {
                 return false;
             }
@@ -237,7 +244,6 @@ fn handle_step(
             skin.print_text(content);
         }
         StepRunnerType::PYTHON => {
-            skin.print_text(&format!("# running python step - {}", &step.title));
             // Execute Python script
             let output = Command::new("python")
                 .arg("-c")
