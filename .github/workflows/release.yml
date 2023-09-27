@@ -319,7 +319,7 @@ jobs:
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
 
   update-website:
-    needs: ["macos-publish-homebrew"]
+    needs: ["extract-version", "macos-publish-homebrew"]
     runs-on: ubuntu-latest
 
     steps:
@@ -336,7 +336,7 @@ jobs:
         run: |
           git config --global user.email "cocmd@cocmd.org"
           git config --global user.name "Github Actions"
-          
+
       - name: Update version in website
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
