@@ -317,4 +317,23 @@ jobs:
         run: |
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
 
-          echo "Cask formula has been published here: "
+  update-website:
+    needs: ["extract-version", "create-release", "macos-m1", "macos-intel"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+
+      - name: "Setup SSH deploy key"
+        uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: ${{ secrets.COCMD_WEBSITE_SSH_PRIVATE_KEY }}
+      
+      - name: Update version in website
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
+      
