@@ -7,7 +7,6 @@ use std::process::{Command, Stdio};
 use anyhow::Result;
 use cocmd::core::models::script_model::StepParamModel;
 
-
 use cocmd::core::{
     models::script_model::{ScriptModel, StepModel, StepRunnerType},
     sources_manager::SourcesManager,
@@ -16,12 +15,10 @@ use cocmd::utils::sys::OS;
 
 use dialoguer::Confirm;
 use dialoguer::{theme::ColorfulTheme, Select};
-use execute::{shell};
+use execute::shell;
 use minijinja::{Environment, Value};
 use termimad::{self, MadSkin};
-use tracing::{error};
-
-
+use tracing::error;
 
 pub fn run_automation(
     sources_manager: &mut SourcesManager,

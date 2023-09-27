@@ -16,14 +16,11 @@ pub enum StepRunnerType {
     COCMD,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
-#[derive(Default)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone, Default)]
 pub struct StepParamModel {
     pub name: String,
     pub save: bool,
 }
-
-
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub struct StepModel {

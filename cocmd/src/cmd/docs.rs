@@ -1,15 +1,5 @@
-
-
-
 use anyhow::Result;
-use cocmd::core::{
-    sources_manager::SourcesManager,
-};
-
-
-
-
-
+use cocmd::core::sources_manager::SourcesManager;
 
 pub fn run_docs(
     _sources_manager: &mut SourcesManager,

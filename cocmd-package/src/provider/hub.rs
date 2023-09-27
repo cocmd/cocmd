@@ -26,10 +26,7 @@ use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
-use crate::{
-    util::download::{read_string_from_url},
-    COCMDHUB_PROVIDER,
-};
+use crate::{util::download::read_string_from_url, COCMDHUB_PROVIDER};
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
     "https://github.com/cocmd/hub/releases/latest/download/package_index.json";

@@ -19,7 +19,7 @@
 
 use std::path::Path;
 
-use anyhow::{Result};
+use anyhow::Result;
 
 #[macro_use]
 mod logging;

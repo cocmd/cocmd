@@ -47,7 +47,8 @@ pub fn run_setup(
     let profile_loader = r#"
 # cocmd profile-loader
 eval "$(cocmd profile-loader)"
-"#.to_string();
+"#
+    .to_string();
     let profile_path = match shell {
         "bash" => {
             let home = std::env::var("HOME").unwrap();
