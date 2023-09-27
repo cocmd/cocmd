@@ -1,6 +1,6 @@
 from typing import Sequence
-from cocmd_cli.utils.io import file_read_lines, file_write_lines
-from cocmd_cli.core.source import Source
+from cocmd.utils.io import file_read_lines, file_write_lines
+from cocmd.core.source import Source
 
 
 class SourcesManager:

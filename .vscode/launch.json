@@ -6,7 +6,7 @@
     "externalConsole":true ,
     "configurations": [
         {
-            "name": "add source",
+            "name": "install source",
             "type": "lldb",
             "request": "launch",
             "cargo": {
@@ -20,9 +20,8 @@
                 }
             },
             "args": [
-                "add",
-                "source",
-                "demo",
+                "install",
+                "git@github.com:cocmd/hub.git",
             ],
             "cwd": "${workspaceFolder}"
         },
@@ -42,7 +41,7 @@
             },
             "args": [
                 "run",
-                "docker.setup"
+                "omega.onboarding"
             ],
             "cwd": "${workspaceFolder}"
         },
@@ -102,9 +101,97 @@
             "args": [
                 "show",
                 "source",
-                "docker"
+                "/Users/mosher/workspace/example-repo-template"
             ],
             "cwd": "${workspaceFolder}"
-        }
+        },
+        {
+            "name": "setup",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "setup",
+                
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "docs",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "docs",
+                
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "howto",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                },
+                "env": {
+                    "LIBTORCH": "/opt/homebrew/Cellar/pytorch/2.0.1",
+                    "LD_LIBRARY_PATH": "/opt/homebrew/Cellar/pytorch/2.0.1/lib:"
+                }
+            },
+            "args": [
+                "howto",
+                "how to clean my docker env?"
+                
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "LIBTORCH": "/opt/homebrew/Cellar/pytorch/2.0.1",
+                "LD_LIBRARY_PATH": "/opt/homebrew/Cellar/pytorch/2.0.1/lib:"
+            }
+        },
+        {
+            "name": "test cocmd-package",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=cocmd-package"
+                ],
+                "filter": {
+                    "name": "cocmd-package",
+                    "kind": "lib"
+                }
+            },
+            "args": [ ],
+            "cwd": "${workspaceFolder}"
+        },
     ]
 }

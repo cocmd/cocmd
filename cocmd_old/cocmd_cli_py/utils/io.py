@@ -8,7 +8,7 @@ import tempfile
 import os
 from pathlib import Path
 from typing import Sequence
-from cocmd_cli.core.os import OS
+from cocmd.core.os import OS
 
 
 def normalize_path(relative_path: str, base_path: str = None) -> str:

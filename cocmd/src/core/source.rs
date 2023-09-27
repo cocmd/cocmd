@@ -1,34 +1,31 @@
+use std::fmt;
 use std::path::Path;
-use std::{fmt, fs};
+use std::path::PathBuf;
 
 use tracing::error;
 
 use crate::consts;
 use crate::core::models::source_config_model::Automation;
 use crate::core::models::source_config_model::SourceConfigModel;
-use crate::utils::io::{exists, from_yaml_file, normalize_path};
+use crate::utils::io::{from_yaml_file, normalize_path};
 use crate::Settings;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct Source {
-    pub location: String,
+    pub uri: String,
+    pub location: PathBuf,
     pub cocmd_config: Option<SourceConfigModel>,
 }
 
 impl Source {
-    pub fn new(location: &str, _settings: &Settings) -> Result<Self, String> {
+    pub fn new(uri: String, location: &PathBuf, _settings: &Settings) -> Self {
         let mut source = Source {
-            location: location.to_lowercase(),
+            uri: uri.clone(),
+            location: location.to_path_buf(),
             cocmd_config: None,
         };
 
-        if exists(&source.location) {
-            source.location = fs::canonicalize(&source.location)
-                .map_err(|e| e.to_string())?
-                .to_str()
-                .unwrap_or("")
-                .to_string();
-
+        if source.location.exists() {
             let config_file_path = Path::new(&source.location).join(consts::SOURCE_CONFIG_FILE);
 
             if config_file_path.exists() {
@@ -39,27 +36,45 @@ impl Source {
                         // Successfully loaded the configuration
                         // You can use 'config' here
                         source.cocmd_config = Some(config_res);
-                        Ok(source)
                     }
                     Err(err) => {
                         // Handle the error, for example, log it
-                        error!("{}", err);
-                        Err(err)
+                        error!("{}: {}", config_file_path.to_str().unwrap(), err);
                     }
-                }
+                };
             } else {
-                Err(format!(
+                error!(
                     "Config Path {:?} does not exist.",
-                    config_file_path
-                ))
+                    config_file_path.to_str().unwrap(),
+                );
             }
         } else {
-            Err(format!("Source Path {} does not exist.", source.location))
+            error!(
+                "Source Path {} does not exist.",
+                source.location.to_str().unwrap()
+            )
         }
+        source
     }
 
     pub fn is_exists_locally(&self) -> bool {
-        false // Implement this logic as needed
+        self.location.exists()
+    }
+
+    pub fn is_legit_cocmd_source(&self) -> bool {
+        if self.location.exists() {
+            let config_file_path = Path::new(&self.location).join(consts::SOURCE_CONFIG_FILE);
+
+            if config_file_path.exists() {
+                let config: Result<SourceConfigModel, String> =
+                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                config.is_ok()
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
     pub fn aliases(&self) -> Option<String> {
@@ -72,7 +87,12 @@ impl Source {
     pub fn name(&self) -> &str {
         match &self.cocmd_config {
             Some(config) => &config.name,
-            None => "", // or any other default behavior
+            None => {
+                panic!(
+                    "Unable to get name for {}",
+                    &self.location.to_str().unwrap()
+                );
+            }
         }
     }
 
@@ -82,7 +102,7 @@ impl Source {
                 match &config.paths {
                     Some(paths) => paths
                         .iter()
-                        .map(|p| normalize_path(p, Some(&self.location)))
+                        .map(|p| normalize_path(p, &self.location))
                         .collect(),
                     None => vec![], // or any other default behavior
                 }
@@ -107,13 +127,13 @@ impl Source {
         result
     }
 
-    pub fn location(&self) -> &str {
+    pub fn location(&self) -> &PathBuf {
         &self.location
     }
 }
 
 impl fmt::Display for Source {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.location)
+        write!(f, "{}", self.location.to_str().unwrap())
     }
 }

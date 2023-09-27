@@ -1,4 +1,4 @@
-from cocmd_cli.consts import Consts
+from cocmd.consts import Consts
 import os
 from typing import List
 

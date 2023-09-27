@@ -1,8 +1,8 @@
 
 
 import pprint
-from cocmd_cli_app.utils import io
-from cocmd_cli_app.core.models.script_model import *
+from cocmd_app.utils import io
+from cocmd_app.core.models.script_model import *
 
 
 
@@ -86,7 +86,7 @@ bash ~/miniconda.sh -b -p $HOME/miniconda
     ])
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/osx/scripts/devmachine.yaml', data_osx)
+io.YamlIO.to_file('./cocmd_app/resources/demo/osx/scripts/devmachine.yaml', data_osx)
 
 
 data_zsh_setup = ScriptModel(
@@ -217,7 +217,7 @@ print('Have a nice day!')
     )
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/zsh/scripts/setup.yaml', data_zsh_setup)
+io.YamlIO.to_file('./cocmd_app/resources/demo/zsh/scripts/setup.yaml', data_zsh_setup)
 
 
 
@@ -259,7 +259,7 @@ Welcome! We choose our new team members carefully and we’re proud to welcome y
     ])
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/team1/scripts/onboarding.yaml', data_onboarding)
+io.YamlIO.to_file('./cocmd_app/resources/demo/team1/scripts/onboarding.yaml', data_onboarding)
 
 
 
@@ -326,7 +326,7 @@ exit 0
     ])
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/docker/scripts/clean.yaml', data_docker_clean)
+io.YamlIO.to_file('./cocmd_app/resources/demo/docker/scripts/clean.yaml', data_docker_clean)
 
 data_docker = ScriptModel(
     name="setup",
@@ -428,7 +428,7 @@ data_docker = ScriptModel(
     ])
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/docker/scripts/setup.yaml', data_docker)
+io.YamlIO.to_file('./cocmd_app/resources/demo/docker/scripts/setup.yaml', data_docker)
 
 
 data_awscli = ScriptModel(
@@ -496,7 +496,7 @@ data_awscli = ScriptModel(
     ])
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/awscli/scripts/setup.yaml', data_awscli)
+io.YamlIO.to_file('./cocmd_app/resources/demo/awscli/scripts/setup.yaml', data_awscli)
 
 
 
@@ -615,5 +615,5 @@ rm -rf kubectl kubectl.sha256
     ])
 )
 
-io.YamlIO.to_file('./cocmd_cli_app/resources/demo/k8s/scripts/setup.yaml', data_k8s)
+io.YamlIO.to_file('./cocmd_app/resources/demo/k8s/scripts/setup.yaml', data_k8s)
 

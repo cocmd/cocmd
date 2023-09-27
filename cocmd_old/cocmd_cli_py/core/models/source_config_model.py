@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from cocmd_cli.core.os import OS
-from cocmd_cli.utils.io import DictLoader, YamlIO, normalize_path
+from cocmd.core.os import OS
+from cocmd.utils.io import DictLoader, YamlIO, normalize_path
 from typing import List, Optional
 from .script_model import ScriptModel
 

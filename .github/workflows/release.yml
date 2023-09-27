@@ -23,9 +23,9 @@ jobs:
       - name: "Extract version"
         id: "version"
         run: |
-          ESPANSO_VERSION=$(grep '^version' cocmd/Cargo.toml | awk -F '"' '{ print $2 }')
-          echo version: $ESPANSO_VERSION
-          echo "::set-output name=version::v$ESPANSO_VERSION"
+          COCMD_VERSION=$(grep '^version' cocmd/Cargo.toml | awk -F '"' '{ print $2 }')
+          echo version: $COCMD_VERSION
+          echo "::set-output name=version::v$COCMD_VERSION"
 
   create-release:
     name: create-release

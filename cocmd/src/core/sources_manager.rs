@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
+use cocmd_package::get_provider;
+use tracing::error;
+
+use crate::core::models::source_config_model::Automation;
 use crate::core::source::Source;
 use crate::utils::io::{file_read_lines, file_write_lines};
 use crate::Settings;
-
-use crate::core::models::source_config_model::Automation;
-use tracing::error;
 
 pub struct SourcesManager {
     pub settings: Settings,
@@ -25,12 +26,12 @@ impl SourcesManager {
     }
 
     pub fn remove_source(&mut self, source: Source) {
-        self.sources.remove(source.name());
+        self.sources.remove(source.uri.as_str());
         self.save();
     }
 
     pub fn add_source(&mut self, source: Source) {
-        self.sources.insert(String::from(source.name()), source);
+        self.sources.insert(source.uri.clone(), source);
         self.save();
     }
 
@@ -39,8 +40,7 @@ impl SourcesManager {
     }
 
     fn save_sources(sources_file: &str, sources: &HashMap<String, Source>) {
-        let source_strings: Vec<String> =
-            sources.values().map(|s| s.location.to_string()).collect();
+        let source_strings: Vec<String> = sources.values().map(|s| s.uri.to_string()).collect();
         let _ = file_write_lines(sources_file, &source_strings);
     }
 
@@ -49,13 +49,17 @@ impl SourcesManager {
             Ok(lines) => {
                 let mut sources = HashMap::new();
                 for line in lines {
-                    let source = Source::new(line.as_str(), settings);
-                    match source {
-                        Ok(source_obj) => {
-                            sources.insert(String::from(source_obj.name()), source_obj);
-                        }
-                        Err(msg) => error!(msg),
+                    let uri = line.trim().to_string();
+
+                    let provider = get_provider(&uri, &settings.runtime_dir);
+                    if let Err(err) = provider {
+                        error!("failed to get location for {} - {}", uri, err);
+                        continue;
                     }
+                    let source =
+                        Source::new(uri.clone(), &provider.unwrap().local_path(), settings);
+
+                    sources.insert(source.uri.clone(), source);
                 }
                 sources
             }
@@ -68,9 +72,9 @@ impl SourcesManager {
 
     pub fn automations(&self) -> HashMap<String, Automation> {
         let mut automations = HashMap::new();
-        for (name, source) in self.sources.iter() {
+        for (_name, source) in self.sources.iter() {
             for automation in source.automations(&self.settings) {
-                let key = format!("{}.{}", name, automation.name);
+                let key = format!("{}.{}", source.name(), automation.name);
                 automations.insert(key, automation);
             }
         }

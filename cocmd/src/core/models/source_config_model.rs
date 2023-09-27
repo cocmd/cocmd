@@ -1,8 +1,11 @@
+use std::path::PathBuf;
+
+use serde_derive::{Deserialize as De, Serialize as Se};
+use tracing::error;
+
 use super::script_model::{ScriptModel, StepModel};
 use crate::utils::io::{from_file, from_yaml_file, normalize_path};
 use crate::utils::sys::OS;
-use serde_derive::{Deserialize as De, Serialize as Se};
-use tracing::error;
 
 #[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
 pub struct Automation {
@@ -12,10 +15,10 @@ pub struct Automation {
 }
 
 impl Automation {
-    pub fn load_content(&self, location: &str) -> Automation {
+    pub fn load_content(&self, location: &PathBuf) -> Automation {
         let mut automation_clone = self.clone();
         if let Some(file) = &self.file {
-            let normalized_path = normalize_path(file, Some(location));
+            let normalized_path = normalize_path(file, location);
 
             match from_yaml_file::<ScriptModel>(&normalized_path) {
                 Ok(script_model) => {
@@ -24,7 +27,7 @@ impl Automation {
                         .iter()
                         .map(|step| {
                             if let Some(file) = &step.file {
-                                let normalized_path = normalize_path(file, Some(location));
+                                let normalized_path = normalize_path(file, location);
 
                                 match from_file(&normalized_path) {
                                     Ok(file_content) => {
@@ -64,7 +67,7 @@ impl Automation {
                 return *content_env == *os || *content_env == OS::ANY;
             }
         }
-        false
+        true
     }
 }
 
