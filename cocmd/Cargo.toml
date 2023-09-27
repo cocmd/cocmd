@@ -1,10 +1,10 @@
 [package]
 name = "cocmd"
-version = "1.0.6"
+version = "1.0.7"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
-homepage = "https:/cocmd.org"
+homepage = "https://cocmd.org"
 
 
 
