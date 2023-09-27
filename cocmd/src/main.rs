@@ -1,7 +1,7 @@
 #![allow(unused_must_use)]
 mod cmd;
 use clap::{Parser, Subcommand};
-use clap_markdown;
+
 use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;

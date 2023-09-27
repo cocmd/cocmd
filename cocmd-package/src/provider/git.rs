@@ -19,7 +19,7 @@
 
 use std::{path::Path, path::PathBuf, process::Command};
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{bail, Context, Result};
 
 use super::PackageProvider;
 use crate::{util::git::GitParts, GIT_PROVIDER};
@@ -33,7 +33,7 @@ pub struct GitPackageProvider {
 impl GitPackageProvider {
     pub fn new(source: &String, git_parts: &GitParts, runtime_dir: &Path) -> Self {
         // localpath is in runtime_dir with the name of the repo
-        let binding = runtime_dir.join(&format!("{}.{}", git_parts.author, git_parts.name));
+        let binding = runtime_dir.join(format!("{}.{}", git_parts.author, git_parts.name));
         let local_path = binding.as_path();
         Self {
             source: source.clone(),
@@ -58,7 +58,7 @@ impl GitPackageProvider {
         args.push(self.source.as_str());
 
         let dest_dir_str = self.local_path.to_str().unwrap();
-        args.push(&dest_dir_str);
+        args.push(dest_dir_str);
 
         let output = Command::new("git")
             .args(&args)

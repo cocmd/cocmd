@@ -7,7 +7,7 @@ use tracing;
 // eval "$(cocmd profile-loader)"
 // output to stdout with tracing::info what you did
 pub fn run_setup(
-    sources_manager: &mut SourcesManager,
+    _sources_manager: &mut SourcesManager,
     shell: Option<String>,
 ) -> Result<cocmd::CmdExit> {
     let mut shell = shell.unwrap_or_else(|| {
@@ -44,12 +44,10 @@ pub fn run_setup(
             ))
         }
     };
-    let profile_loader = format!(
-        r#"
+    let profile_loader = r#"
 # cocmd profile-loader
 eval "$(cocmd profile-loader)"
-"#
-    );
+"#.to_string();
     let profile_path = match shell {
         "bash" => {
             let home = std::env::var("HOME").unwrap();

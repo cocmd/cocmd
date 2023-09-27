@@ -17,19 +17,13 @@ pub enum StepRunnerType {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
+#[derive(Default)]
 pub struct StepParamModel {
     pub name: String,
     pub save: bool,
 }
 
-impl Default for StepParamModel {
-    fn default() -> Self {
-        StepParamModel {
-            name: String::default(),
-            save: false,
-        }
-    }
-}
+
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub struct StepModel {

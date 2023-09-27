@@ -19,7 +19,7 @@
 
 use std::path::Path;
 
-use anyhow::{bail, Result};
+use anyhow::{Result};
 
 #[macro_use]
 mod logging;
@@ -37,9 +37,9 @@ pub fn get_provider(source: &String, runtime_dir: &Path) -> Result<Box<dyn Packa
     // otherwise look for it in the hub and create a HubPackageProvider
 
     if let Some(local_path) = util::path::extract_local_path(source) {
-        return Ok(Box::new(provider::local::LocalPackageProvider::new(
+        Ok(Box::new(provider::local::LocalPackageProvider::new(
             source, local_path,
-        )));
+        )))
     } else if let Some(github_parts) = util::git::extract_git_url_parts(source) {
         return Ok(Box::new(provider::git::GitPackageProvider::new(
             source,
@@ -68,28 +68,28 @@ mod tests {
         let hub_url = "cocmd-hub";
         let local_url = "/tmp/test/no-existing";
 
-        let provider = get_provider(&git_url.to_string(), &runtime_dir).unwrap();
+        let provider = get_provider(&git_url.to_string(), runtime_dir).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
         assert_eq!(
             provider.local_path(),
             Path::new("/tmp/mzsrtgzt2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&git_url2.to_string(), &runtime_dir).unwrap();
+        let provider = get_provider(&git_url2.to_string(), runtime_dir).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
         assert_eq!(
             provider.local_path(),
             Path::new("/tmp/mzsrtgzr2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&hub_url.to_string(), &runtime_dir).unwrap();
+        let provider = get_provider(&hub_url.to_string(), runtime_dir).unwrap();
         assert_eq!(provider.name(), COCMDHUB_PROVIDER);
         assert_eq!(
             provider.local_path(),
             Path::new("/tmp/cocmd-hub").to_path_buf()
         );
 
-        let provider = get_provider(&local_url.to_string(), &runtime_dir).unwrap();
+        let provider = get_provider(&local_url.to_string(), runtime_dir).unwrap();
         assert_eq!(provider.name(), LOCAL_PROVIDER);
         assert_eq!(provider.local_path(), Path::new(local_url).to_path_buf());
     }

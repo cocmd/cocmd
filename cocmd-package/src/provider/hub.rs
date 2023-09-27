@@ -27,7 +27,7 @@ use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
 use crate::{
-    util::download::{read_json_from_url, read_string_from_url},
+    util::download::{read_string_from_url},
     COCMDHUB_PROVIDER,
 };
 

@@ -1,6 +1,6 @@
 use std::path::Path;
 use std::path::PathBuf;
-use std::{fmt, fs};
+use std::{fmt};
 
 use tracing::error;
 
@@ -68,10 +68,7 @@ impl Source {
             if config_file_path.exists() {
                 let config: Result<SourceConfigModel, String> =
                     from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
-                match config {
-                    Ok(_) => true,
-                    Err(_) => false,
-                }
+                config.is_ok()
             } else {
                 false
             }

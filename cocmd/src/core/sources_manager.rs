@@ -72,7 +72,7 @@ impl SourcesManager {
 
     pub fn automations(&self) -> HashMap<String, Automation> {
         let mut automations = HashMap::new();
-        for (name, source) in self.sources.iter() {
+        for (_name, source) in self.sources.iter() {
             for automation in source.automations(&self.settings) {
                 let key = format!("{}.{}", source.name(), automation.name);
                 automations.insert(key, automation);

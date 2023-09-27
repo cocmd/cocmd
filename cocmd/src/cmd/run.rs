@@ -1,27 +1,27 @@
 use std::collections::HashMap;
 use std::io::{self, BufRead};
-use std::path::Path;
+
 use std::process;
 use std::process::{Command, Stdio};
 
 use anyhow::Result;
 use cocmd::core::models::script_model::StepParamModel;
-use cocmd::core::source::Source;
-use cocmd::core::sources_manager;
+
+
 use cocmd::core::{
     models::script_model::{ScriptModel, StepModel, StepRunnerType},
     sources_manager::SourcesManager,
 };
 use cocmd::utils::sys::OS;
-use cocmd_package::get_provider;
+
 use dialoguer::Confirm;
 use dialoguer::{theme::ColorfulTheme, Select};
-use execute::{shell, Execute};
-use minijinja::{context, Environment, Value};
+use execute::{shell};
+use minijinja::{Environment, Value};
 use termimad::{self, MadSkin};
-use tracing::{error, info};
+use tracing::{error};
 
-use crate::Settings;
+
 
 pub fn run_automation(
     sources_manager: &mut SourcesManager,
@@ -191,7 +191,7 @@ fn handle_step(
 
     match &step.runner {
         StepRunnerType::SHELL => {
-            if let Err(err) = interactive_shell(step, skin, params.clone(), sources_manager) {
+            if let Err(_err) = interactive_shell(step, skin, params.clone(), sources_manager) {
                 return false;
             }
         }
@@ -215,7 +215,7 @@ fn handle_step(
 
                 // ask the user if he wants to download the source. get yes/no approval
                 // if yes, download the source
-                if let Err(err) = interactive_shell(
+                if let Err(_err) = interactive_shell(
                     &StepModel {
                         content: Some(format!("cocmd install {}", &provider_name)),
                         ..step.clone()
@@ -227,7 +227,7 @@ fn handle_step(
                     return false;
                 }
             }
-            if let Err(err) = interactive_shell(
+            if let Err(_err) = interactive_shell(
                 &StepModel {
                     content: Some(format!("cocmd run {}", &content)),
                     ..step.clone()
@@ -282,7 +282,7 @@ fn handle_step(
             }
         }
     }
-    return true;
+    true
 }
 
 fn handle_script(
