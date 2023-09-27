@@ -333,10 +333,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.COCMD_WEBSITE_SSH_PRIVATE_KEY }}
       
-      - uses: peaceiris/actions-gh-pages@v3
       - name: Update version in website
         
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
+          git config --global user.email "cocmd@cocmd.org"
+          git config --global user.name "Github Actions"
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
       
