@@ -1,4 +1,5 @@
 use std::fmt;
+use std::os::macos::raw;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -111,14 +112,15 @@ impl Source {
         }
     }
 
-    pub fn automations(&self, settings: &Settings) -> Vec<Automation> {
+    pub fn automations(&self, settings: &Settings, env_specific: Option<bool>) -> Vec<Automation> {
         let mut result = vec![];
+        let env_specific = env_specific.unwrap_or(true);
 
         if let Some(source_config) = &self.cocmd_config {
             if let Some(automations) = &source_config.automations {
                 for automation in automations.iter() {
                     let automation_loaded = automation.load_content(&self.location);
-                    if automation_loaded.supports_os(&settings.os) {
+                    if !env_specific || automation_loaded.supports_os(&settings.os) {
                         result.push(automation_loaded);
                     }
                 }
@@ -129,6 +131,51 @@ impl Source {
 
     pub fn location(&self) -> &PathBuf {
         &self.location
+    }
+
+    pub fn print_doc(&self, settings: &Settings, print_as_md: bool) {
+        // i want to print this content as md(with skin) or raw text(just println):
+        if print_as_md {
+            let skin = termimad::MadSkin::default();
+
+            skin.print_text(&format!("# {}", self.uri));
+            skin.print_text(&format!(
+                "- location: {}",
+                self.location().to_str().unwrap()
+            ));
+
+            if let Some(alias) = &self.aliases() {
+                skin.print_text(&format!("## aliases\n```\n{}\n```", alias));
+            }
+
+            skin.print_text("## automations");
+            // Apply automations as aliases
+            for automation in &self.automations(settings, Some(false)) {
+                skin.print_text(&format!("- `{}.{}`", self.name(), automation.name));
+            }
+
+            skin.print_text("## paths");
+
+            for p in &self.paths() {
+                skin.print_text(&format!("- `{}`", p));
+            }
+        } else {
+            println!("{}", self.uri);
+            println!("{}", self.location().to_str().unwrap());
+
+            if let Some(alias) = &self.aliases() {
+                println!("{}", alias);
+            }
+
+            // Apply automations as aliases
+            for automation in &self.automations(settings, Some(false)) {
+                println!("{}.{},{}", self.name(), automation.name, automation.command);
+            }
+
+            for p in &self.paths() {
+                println!("{}", p);
+            }
+        }
     }
 }
 

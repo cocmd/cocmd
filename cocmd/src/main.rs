@@ -1,11 +1,11 @@
 #![allow(unused_must_use)]
 mod cmd;
 use clap::{Parser, Subcommand};
-
 use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::Settings;
+use termimad::{self, MadSkin};
 use tracing::error;
 
 use crate::cmd::docs::run_docs;
@@ -115,6 +115,8 @@ fn main() {
         message: None,
     });
 
+    let skin = MadSkin::default();
+
     match cli.command {
         Commands::Setup(args) => {
             res = run_setup(&mut sources_manager, args.shell);
@@ -125,11 +127,16 @@ fn main() {
         Commands::Refresh => {
             println!("'cocmd refresh' was used");
         }
-        Commands::Docs { name } => {
-            let markdown: String = clap_markdown::help_markdown::<Cli>();
-            println!("{}", markdown);
-            res = run_docs(&mut sources_manager, name);
-        }
+        Commands::Docs { name } => match name {
+            Some(name) => {
+                res = run_docs(&mut sources_manager, Some(name));
+            }
+            None => {
+                let markdown: String = clap_markdown::help_markdown::<Cli>();
+                skin.print_text(&markdown.to_string());
+                res = run_docs(&mut sources_manager, None);
+            }
+        },
         Commands::Run { name } => {
             res = run_automation(&mut sources_manager, name);
         }

@@ -29,7 +29,9 @@ pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdEx
                 0
             };
             let automations_count = if source.is_legit_cocmd_source() {
-                source.automations(&sources_manager.settings).len()
+                source
+                    .automations(&sources_manager.settings, Some(true))
+                    .len()
             } else {
                 0
             };
@@ -77,12 +79,14 @@ pub fn show_source(sources_manager: &mut SourcesManager, uri: String) -> Result<
             bail!("Source \"{}\" not found", uri);
         }
     }
+
     let source = &sources_manager.sources[&uri];
-    let skin = termimad::MadSkin::default();
 
     if !source.is_legit_cocmd_source() {
         bail!("Source {} is not a legit cocmd source", uri);
     }
+
+    let skin = termimad::MadSkin::default();
 
     skin.print_text(&format!("# {}", uri));
     skin.print_text(&format!(

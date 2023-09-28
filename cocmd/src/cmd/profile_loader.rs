@@ -16,7 +16,7 @@ pub fn run_profile_loader(sources_manager: &mut SourcesManager) -> Result<cocmd:
         println!("#cocmd automations for source {}", source.name());
 
         // Apply automations as aliases
-        for automation in &source.automations(&sources_manager.settings) {
+        for automation in &source.automations(&sources_manager.settings, Some(true)) {
             println!(
                 r#"alias {}.{}="cocmd run {}.{}""#,
                 source.name(),
