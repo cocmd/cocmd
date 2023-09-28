@@ -1,3 +1,4 @@
+use std::env;
 use std::fmt;
 use std::os::macos::raw;
 use std::path::Path;
@@ -9,6 +10,7 @@ use crate::consts;
 use crate::core::models::source_config_model::Automation;
 use crate::core::models::source_config_model::SourceConfigModel;
 use crate::utils::io::{from_yaml_file, normalize_path};
+use crate::utils::sys::OS;
 use crate::Settings;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -133,48 +135,48 @@ impl Source {
         &self.location
     }
 
-    pub fn print_doc(&self, settings: &Settings, print_as_md: bool) {
+    pub fn print_doc(&self, settings: &Settings, print_as_md: bool, env_specific: bool) {
         // i want to print this content as md(with skin) or raw text(just println):
+
+        let mut output = String::new();
+
+        output += &format!("# {}\n", self.uri);
+        output += &format!("- location: {}\n", self.location().to_str().unwrap());
+
+        if let Some(alias) = &self.aliases() {
+            output += &format!("## aliases\n```\n{}\n```\n", alias);
+        }
+
+        output += "## automations\n";
+        for automation in &self.automations(settings, Some(env_specific)) {
+            output += &format!("- `{}.{}`\n", self.name(), automation.name);
+            output += &format!(
+                "  - description: {}\n",
+                automation
+                    .content
+                    .as_ref()
+                    .unwrap()
+                    .description
+                    .as_ref()
+                    .unwrap_or(&"Not provided".to_string())
+            );
+            if !env_specific {
+                let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
+                output += &format!("  - env: {}\n", env);
+            }
+            output += &format!("\n");
+        }
+
+        output += "## paths\n";
+        for p in &self.paths() {
+            output += &format!("- `{}`\n", p);
+        }
+
         if print_as_md {
             let skin = termimad::MadSkin::default();
-
-            skin.print_text(&format!("# {}", self.uri));
-            skin.print_text(&format!(
-                "- location: {}",
-                self.location().to_str().unwrap()
-            ));
-
-            if let Some(alias) = &self.aliases() {
-                skin.print_text(&format!("## aliases\n```\n{}\n```", alias));
-            }
-
-            skin.print_text("## automations");
-            // Apply automations as aliases
-            for automation in &self.automations(settings, Some(false)) {
-                skin.print_text(&format!("- `{}.{}`", self.name(), automation.name));
-            }
-
-            skin.print_text("## paths");
-
-            for p in &self.paths() {
-                skin.print_text(&format!("- `{}`", p));
-            }
+            skin.print_text(&output);
         } else {
-            println!("{}", self.uri);
-            println!("{}", self.location().to_str().unwrap());
-
-            if let Some(alias) = &self.aliases() {
-                println!("{}", alias);
-            }
-
-            // Apply automations as aliases
-            for automation in &self.automations(settings, Some(false)) {
-                println!("{}.{},{}", self.name(), automation.name, automation.command);
-            }
-
-            for p in &self.paths() {
-                println!("{}", p);
-            }
+            println!("{}", output);
         }
     }
 }

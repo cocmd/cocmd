@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash, Clone, Copy)]
@@ -17,6 +19,18 @@ pub enum OS {
     Other,
     #[serde(alias = "any")]
     ANY,
+}
+
+impl Display for OS {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            OS::Windows => write!(f, "Windows"),
+            OS::Linux => write!(f, "Linux"),
+            OS::MacOS => write!(f, "MacOS"),
+            OS::Other => write!(f, "Other"),
+            OS::ANY => write!(f, "Any"),
+        }
+    }
 }
 
 pub fn get_os() -> OS {

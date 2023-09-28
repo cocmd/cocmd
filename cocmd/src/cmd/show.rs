@@ -86,29 +86,7 @@ pub fn show_source(sources_manager: &mut SourcesManager, uri: String) -> Result<
         bail!("Source {} is not a legit cocmd source", uri);
     }
 
-    let skin = termimad::MadSkin::default();
-
-    skin.print_text(&format!("# {}", uri));
-    skin.print_text(&format!(
-        "- location: {}",
-        source.location().to_str().unwrap()
-    ));
-
-    if let Some(alias) = &source.aliases() {
-        skin.print_text(&format!("## aliases\n```\n{}\n```", alias));
-    }
-
-    skin.print_text("## automations");
-    // Apply automations as aliases
-    for automation in &source.automations(&sources_manager.settings) {
-        skin.print_text(&format!("- `{}.{}`", source.name(), automation.name));
-    }
-
-    skin.print_text("## paths");
-
-    for p in &source.paths() {
-        skin.print_text(&format!("- `{}`", p));
-    }
+    source.print_doc(&sources_manager.settings, true, true);
 
     Ok(cocmd::CmdExit {
         code: exitcode::OK,

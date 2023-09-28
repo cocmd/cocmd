@@ -5,8 +5,10 @@ use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::Settings;
+use serde;
 use termimad::{self, MadSkin};
 use tracing::error;
+use tracing_subscriber::fmt::writer::OptionalWriter;
 
 use crate::cmd::docs::run_docs;
 use crate::cmd::profile_loader::run_profile_loader;
@@ -48,6 +50,9 @@ enum Commands {
     Docs {
         /// Optional name argument for specific documentation generation
         name: Option<String>,
+        /// Optional flag to show raw markdown
+        #[arg(long = "raw-markdown")]
+        raw_markdown: Option<bool>,
     },
 
     /// Run command with a name argument - Runs a specific automation
@@ -127,14 +132,13 @@ fn main() {
         Commands::Refresh => {
             println!("'cocmd refresh' was used");
         }
-        Commands::Docs { name } => match name {
+        Commands::Docs { name, raw_markdown } => match name {
             Some(name) => {
-                res = run_docs(&mut sources_manager, Some(name));
+                res = run_docs(&mut sources_manager, &name, raw_markdown.unwrap_or(false));
             }
             None => {
                 let markdown: String = clap_markdown::help_markdown::<Cli>();
                 skin.print_text(&markdown.to_string());
-                res = run_docs(&mut sources_manager, None);
             }
         },
         Commands::Run { name } => {
