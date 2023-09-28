@@ -80,4 +80,25 @@ impl SourcesManager {
         }
         automations
     }
+
+    pub fn get_source(&self, uri: String) -> Option<&Source> {
+        let mut id = uri.clone();
+        if !self.sources.contains_key(&uri) {
+            // look for sources .name() value and compare with uri. if yes, uri should be the source.uri
+            let mut found = false;
+            for source in self.sources.values() {
+                if source.name() == uri {
+                    found = true;
+                    id = source.uri.clone();
+                    break;
+                }
+            }
+            if !found {
+                return None;
+            }
+        }
+
+        let source = &self.sources[&id];
+        Some(source)
+    }
 }

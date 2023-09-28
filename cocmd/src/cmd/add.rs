@@ -12,6 +12,7 @@ use tracing::info;
 pub fn install_source(
     sources_manager: &mut SourcesManager,
     source: &str,
+    dont_ask: bool,
 ) -> Result<cocmd::CmdExit> {
     info!("Installing source {:?}", source);
 
@@ -49,6 +50,7 @@ pub fn install_source(
     }
 
     if provider.name() != LOCAL_PROVIDER
+        || dont_ask
         || Confirm::new()
             .with_prompt("Do you want to continue?")
             .interact()?

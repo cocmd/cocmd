@@ -7,17 +7,13 @@ pub fn run_docs(
     specific_name: &String,
     raw_markdown: bool,
 ) -> Result<cocmd::CmdExit> {
-    let skin = MadSkin::default();
+    let _skin = MadSkin::default();
 
     // load source with the specific name
-    let source = sources_manager.sources.get(specific_name);
-    if let None = source {
-        return Ok(cocmd::CmdExit {
-            code: exitcode::NOINPUT,
-            message: Some(format!("Source with name {} not found", specific_name)),
-        });
-    }
-    let source = source.unwrap();
+
+    let source = sources_manager
+        .get_source(specific_name.clone())
+        .unwrap_or_else(|| panic!("Can't get source {}", specific_name));
 
     if !source.is_legit_cocmd_source() {
         bail!("Source {} is not a legit cocmd source", specific_name);

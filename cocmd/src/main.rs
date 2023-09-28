@@ -5,10 +5,9 @@ use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::Settings;
-use serde;
+
 use termimad::{self, MadSkin};
 use tracing::error;
-use tracing_subscriber::fmt::writer::OptionalWriter;
 
 use crate::cmd::docs::run_docs;
 use crate::cmd::profile_loader::run_profile_loader;
@@ -51,8 +50,8 @@ enum Commands {
         /// Optional name argument for specific documentation generation
         name: Option<String>,
         /// Optional flag to show raw markdown
-        #[arg(long = "raw-markdown")]
-        raw_markdown: Option<bool>,
+        #[arg(long = "raw-markdown", short = 'r', default_value_t = false)]
+        raw_markdown: bool,
     },
 
     /// Run command with a name argument - Runs a specific automation
@@ -69,7 +68,10 @@ enum Commands {
     /// Install command with subcommands
     Install {
         /// Name argument for 'install' - Specifies the name of the source to add
-        names: Vec<String>,
+        names: Option<Vec<String>>,
+
+        #[arg(long = "yes", short = 'y', default_value_t = false)]
+        dont_ask: bool,
     },
 
     /// Remove command (no subcommands) - Removes something (add a description here)
@@ -134,11 +136,16 @@ fn main() {
         }
         Commands::Docs { name, raw_markdown } => match name {
             Some(name) => {
-                res = run_docs(&mut sources_manager, &name, raw_markdown.unwrap_or(false));
+                res = run_docs(&mut sources_manager, &name, raw_markdown);
             }
             None => {
                 let markdown: String = clap_markdown::help_markdown::<Cli>();
-                skin.print_text(&markdown.to_string());
+                let md = markdown.to_string();
+                if raw_markdown {
+                    println!("{}", md);
+                } else {
+                    skin.print_text(&md);
+                }
             }
         },
         Commands::Run { name } => {
@@ -156,9 +163,13 @@ fn main() {
                 res = show_sources(&mut sources_manager);
             }
         },
-        Commands::Install { names } => {
-            for name in names {
-                res = add::install_source(&mut sources_manager, &name);
+        Commands::Install { names, dont_ask } => {
+            if let Some(names) = names {
+                for name in names {
+                    res = add::install_source(&mut sources_manager, &name, dont_ask);
+                }
+            } else {
+                !todo!("install from hub");
             }
         }
         Commands::Remove => {

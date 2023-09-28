@@ -38,7 +38,8 @@ pub fn get_provider(source: &String, runtime_dir: &Path) -> Result<Box<dyn Packa
 
     if let Some(local_path) = util::path::extract_local_path(source) {
         Ok(Box::new(provider::local::LocalPackageProvider::new(
-            source, local_path,
+            source,
+            &local_path,
         )))
     } else if let Some(github_parts) = util::git::extract_git_url_parts(source) {
         return Ok(Box::new(provider::git::GitPackageProvider::new(

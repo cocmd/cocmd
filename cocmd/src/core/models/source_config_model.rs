@@ -71,7 +71,7 @@ impl Automation {
     }
 }
 
-#[derive(Debug, Se, De, PartialEq, Eq, Hash)]
+#[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
 pub struct SourceConfigModel {
     pub name: String,
     pub aliases: Option<String>,

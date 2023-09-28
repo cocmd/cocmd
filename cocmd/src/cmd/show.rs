@@ -63,24 +63,9 @@ pub fn show_sources(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdEx
 }
 
 pub fn show_source(sources_manager: &mut SourcesManager, uri: String) -> Result<cocmd::CmdExit> {
-    let mut uri: String = uri;
-    // check if uri is in sources_manager.sources. if not print error and exit
-    if !sources_manager.sources.contains_key(&uri) {
-        // look for sources .name() value and compare with uri. if yes, uri should be the source.uri
-        let mut found = false;
-        for source in sources_manager.sources.values() {
-            if source.name() == uri {
-                found = true;
-                uri = source.uri.clone();
-                break;
-            }
-        }
-        if !found {
-            bail!("Source \"{}\" not found", uri);
-        }
-    }
-
-    let source = &sources_manager.sources[&uri];
+    let source = sources_manager
+        .get_source(uri.clone())
+        .unwrap_or_else(|| panic!("Can't get source {}", &uri));
 
     if !source.is_legit_cocmd_source() {
         bail!("Source {} is not a legit cocmd source", uri);

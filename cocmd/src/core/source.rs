@@ -1,6 +1,5 @@
-use std::env;
 use std::fmt;
-use std::os::macos::raw;
+
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -13,7 +12,7 @@ use crate::utils::io::{from_yaml_file, normalize_path};
 use crate::utils::sys::OS;
 use crate::Settings;
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub struct Source {
     pub uri: String,
     pub location: PathBuf,
@@ -140,7 +139,7 @@ impl Source {
 
         let mut output = String::new();
 
-        output += &format!("# {}\n", self.uri);
+        // output += &format!("## {}\n", self.name());
         output += &format!("- location: {}\n", self.location().to_str().unwrap());
 
         if let Some(alias) = &self.aliases() {
@@ -164,7 +163,7 @@ impl Source {
                 let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
                 output += &format!("  - env: {}\n", env);
             }
-            output += &format!("\n");
+            output += "\n";
         }
 
         output += "## paths\n";
