@@ -20,33 +20,12 @@ pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<cocmd::Cm
 
         // Iterate through packages and append rows to the table
         for package in packages {
-            let aliases_count = if package.is_legit_cocmd_package() {
-                match package.aliases() {
-                    Some(aliases_str) => aliases_str.split('\n').count(),
-                    _ => 0,
-                }
-            } else {
-                0
-            };
-            let automations_count = if package.is_legit_cocmd_package() {
-                package
-                    .automations(&packages_manager.settings, Some(true))
-                    .len()
-            } else {
-                0
-            };
-            let paths_count = if package.is_legit_cocmd_package() {
-                package.paths().len()
-            } else {
-                0
-            };
-
             table.push_str(&format!(
                 "| {} | {} | {} | {} | {} |\n",
                 package.uri,
-                aliases_count,
-                automations_count,
-                paths_count,
+                package.get_aliases_count(),
+                package.get_automations_count(&packages_manager.settings),
+                package.get_paths_count(),
                 package.location().to_str().unwrap()
             ));
         }

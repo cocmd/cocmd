@@ -195,6 +195,33 @@ impl Package {
             println!("{}", output);
         }
     }
+
+    pub fn get_aliases_count(&self) -> usize {
+        if self.is_legit_cocmd_package() {
+            match self.aliases() {
+                Some(aliases_str) => aliases_str.split('\n').count(),
+                _ => 0,
+            }
+        } else {
+            0
+        }
+    }
+
+    pub fn get_automations_count(&self, settings: &Settings) -> usize {
+        if self.is_legit_cocmd_package() {
+            self.automations(settings, Some(true)).len()
+        } else {
+            0
+        }
+    }
+
+    pub fn get_paths_count(&self) -> usize {
+        if self.is_legit_cocmd_package() {
+            self.paths().len()
+        } else {
+            0
+        }
+    }
 }
 
 impl fmt::Display for Package {

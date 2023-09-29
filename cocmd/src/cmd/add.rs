@@ -67,8 +67,18 @@ pub fn install_package(
                 &packages_manager.settings,
             );
             let uri = package.uri.clone();
-            packages_manager.add_package(package);
-            info!("Package '{}' added", uri);
+            packages_manager.add_package(package.clone());
+            info!("Package '{}' was installed:", uri);
+            info!("- ✅ {} aliases available now", package.get_aliases_count());
+            info!(
+                "- ✅ {} automations available now",
+                package.get_automations_count(&packages_manager.settings)
+            );
+            info!(
+                "- ✅ {} paths available now in PATH env",
+                package.get_paths_count()
+            );
+            info!("- run `cocmd show package {}` for more details", uri);
         }
     } else {
         println!("{}", style.apply_to("Skipped. you answered 'NO'"));
