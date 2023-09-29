@@ -1,25 +1,25 @@
 use anyhow::{bail, Result};
-use cocmd::core::sources_manager::SourcesManager;
+use cocmd::core::packages_manager::PackagesManager;
 use termimad::MadSkin;
 
 pub fn run_docs(
-    sources_manager: &mut SourcesManager,
+    packages_manager: &mut PackagesManager,
     specific_name: &String,
     raw_markdown: bool,
 ) -> Result<cocmd::CmdExit> {
     let _skin = MadSkin::default();
 
-    // load source with the specific name
+    // load package with the specific name
 
-    let source = sources_manager
-        .get_source(specific_name.clone())
-        .unwrap_or_else(|| panic!("Can't get source {}", specific_name));
+    let package = packages_manager
+        .get_package(specific_name.clone())
+        .unwrap_or_else(|| panic!("Can't get package {}", specific_name));
 
-    if !source.is_legit_cocmd_source() {
-        bail!("Source {} is not a legit cocmd source", specific_name);
+    if !package.is_legit_cocmd_package() {
+        bail!("Package {} is not a legit cocmd package", specific_name);
     }
 
-    source.print_doc(&sources_manager.settings, !raw_markdown, false);
+    package.print_doc(&packages_manager.settings, !raw_markdown, false);
 
     Ok(cocmd::CmdExit {
         code: exitcode::OK,

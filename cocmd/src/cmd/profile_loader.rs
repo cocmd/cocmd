@@ -1,34 +1,34 @@
 use anyhow::Result;
-use cocmd::core::sources_manager::SourcesManager;
+use cocmd::core::packages_manager::PackagesManager;
 
-pub fn run_profile_loader(sources_manager: &mut SourcesManager) -> Result<cocmd::CmdExit> {
-    for source in sources_manager.sources.values() {
-        if !(source.is_legit_cocmd_source()) {
-            println!("# Skipping source {}", &source.uri);
+pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<cocmd::CmdExit> {
+    for package in packages_manager.packages.values() {
+        if !(package.is_legit_cocmd_package()) {
+            println!("# Skipping package {}", &package.uri);
             continue;
         }
-        println!("#cocmd aliases for source {}", source.name());
+        println!("#cocmd aliases for package {}", package.name());
 
-        if let Some(alias) = &source.aliases() {
+        if let Some(alias) = &package.aliases() {
             println!("{}", alias);
         }
 
-        println!("#cocmd automations for source {}", source.name());
+        println!("#cocmd automations for package {}", package.name());
 
         // Apply automations as aliases
-        for automation in &source.automations(&sources_manager.settings, Some(true)) {
+        for automation in &package.automations(&packages_manager.settings, Some(true)) {
             println!(
                 r#"alias {}.{}="cocmd run {}.{}""#,
-                source.name(),
+                package.name(),
                 automation.name,
-                source.name(),
+                package.name(),
                 automation.name
             );
         }
 
-        println!("# cocmd paths for source {}", source.name());
+        println!("# cocmd paths for package {}", package.name());
 
-        for p in &source.paths() {
+        for p in &package.paths() {
             println!(r#"export PATH="{}:$PATH""#, p);
         }
     }

@@ -1,40 +1,40 @@
 use std::path::Path;
 
 use anyhow::{bail, Result};
-use cocmd::core::source::Source;
-use cocmd::core::sources_manager::SourcesManager;
+use cocmd::core::package::Package;
+use cocmd::core::packages_manager::PackagesManager;
 use cocmd::utils::repository::find_cocmd_files;
 use cocmd_package::{get_provider, LOCAL_PROVIDER};
 use console::Style;
 use dialoguer::Confirm;
 use tracing::info;
 
-pub fn install_source(
-    sources_manager: &mut SourcesManager,
-    source: &str,
+pub fn install_package(
+    packages_manager: &mut PackagesManager,
+    package: &str,
     dont_ask: bool,
 ) -> Result<cocmd::CmdExit> {
-    info!("Installing source {:?}", source);
+    info!("Installing package {:?}", package);
 
-    let settings = &sources_manager.settings;
+    let settings = &packages_manager.settings;
 
-    let provider = get_provider(&source.to_string(), &settings.runtime_dir).unwrap();
+    let provider = get_provider(&package.to_string(), &settings.runtime_dir).unwrap();
     let localpath = provider.local_path();
 
     if !provider.is_exists_locally() {
-        info!("Source not found locally. Downloading...");
+        info!("Package not found locally. Downloading...");
         match provider.download() {
             Ok(downloaded_path) => {
-                info!("Downloaded source to {:?}", downloaded_path);
+                info!("Downloaded package to {:?}", downloaded_path);
             }
             Err(e) => {
-                bail!("Failed to download source: {}", e);
+                bail!("Failed to download package: {}", e);
             }
         }
     }
 
     let locations = if provider.name() == LOCAL_PROVIDER {
-        find_cocmd_files(&localpath, sources_manager.settings.scan_depth)
+        find_cocmd_files(&localpath, packages_manager.settings.scan_depth)
     } else {
         vec![localpath.to_str().unwrap().to_string()]
     };
@@ -43,7 +43,7 @@ pub fn install_source(
     let style = Style::new().bold().green();
     if provider.name() == LOCAL_PROVIDER {
         println!(
-            "found {} cocmd sources in this path:\n  - {}",
+            "found {} cocmd packages in this path:\n  - {}",
             locations.len(),
             lst_locs
         );
@@ -56,19 +56,19 @@ pub fn install_source(
             .interact()?
     {
         for loc in locations {
-            let source: Source = Source::new(
+            let package: Package = Package::new(
                 if provider.name() == LOCAL_PROVIDER {
                     loc.clone()
                 } else {
-                    let source_label = source.to_string();
-                    source_label.clone()
+                    let package_label = package.to_string();
+                    package_label.clone()
                 },
                 &Path::new(&loc).to_path_buf(),
-                &sources_manager.settings,
+                &packages_manager.settings,
             );
-            let uri = source.uri.clone();
-            sources_manager.add_source(source);
-            info!("Source '{}' added", uri);
+            let uri = package.uri.clone();
+            packages_manager.add_package(package);
+            info!("Package '{}' added", uri);
         }
     } else {
         println!("{}", style.apply_to("Skipped. you answered 'NO'"));

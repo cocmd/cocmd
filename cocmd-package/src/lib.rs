@@ -31,25 +31,25 @@ pub const LOCAL_PROVIDER: &str = "local";
 pub const GIT_PROVIDER: &str = "git";
 pub const COCMDHUB_PROVIDER: &str = "cocmd-hub";
 
-pub fn get_provider(source: &String, runtime_dir: &Path) -> Result<Box<dyn PackageProvider>> {
-    // parse "source" if it's a local path create a LocalPackageProvider
+pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn PackageProvider>> {
+    // parse "package" if it's a local path create a LocalPackageProvider
     // if it's a git url create a GitPackageProvider
     // otherwise look for it in the hub and create a HubPackageProvider
 
-    if let Some(local_path) = util::path::extract_local_path(source) {
+    if let Some(local_path) = util::path::extract_local_path(package) {
         Ok(Box::new(provider::local::LocalPackageProvider::new(
-            source,
+            package,
             &local_path,
         )))
-    } else if let Some(github_parts) = util::git::extract_git_url_parts(source) {
+    } else if let Some(github_parts) = util::git::extract_git_url_parts(package) {
         return Ok(Box::new(provider::git::GitPackageProvider::new(
-            source,
+            package,
             &github_parts,
             runtime_dir,
         )));
     } else {
         return Ok(Box::new(provider::hub::CocmdHubPackageProvider::new(
-            source,
+            package,
             runtime_dir,
         )));
     }

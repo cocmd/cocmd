@@ -3,7 +3,7 @@ mod cmd;
 use clap::{Parser, Subcommand};
 use cmd::add;
 use cmd::tracing;
-use cocmd::core::sources_manager::SourcesManager;
+use cocmd::core::packages_manager::PackagesManager;
 use cocmd::Settings;
 use cocmd_package::provider;
 use dialoguer::MultiSelect;
@@ -16,7 +16,7 @@ use crate::cmd::run::run_automation;
 use crate::cmd::setup::run_setup;
 #[cfg(feature = "howto")]
 use crate::cmd::show::howto;
-use crate::cmd::show::{show_source, show_sources};
+use crate::cmd::show::{show_package, show_packages};
 
 /// Main CLI struct with meta-information
 #[derive(Parser)]
@@ -68,7 +68,7 @@ enum Commands {
 
     /// Install command with subcommands
     Install {
-        /// Name argument for 'install' - Specifies the name of the source to add
+        /// Name argument for 'install' - Specifies the name of the package to add
         names: Option<Vec<String>>,
 
         #[arg(long = "yes", short = 'y', default_value_t = false)]
@@ -93,14 +93,14 @@ struct ShowArgs {
 /// Subcommands enum for 'show' with meta-information
 #[derive(Subcommand)]
 enum ShowCommands {
-    /// Source subcommand with a 'name' argument - Shows information about a specific source
-    Source {
-        /// Name argument for 'show source' subcommand - Specifies the name of the source to show
+    /// Package subcommand with a 'name' argument - Shows information about a specific package
+    Package {
+        /// Name argument for 'show package' subcommand - Specifies the name of the package to show
         name: String,
     },
 
-    /// Sources subcommand - Shows information about all sources
-    Sources,
+    /// Packages subcommand - Shows information about all packages
+    Packages,
 }
 
 /// Arguments for the 'setup' subcommand with meta-information
@@ -116,7 +116,7 @@ fn main() {
     tracing(cli.verbose);
 
     let settings = Settings::new(None, None);
-    let mut sources_manager = SourcesManager::new(settings);
+    let mut packages_manager = PackagesManager::new(settings);
 
     let mut res = Ok(cocmd::CmdExit {
         code: exitcode::OK,
@@ -127,17 +127,17 @@ fn main() {
 
     match cli.command {
         Commands::Setup(args) => {
-            res = run_setup(&mut sources_manager, args.shell);
+            res = run_setup(&mut packages_manager, args.shell);
         }
         Commands::ProfileLoader => {
-            res = run_profile_loader(&mut sources_manager);
+            res = run_profile_loader(&mut packages_manager);
         }
         Commands::Refresh => {
             println!("'cocmd refresh' was used");
         }
         Commands::Docs { name, raw_markdown } => match name {
             Some(name) => {
-                res = run_docs(&mut sources_manager, &name, raw_markdown);
+                res = run_docs(&mut packages_manager, &name, raw_markdown);
             }
             None => {
                 let markdown: String = clap_markdown::help_markdown::<Cli>();
@@ -150,18 +150,18 @@ fn main() {
             }
         },
         Commands::Run { name } => {
-            res = run_automation(&mut sources_manager, name);
+            res = run_automation(&mut packages_manager, name);
         }
         #[cfg(feature = "howto")]
         Commands::Howto { query } => {
-            res = howto(&mut sources_manager, query);
+            res = howto(&mut packages_manager, query);
         }
         Commands::Show(args) => match args.show_commands {
-            ShowCommands::Source { name } => {
-                res = show_source(&mut sources_manager, name);
+            ShowCommands::Package { name } => {
+                res = show_package(&mut packages_manager, name);
             }
-            ShowCommands::Sources => {
-                res = show_sources(&mut sources_manager);
+            ShowCommands::Packages => {
+                res = show_packages(&mut packages_manager);
             }
         },
         Commands::Install { names, dont_ask } => {
@@ -171,7 +171,7 @@ fn main() {
             } else {
                 let hub_provider = provider::hub::CocmdHubPackageProvider::new(
                     &"placeholder".to_string(),
-                    &sources_manager.settings.runtime_dir,
+                    &packages_manager.settings.runtime_dir,
                 );
                 let index = hub_provider
                     .get_index(false)
@@ -191,7 +191,7 @@ fn main() {
             }
             println!("Ok, I will install: {}", selected_names.join(", "));
             for name in selected_names {
-                res = add::install_source(&mut sources_manager, &name, dont_ask);
+                res = add::install_package(&mut packages_manager, &name, dont_ask);
             }
         }
         Commands::Remove => {

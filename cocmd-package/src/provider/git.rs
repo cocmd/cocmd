@@ -25,18 +25,18 @@ use super::PackageProvider;
 use crate::{util::git::GitParts, GIT_PROVIDER};
 
 pub struct GitPackageProvider {
-    source: String,
+    package: String,
     local_path: PathBuf,
     git_parts: GitParts,
 }
 
 impl GitPackageProvider {
-    pub fn new(source: &String, git_parts: &GitParts, runtime_dir: &Path) -> Self {
+    pub fn new(package: &String, git_parts: &GitParts, runtime_dir: &Path) -> Self {
         // localpath is in runtime_dir with the name of the repo
         let binding = runtime_dir.join(format!("{}.{}", git_parts.author, git_parts.name));
         let local_path = binding.as_path();
         Self {
-            source: source.clone(),
+            package: package.clone(),
             git_parts: (*git_parts).clone(),
             local_path: local_path.to_path_buf(),
         }
@@ -55,7 +55,7 @@ impl GitPackageProvider {
     fn clone_repo(&self) -> Result<()> {
         let mut args = vec!["clone"];
 
-        args.push(self.source.as_str());
+        args.push(self.package.as_str());
 
         let dest_dir_str = self.local_path.to_str().unwrap();
         args.push(dest_dir_str);
@@ -83,8 +83,8 @@ impl PackageProvider for GitPackageProvider {
         self.local_path.to_path_buf()
     }
 
-    fn source(&self) -> String {
-        self.source.clone()
+    fn package(&self) -> String {
+        self.package.clone()
     }
 
     fn download(&self) -> Result<PathBuf> {

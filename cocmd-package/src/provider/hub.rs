@@ -38,7 +38,7 @@ const PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS: u64 = 60 * 60;
 const VERSION: &str = "0.0.0";
 
 pub struct CocmdHubPackageProvider {
-    source: String,
+    package: String,
     local_path: PathBuf,
     runtime_dir: PathBuf,
 }
@@ -57,11 +57,11 @@ impl PackageProvider for CocmdHubPackageProvider {
         // .context("unable to get package index from cocmd hub")?;
 
         let package_info = index
-            .get_package(&self.source, Some(VERSION))
+            .get_package(&self.package, Some(VERSION))
             .ok_or_else(|| {
                 anyhow!(
                     "unable to find package '{}@{}' in the cocmd hub",
-                    &self.source,
+                    &self.package,
                     &VERSION
                 )
             })?;
@@ -80,17 +80,17 @@ impl PackageProvider for CocmdHubPackageProvider {
         Ok(local_path)
     }
 
-    fn source(&self) -> String {
-        self.source.clone()
+    fn package(&self) -> String {
+        self.package.clone()
     }
 }
 
 impl CocmdHubPackageProvider {
-    pub fn new(source: &String, runtime_dir: &Path) -> Self {
-        let binding = runtime_dir.join(source);
+    pub fn new(package: &String, runtime_dir: &Path) -> Self {
+        let binding = runtime_dir.join(package);
         let local_path = binding.as_path();
         Self {
-            source: (*source.clone()).to_string(),
+            package: (*package.clone()).to_string(),
             local_path: local_path.to_path_buf(),
             runtime_dir: runtime_dir.to_path_buf(),
         }

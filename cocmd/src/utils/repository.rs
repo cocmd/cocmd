@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use crate::consts;
 
-pub fn find_cocmd_files(source_label: &Path, scan_depth: usize) -> Vec<String> {
+pub fn find_cocmd_files(package_label: &Path, scan_depth: usize) -> Vec<String> {
     let mut result = Vec::new();
     let mut visited = HashSet::new();
 
@@ -37,7 +37,7 @@ pub fn find_cocmd_files(source_label: &Path, scan_depth: usize) -> Vec<String> {
         }
     }
 
-    visit_dir(source_label, scan_depth, &mut result, &mut visited);
+    visit_dir(package_label, scan_depth, &mut result, &mut visited);
 
     result
 }

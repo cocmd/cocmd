@@ -8,7 +8,7 @@
 use std::path::PathBuf;
 
 const TARGET_DIR: &str = "target/windows/portable";
-const RESOURCE_DIR: &str = "target/windows/resources";
+const RESOURCE_DIR: &str = "target/windows/repackages";
 
 fn main() {
     // Clean the target directory
@@ -20,21 +20,21 @@ fn main() {
         panic!("expected target directory, found none");
     }
 
-    let resources_dir = PathBuf::from(RESOURCE_DIR);
-    if !resources_dir.is_dir() {
-        panic!("expected resources dir, found none");
+    let repackages_dir = PathBuf::from(RESOURCE_DIR);
+    if !repackages_dir.is_dir() {
+        panic!("expected repackages dir, found none");
     }
 
-    // Copy all the resources
+    // Copy all the repackages
     fs_extra::dir::copy(
-        &resources_dir,
+        &repackages_dir,
         &target_dir,
         &fs_extra::dir::CopyOptions {
             content_only: true,
             ..Default::default()
         },
     )
-    .expect("unable to copy resources");
+    .expect("unable to copy repackages");
 
     // Create the launcher
     std::fs::write(

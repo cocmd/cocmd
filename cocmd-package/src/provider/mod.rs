@@ -26,7 +26,7 @@ pub mod local;
 
 pub trait PackageProvider {
     fn name(&self) -> String;
-    fn source(&self) -> String;
+    fn package(&self) -> String;
     fn local_path(&self) -> PathBuf;
     fn is_exists_locally(&self) -> bool {
         // check for existsance of the local path

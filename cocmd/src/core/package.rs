@@ -6,38 +6,38 @@ use std::path::PathBuf;
 use tracing::error;
 
 use crate::consts;
-use crate::core::models::source_config_model::Automation;
-use crate::core::models::source_config_model::SourceConfigModel;
+use crate::core::models::package_config_model::Automation;
+use crate::core::models::package_config_model::PackageConfigModel;
 use crate::utils::io::{from_yaml_file, normalize_path};
 use crate::utils::sys::OS;
 use crate::Settings;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
-pub struct Source {
+pub struct Package {
     pub uri: String,
     pub location: PathBuf,
-    pub cocmd_config: Option<SourceConfigModel>,
+    pub cocmd_config: Option<PackageConfigModel>,
 }
 
-impl Source {
+impl Package {
     pub fn new(uri: String, location: &PathBuf, _settings: &Settings) -> Self {
-        let mut source = Source {
+        let mut package = Package {
             uri: uri.clone(),
             location: location.to_path_buf(),
             cocmd_config: None,
         };
 
-        if source.location.exists() {
-            let config_file_path = Path::new(&source.location).join(consts::SOURCE_CONFIG_FILE);
+        if package.location.exists() {
+            let config_file_path = Path::new(&package.location).join(consts::SOURCE_CONFIG_FILE);
 
             if config_file_path.exists() {
-                let config: Result<SourceConfigModel, String> =
+                let config: Result<PackageConfigModel, String> =
                     from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
                 match config {
                     Ok(config_res) => {
                         // Successfully loaded the configuration
                         // You can use 'config' here
-                        source.cocmd_config = Some(config_res);
+                        package.cocmd_config = Some(config_res);
                     }
                     Err(err) => {
                         // Handle the error, for example, log it
@@ -52,23 +52,23 @@ impl Source {
             }
         } else {
             error!(
-                "Source Path {} does not exist.",
-                source.location.to_str().unwrap()
+                "Package Path {} does not exist.",
+                package.location.to_str().unwrap()
             )
         }
-        source
+        package
     }
 
     pub fn is_exists_locally(&self) -> bool {
         self.location.exists()
     }
 
-    pub fn is_legit_cocmd_source(&self) -> bool {
+    pub fn is_legit_cocmd_package(&self) -> bool {
         if self.location.exists() {
             let config_file_path = Path::new(&self.location).join(consts::SOURCE_CONFIG_FILE);
 
             if config_file_path.exists() {
-                let config: Result<SourceConfigModel, String> =
+                let config: Result<PackageConfigModel, String> =
                     from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
                 config.is_ok()
             } else {
@@ -118,8 +118,8 @@ impl Source {
         let mut result = vec![];
         let env_specific = env_specific.unwrap_or(true);
 
-        if let Some(source_config) = &self.cocmd_config {
-            if let Some(automations) = &source_config.automations {
+        if let Some(package_config) = &self.cocmd_config {
+            if let Some(automations) = &package_config.automations {
                 for automation in automations.iter() {
                     let automation_loaded = automation.load_content(&self.location);
                     if !env_specific || automation_loaded.supports_os(&settings.os) {
@@ -197,7 +197,7 @@ impl Source {
     }
 }
 
-impl fmt::Display for Source {
+impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.location.to_str().unwrap())
     }

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use cocmd::core::sources_manager::SourcesManager;
+use cocmd::core::packages_manager::PackagesManager;
 use dialoguer::{theme::ColorfulTheme, Select};
 use tracing;
 
@@ -7,7 +7,7 @@ use tracing;
 // eval "$(cocmd profile-loader)"
 // output to stdout with tracing::info what you did
 pub fn run_setup(
-    _sources_manager: &mut SourcesManager,
+    _packages_manager: &mut PackagesManager,
     shell: Option<String>,
 ) -> Result<cocmd::CmdExit> {
     let mut shell = shell.unwrap_or_else(|| {

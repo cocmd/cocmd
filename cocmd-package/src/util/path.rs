@@ -3,11 +3,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub fn extract_local_path(source: &String) -> Option<PathBuf> {
-    // find out if source is a local path, even if it doesn't exist
+pub fn extract_local_path(package: &String) -> Option<PathBuf> {
+    // find out if package is a local path, even if it doesn't exist
     // if it is, return Some(path)
     // otherwise return None
-    let path = Path::new(source);
+    let path = Path::new(package);
 
     // check for local file system pattern
     if path.is_absolute() {

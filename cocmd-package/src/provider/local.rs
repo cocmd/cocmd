@@ -25,14 +25,14 @@ use super::PackageProvider;
 use crate::LOCAL_PROVIDER;
 
 pub struct LocalPackageProvider {
-    source: String,
+    package: String,
     local_path: PathBuf,
 }
 
 impl LocalPackageProvider {
-    pub fn new(source: &String, path: &Path) -> Self {
+    pub fn new(package: &String, path: &Path) -> Self {
         Self {
-            source: source.clone(),
+            package: package.clone(),
             local_path: path.to_path_buf(),
         }
     }
@@ -51,7 +51,7 @@ impl PackageProvider for LocalPackageProvider {
         Ok(self.local_path.to_path_buf())
     }
 
-    fn source(&self) -> String {
-        self.source.clone()
+    fn package(&self) -> String {
+        self.package.clone()
     }
 }

@@ -1,18 +1,15 @@
 use std::collections::HashMap;
 use std::io::{self, BufRead};
-
 use std::process;
 use std::process::{Command, Stdio};
 
 use anyhow::Result;
 use cocmd::core::models::script_model::StepParamModel;
-
 use cocmd::core::{
     models::script_model::{ScriptModel, StepModel, StepRunnerType},
-    sources_manager::SourcesManager,
+    packages_manager::PackagesManager,
 };
 use cocmd::utils::sys::OS;
-
 use dialoguer::Confirm;
 use dialoguer::{theme::ColorfulTheme, Select};
 use execute::shell;
@@ -21,10 +18,10 @@ use termimad::{self, MadSkin};
 use tracing::error;
 
 pub fn run_automation(
-    sources_manager: &mut SourcesManager,
+    packages_manager: &mut PackagesManager,
     specific_name: Option<String>,
 ) -> Result<cocmd::CmdExit> {
-    let available_automations = sources_manager.automations();
+    let available_automations = packages_manager.automations();
 
     let selected_name = match specific_name {
         Some(name) => name,
@@ -51,8 +48,8 @@ pub fn run_automation(
         handle_script(
             &selected_name,
             automation.content.as_ref().unwrap(),
-            sources_manager.settings.os,
-            sources_manager,
+            packages_manager.settings.os,
+            packages_manager,
         );
         // info!("[blue] Script executed:");
         // for line in output {
@@ -74,7 +71,7 @@ fn interactive_shell(
     step: &StepModel,
     skin: &mut MadSkin,
     params: Vec<StepParamModel>,
-    sources_manager: &mut SourcesManager,
+    packages_manager: &mut PackagesManager,
 ) -> Result<bool, String> {
     let command = step.content.as_ref().unwrap();
 
@@ -88,7 +85,7 @@ fn interactive_shell(
     let mut params_map: HashMap<String, String> = HashMap::new();
 
     for param in params {
-        let param_value = sources_manager.settings.get_param(&param.name);
+        let param_value = packages_manager.settings.get_param(&param.name);
         // if param_value is None, get it from STDIN with some nice prompt
         let param_value = match param_value {
             Some(value) => value,
@@ -108,7 +105,7 @@ fn interactive_shell(
         params_map.insert(param.name.clone(), param_value.clone());
 
         if param.save {
-            sources_manager
+            packages_manager
                 .settings
                 .save_param(&param.name, &param_value);
         }
@@ -174,7 +171,7 @@ fn handle_step(
     env: OS,
     skin: &mut MadSkin,
     script_params: Option<Vec<StepParamModel>>,
-    sources_manager: &mut SourcesManager,
+    packages_manager: &mut PackagesManager,
 ) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
     let params = step.get_params(script_params);
@@ -188,7 +185,7 @@ fn handle_step(
 
     match &step.runner {
         StepRunnerType::SHELL => {
-            if let Err(_err) = interactive_shell(step, skin, params.clone(), sources_manager) {
+            if let Err(_err) = interactive_shell(step, skin, params.clone(), packages_manager) {
                 return false;
             }
         }
@@ -197,11 +194,11 @@ fn handle_step(
 
             let provider_name = content.split('.').next().unwrap();
 
-            let available_automations = sources_manager.automations();
+            let available_automations = packages_manager.automations();
             if !available_automations.contains_key(content) {
                 if !Confirm::new()
                     .with_prompt(format!(
-                        "Cocmd Source {} not found. Download?",
+                        "Cocmd Package {} not found. Download?",
                         &provider_name
                     ))
                     .interact()
@@ -210,8 +207,8 @@ fn handle_step(
                     return false;
                 }
 
-                // ask the user if he wants to download the source. get yes/no approval
-                // if yes, download the source
+                // ask the user if he wants to download the package. get yes/no approval
+                // if yes, download the package
                 if let Err(_err) = interactive_shell(
                     &StepModel {
                         content: Some(format!("cocmd install {}", &provider_name)),
@@ -219,7 +216,7 @@ fn handle_step(
                     },
                     skin,
                     params.clone(),
-                    sources_manager,
+                    packages_manager,
                 ) {
                     return false;
                 }
@@ -231,7 +228,7 @@ fn handle_step(
                 },
                 skin,
                 params.clone(),
-                sources_manager,
+                packages_manager,
             ) {
                 return false;
             }
@@ -286,13 +283,19 @@ fn handle_script(
     automation_name: &String,
     script: &ScriptModel,
     env: OS,
-    sources_manager: &mut SourcesManager,
+    packages_manager: &mut PackagesManager,
 ) {
     let mut skin: MadSkin = MadSkin::default();
     let mut step_statuses = Vec::new();
     let script_params = script.params.clone();
     for step in &script.steps {
-        let success = handle_step(step, env, &mut skin, script_params.clone(), sources_manager);
+        let success = handle_step(
+            step,
+            env,
+            &mut skin,
+            script_params.clone(),
+            packages_manager,
+        );
         // check if step runner is executable shell/cmd/python add it
         if step.runner == StepRunnerType::SHELL
             || step.runner == StepRunnerType::COCMD
