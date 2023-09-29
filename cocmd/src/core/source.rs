@@ -1,4 +1,5 @@
 use std::fmt;
+use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -104,6 +105,7 @@ impl Source {
                     Some(paths) => paths
                         .iter()
                         .map(|p| normalize_path(p, &self.location))
+                        .filter(|p| Path::new(p).exists())
                         .collect(),
                     None => vec![], // or any other default behavior
                 }
@@ -172,48 +174,17 @@ impl Source {
             output += "\n";
         }
 
-        //     for automation in &automations {
-        //         output += &format!("- `{}.{}`\n", self.name(), automation.name);
-        //         output += &format!(
-        //             "  - description: {}\n",
-        //             automation
-        //                 .content
-        //                 .as_ref()
-        //                 .unwrap()
-        //                 .description
-        //                 .as_ref()
-        //                 .unwrap_or(&"Not provided".to_string())
-        //         );
-        //         if !env_specific {
-        //             let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
-        //             output += &format!("  - env: {}\n", env);
-        //         }
-
-        //         // output += &format!("  - steps:\n");
-        //         // // add to output the automation steps, the titles and the descriptions
-        //         // for step in &automation.content.as_ref().unwrap().steps {
-        //         //     output += &format!("      - {}\n", step.title);
-        //         // }
-
-        //         // create a markdown table with the steps. columns should be the title and the content based on the runner type
-        //         // output += &format!("  - steps:\n");
-        //         // output += &format!("      | title | content |\n");
-        //         // output += &format!("      | --- | --- |\n");
-        //         // for step in &automation.content.as_ref().unwrap().steps {
-        //         //     output += &format!(
-        //         //         "      | {} | ```{}``` |\n",
-        //         //         step.title,
-        //         //         step.content.as_ref().unwrap_or(&"Not provided".to_string())
-        //         //     );
-        //         // }
-        //         output += "\n";
-        //     }
-        // }
-
         if !self.paths().is_empty() {
             output += "## paths\n";
             for p in &self.paths() {
-                output += &format!("- `{}`\n", p);
+                // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
+                // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
+                output += &format!("### {}\n", p);
+
+                for entry in fs::read_dir(p).unwrap() {
+                    let entry = entry.unwrap();
+                    output += &format!("  - {}\n", entry.file_name().to_str().unwrap());
+                }
             }
         }
 
