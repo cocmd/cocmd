@@ -141,8 +141,7 @@
             "args": [
                 "docs",
                 "docker",
-                "--raw-markdown",
-                "true"
+                // "--raw-markdown",
                 
             ],
             "cwd": "${workspaceFolder}"

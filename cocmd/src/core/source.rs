@@ -1,5 +1,4 @@
 use std::fmt;
-
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -146,29 +145,76 @@ impl Source {
             output += &format!("## aliases\n```\n{}\n```\n", alias);
         }
 
-        output += "## automations\n";
-        for automation in &self.automations(settings, Some(env_specific)) {
-            output += &format!("- `{}.{}`\n", self.name(), automation.name);
-            output += &format!(
-                "  - description: {}\n",
-                automation
-                    .content
-                    .as_ref()
-                    .unwrap()
-                    .description
-                    .as_ref()
-                    .unwrap_or(&"Not provided".to_string())
-            );
-            if !env_specific {
+        let automations = self.automations(settings, Some(env_specific));
+        if !automations.is_empty() {
+            output += "## automations\n";
+
+            // write a markdown table for automation. columns are name, env, description, number of steps
+            output += &format!("| name | env | description | steps |\n");
+            output += &format!("| --- | --- | --- | --- |\n");
+
+            for automation in &automations {
                 let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
-                output += &format!("  - env: {}\n", env);
+                output += &format!(
+                    "| {} | {} | {} | {} |\n",
+                    automation.name,
+                    env,
+                    automation
+                        .content
+                        .as_ref()
+                        .unwrap()
+                        .description
+                        .as_ref()
+                        .unwrap_or(&"Not provided".to_string()),
+                    automation.content.as_ref().unwrap().steps.len().to_string()
+                );
             }
             output += "\n";
         }
 
-        output += "## paths\n";
-        for p in &self.paths() {
-            output += &format!("- `{}`\n", p);
+        //     for automation in &automations {
+        //         output += &format!("- `{}.{}`\n", self.name(), automation.name);
+        //         output += &format!(
+        //             "  - description: {}\n",
+        //             automation
+        //                 .content
+        //                 .as_ref()
+        //                 .unwrap()
+        //                 .description
+        //                 .as_ref()
+        //                 .unwrap_or(&"Not provided".to_string())
+        //         );
+        //         if !env_specific {
+        //             let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
+        //             output += &format!("  - env: {}\n", env);
+        //         }
+
+        //         // output += &format!("  - steps:\n");
+        //         // // add to output the automation steps, the titles and the descriptions
+        //         // for step in &automation.content.as_ref().unwrap().steps {
+        //         //     output += &format!("      - {}\n", step.title);
+        //         // }
+
+        //         // create a markdown table with the steps. columns should be the title and the content based on the runner type
+        //         // output += &format!("  - steps:\n");
+        //         // output += &format!("      | title | content |\n");
+        //         // output += &format!("      | --- | --- |\n");
+        //         // for step in &automation.content.as_ref().unwrap().steps {
+        //         //     output += &format!(
+        //         //         "      | {} | ```{}``` |\n",
+        //         //         step.title,
+        //         //         step.content.as_ref().unwrap_or(&"Not provided".to_string())
+        //         //     );
+        //         // }
+        //         output += "\n";
+        //     }
+        // }
+
+        if !self.paths().is_empty() {
+            output += "## paths\n";
+            for p in &self.paths() {
+                output += &format!("- `{}`\n", p);
+            }
         }
 
         if print_as_md {
