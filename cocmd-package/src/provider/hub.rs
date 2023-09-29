@@ -43,18 +43,6 @@ pub struct CocmdHubPackageProvider {
     runtime_dir: PathBuf,
 }
 
-impl CocmdHubPackageProvider {
-    pub fn new(source: &String, runtime_dir: &Path) -> Self {
-        let binding = runtime_dir.join(source);
-        let local_path = binding.as_path();
-        Self {
-            source: (*source.clone()).to_string(),
-            local_path: local_path.to_path_buf(),
-            runtime_dir: runtime_dir.to_path_buf(),
-        }
-    }
-}
-
 impl PackageProvider for CocmdHubPackageProvider {
     fn name(&self) -> String {
         COCMDHUB_PROVIDER.to_string()
@@ -98,7 +86,17 @@ impl PackageProvider for CocmdHubPackageProvider {
 }
 
 impl CocmdHubPackageProvider {
-    fn get_index(&self, force_update: bool) -> Result<PackageIndex> {
+    pub fn new(source: &String, runtime_dir: &Path) -> Self {
+        let binding = runtime_dir.join(source);
+        let local_path = binding.as_path();
+        Self {
+            source: (*source.clone()).to_string(),
+            local_path: local_path.to_path_buf(),
+            runtime_dir: runtime_dir.to_path_buf(),
+        }
+    }
+
+    pub fn get_index(&self, force_update: bool) -> Result<PackageIndex> {
         let old_index = self.get_index_from_cache()?;
 
         if let Some(old_index) = old_index {
@@ -113,13 +111,13 @@ impl CocmdHubPackageProvider {
             }
         }
 
-        let new_index = self.download_index()?;
+        let new_index = CocmdHubPackageProvider::download_index()?;
         self.save_index_to_cache(new_index.clone())?;
         Ok(new_index)
     }
 
-    fn download_index(&self) -> Result<PackageIndex> {
-        info_println!("fetching package index...");
+    fn download_index() -> Result<PackageIndex> {
+        info_println!("fetching from hub...");
         let json_body = read_string_from_url(COCMD_HUB_PACKAGE_INDEX_URL)?;
         let index: PackageIndex = serde_json::from_str(&json_body)?;
         Ok(index)
@@ -152,27 +150,27 @@ impl CocmdHubPackageProvider {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct CachedPackageIndex {
+pub struct CachedPackageIndex {
     cached_at: u64,
     index: PackageIndex,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct PackageIndex {
-    last_update: u64,
-    packages: Vec<PackageInfo>,
+pub struct PackageIndex {
+    pub last_update: u64,
+    pub packages: Vec<PackageInfo>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct PackageInfo {
-    name: String,
-    title: String,
-    author: String,
-    description: String,
-    version: String,
+pub struct PackageInfo {
+    pub name: String,
+    pub title: String,
+    pub author: String,
+    pub description: String,
+    pub version: String,
 
-    archive_url: String,
-    archive_sha256_url: String,
+    pub archive_url: String,
+    pub archive_sha256_url: String,
 }
 
 impl PackageIndex {

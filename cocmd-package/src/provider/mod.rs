@@ -20,10 +20,9 @@
 use std::path::PathBuf;
 
 use anyhow::Result;
-pub(crate) mod git;
-
-pub(crate) mod hub;
-pub(crate) mod local;
+pub mod git;
+pub mod hub;
+pub mod local;
 
 pub trait PackageProvider {
     fn name(&self) -> String;

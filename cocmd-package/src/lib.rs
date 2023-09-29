@@ -23,7 +23,7 @@ use anyhow::Result;
 
 #[macro_use]
 mod logging;
-mod provider;
+pub mod provider;
 mod util;
 use provider::PackageProvider;
 

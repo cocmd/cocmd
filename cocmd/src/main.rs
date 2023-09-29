@@ -5,7 +5,8 @@ use cmd::add;
 use cmd::tracing;
 use cocmd::core::sources_manager::SourcesManager;
 use cocmd::Settings;
-
+use cocmd_package::provider;
+use dialoguer::MultiSelect;
 use termimad::{self, MadSkin};
 use tracing::error;
 
@@ -164,12 +165,33 @@ fn main() {
             }
         },
         Commands::Install { names, dont_ask } => {
+            let mut selected_names;
             if let Some(names) = names {
-                for name in names {
-                    res = add::install_source(&mut sources_manager, &name, dont_ask);
-                }
+                selected_names = names.clone();
             } else {
-                !todo!("install from hub");
+                let hub_provider = provider::hub::CocmdHubPackageProvider::new(
+                    &"placeholder".to_string(),
+                    &sources_manager.settings.runtime_dir,
+                );
+                let index = hub_provider
+                    .get_index(false)
+                    .expect("unable to get index from hub");
+
+                // create with dialoguer MultiSelect, what packages the user asks to install. use index.packages.iter() and use package.name as the text
+                let packages: Vec<String> = index.packages.iter().map(|p| p.name.clone()).collect();
+
+                let selections = MultiSelect::new()
+                    .items(&packages)
+                    .with_prompt("What Packages to install?")
+                    .interact()
+                    .unwrap();
+
+                // set packages into selected_names (Vec[String])
+                selected_names = selections.iter().map(|s| packages[*s].clone()).collect();
+            }
+            println!("Ok, I will install: {}", selected_names.join(", "));
+            for name in selected_names {
+                res = add::install_source(&mut sources_manager, &name, dont_ask);
             }
         }
         Commands::Remove => {

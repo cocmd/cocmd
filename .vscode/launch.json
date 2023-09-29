@@ -20,9 +20,7 @@
                 }
             },
             "args": [
-                "install",
-                "git@github.com:cocmd/hub.git",
-                "-y"
+                "install"
             ],
             "cwd": "${workspaceFolder}"
         },

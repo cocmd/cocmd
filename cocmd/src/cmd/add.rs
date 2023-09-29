@@ -68,7 +68,7 @@ pub fn install_source(
             );
             let uri = source.uri.clone();
             sources_manager.add_source(source);
-            println!("{}", style.apply_to(format!("Source '{}' added", uri)));
+            info!("Source '{}' added", uri);
         }
     } else {
         println!("{}", style.apply_to("Skipped. you answered 'NO'"));
