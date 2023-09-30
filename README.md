@@ -1,104 +1,64 @@
 
-# Rust CI Starter
 
-A Rust template project that gets you:
+Cocmd is an open source tool for Developers to add Command line operations specification to their projects and 
+distribute them to their community.
 
-* A CLI skeletons for a CLI with subcommands or flat, or a library
-* CI and CD (releases) with lint, testing, [and coverage with Codecov](https://blog.rng0.io/how-to-do-code-coverage-in-rust)
-* Developer workflow based on [xtask](https://github.com/matklad/cargo-xtask)
-* A good base linting configuration, popular libraries (which you can remove), and [insta](https://insta.rs) for tests.
+For example, lets say you have a lot of `git` commands you type in during the day. Use CoCMD to easily add `git` related scripts, shortcuts and automations to your terminal. 
 
+# Getting Started
 
+## Installation
 
-## Getting started
-
-Clone the project or use a tool like [`backpack`](https://github.com/rusty-ferris-club/backpack) to kickstart a new project:
-
-```
-$ brew tap rusty-ferris-club/tap && brew install backpack
-$ bp new rusty-ferris-club/rust-starter my-project
+### Step 1 - Install CoCMD
+* MacOs - 
+Best way to install is with brew:
+```shell
+brew tap cocmd/cocmd
+brew install cocmd
 ```
 
-Then take an approach of _removing what you don't need_:
+* Linux - not supported yet
+* Windows - not supported yet
 
-```
-`cocmd/` - a CLI with subcommands, based on clap
-`cocmd_simpler/` - a CLI with a simple flat structure, based on clap
-`cocmd_lib/` - a library-only starter project, with minimal dependencies
-```
-Once that's done you can update `cargo.toml` and remove crates from the workspace.
+### Step 2 - Add CoCMD to your shell
 
-Run build to see that you're ready to start:
-
-```
-cargo build
+Run in terminal:
+```shell
+cocmd setup zsh
+or 
+cocmd setup bash
 ```
 
-### Personalising
+what this does is adding a loader of all aliases and automations shortcuts to your shell and lets you call any of them directly.
 
-Find where `cocmd` is and replace it with the name of your project. `$ rg cocmd`, `find . | grep cocmd`.
-Find which variables you need to swap. `$ rg __V_`, `$ rg __v_`.
-  
-Update all snapshots:
+## Add Packages
 
-```
-$ cargo insta test
-```
-And then
+You can start right away with `cocmd install`.
+See all packages options in [Hub](https://cocmd.org/docs/packages/from_hub).
 
-```
-$ cargo insta review
-````
-
-### README.md
-
-If you like, you can replace this file with a README from the sub-crates:
-* [Library README.md](cocmd_lib/README.md)
+If you want to create your own read [Here](https://cocmd.org/docs/packages/package-specification)
 
 
-# Workflow
 
-Workflow for your future project is based on `xtask`.
+# Showcase
 
-Install the helper cargo tools with:
+## New-hire Onboarding
 
-```
-$ cargo xtask install
-```
+Onboarding new hires is a very important process in any company. It's the first impression that the new hire gets from the company and it's the first impression that the company gets from the new hire. It's also a very important process for the new hire to get to know the company and the people in it.
 
-## Build
+Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/onboarding)
 
-```
-$ cargo build
-```
+## Daily Routines
 
-or, for full build suite with tests:
+Usually, every team has a set of routines and procedures that are executed on a regular basis.
+This can also be called "playbooks" or "runbooks". 
 
-```
-$ cargo xtask ci
-```
+CoCMD can help you automate these routines and make them available to your team.
 
-## Coverage
+Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/routines)
 
-```
-$ cargo xtask coverage [--dev]
-```
 
-## Docs
+## Codebase CMDOps
+Any project can have CMDOps (Command Line Operations). Lets say for example, your project requires some installation steps, or you want to add some shortcuts for your team or community to use.
 
-```
-$ cargo xtask docs
-```
-
-## Release
-
-Set up your [release.yml](.github/workflows/release.yml), replace the project names and repo locations.
-
-Then to release new versions:
-
-* Update [cargo.toml](cocmd/Cargo.toml) version.
-* `git tag v[your-new-version]`
-* push the new tag
-
-Your Github Action CI workflow should release a new version.
-
+Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/cmdops)
