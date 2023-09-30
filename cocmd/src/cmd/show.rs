@@ -22,7 +22,7 @@ pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<cocmd::Cm
         for package in packages {
             table.push_str(&format!(
                 "| {} | {} | {} | {} | {} |\n",
-                package.uri,
+                package.name(),
                 package.get_aliases_count(),
                 package.get_automations_count(&packages_manager.settings),
                 package.get_paths_count(),

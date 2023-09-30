@@ -78,7 +78,10 @@ pub fn install_package(
                 "- ✅ {} paths available now in PATH env",
                 package.get_paths_count()
             );
-            info!("- run `cocmd show package {}` for more details", uri);
+            info!(
+                "- run `cocmd show package {}` for more details",
+                package.name()
+            );
         }
     } else {
         println!("{}", style.apply_to("Skipped. you answered 'NO'"));

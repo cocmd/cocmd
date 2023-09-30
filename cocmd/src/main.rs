@@ -165,7 +165,7 @@ fn main() {
             }
         },
         Commands::Install { names, dont_ask } => {
-            let mut selected_names;
+            let selected_names;
             if let Some(names) = names {
                 selected_names = names.clone();
             } else {

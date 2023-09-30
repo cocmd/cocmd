@@ -152,8 +152,8 @@ impl Package {
             output += "## automations\n";
 
             // write a markdown table for automation. columns are name, env, description, number of steps
-            output += &format!("| name | env | description | steps |\n");
-            output += &format!("| --- | --- | --- | --- |\n");
+            output += "| name | env | description | steps |\n";
+            output += "| --- | --- | --- | --- |\n";
 
             for automation in &automations {
                 let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
@@ -168,7 +168,7 @@ impl Package {
                         .description
                         .as_ref()
                         .unwrap_or(&"Not provided".to_string()),
-                    automation.content.as_ref().unwrap().steps.len().to_string()
+                    automation.content.as_ref().unwrap().steps.len()
                 );
             }
             output += "\n";
