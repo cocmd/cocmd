@@ -28,7 +28,7 @@ pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<cocm
 
         println!("# cocmd paths for package {}", package.name());
 
-        for p in &package.paths() {
+        for p in &package.paths(true) {
             println!(r#"export PATH="{}:$PATH""#, p);
         }
     }

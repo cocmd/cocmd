@@ -140,7 +140,7 @@
             },
             "args": [
                 "docs",
-                "docker",
+                "omega",
                 // "--raw-markdown",
                 
             ],
