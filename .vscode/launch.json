@@ -140,7 +140,7 @@
             },
             "args": [
                 "docs",
-                "omega",
+                "git",
                 // "--raw-markdown",
                 
             ],
