@@ -11,11 +11,7 @@ pub fn extract_local_path(package: &String) -> Option<PathBuf> {
 
     // check for local file system pattern
     if path.is_absolute() {
-        if path.exists() {
-            return Some(path.to_path_buf());
-        } else {
-            return None;
-        }
+        return Some(path.to_path_buf());
     }
 
     if path.is_relative() {

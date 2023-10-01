@@ -79,7 +79,7 @@ fn interactive_shell(
     // get the value of the param by param.name and the function settings.get_param
     // if param.save == true, call save_param with the param.name and the value
 
-    let mut cmd = command.clone();
+    let mut cmd = "set -e\n".to_string() + command.clone().as_str();
 
     let env = Environment::new();
     let mut params_map: HashMap<String, String> = HashMap::new();

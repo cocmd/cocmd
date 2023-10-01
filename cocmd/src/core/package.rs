@@ -179,7 +179,7 @@ impl Package {
             for p in &self.paths() {
                 // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
                 // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
-                output += &format!("### {}\n", p);
+                output += &format!("{}:\n", p);
 
                 for entry in fs::read_dir(p).unwrap() {
                     let entry = entry.unwrap();
