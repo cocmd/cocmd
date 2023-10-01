@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         # os: [windows-latest, macos-latest, ubuntu-latest]
-        os: [macos-latest]
+        os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -42,15 +42,6 @@ jobs:
         run: |
           cargo install rust-script --version "0.7.0"
           cargo install cargo-make --version 0.34.0
-      # wxWidgets builds (internal to cocmd-modulo) are by far the largest bottleneck
-      # in the current pipeline, so we cache the results for a faster compilation process
-      - name: "Cache wxWidgets builds"
-        if: ${{ runner.os != 'Linux' }}
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{env.WX_WIDGETS_BUILD_OUT_DIR}}
-          key: ${{ github.job }}-${{ runner.os }}-${{ hashFiles('cocmd-modulo/build.rs') }}-${{ hashFiles('cocmd-modulo/vendor/*') }}
       - name: Build
         run: |
           cargo make build-binary
@@ -65,7 +56,7 @@ jobs:
     strategy:
       matrix:
         # os: [windows-latest, macos-latest, ubuntu-latest]
-        os: [macos-latest]
+        os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
