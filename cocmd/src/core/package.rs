@@ -199,8 +199,8 @@ impl Package {
                 // column 2 desc (pick up from comment line that starts with # COCMD-DESC: ...
                 // column 3 usage (pick up from comment line that starts with # COCMD-USAGE: ...
                 // column 4 example (pick up from comment line that starts with # COCMD-EXAMPLE: ...
-                output += "| filename | desc | usage | example |\n";
-                output += "| --- | --- | --- | --- |\n";
+                output += "| filename | desc | usage \n";
+                output += "| --- | --- | --- |\n";
 
                 for entry in fs::read_dir(abs_p).unwrap() {
                     let entry = entry.unwrap();
@@ -210,24 +210,20 @@ impl Package {
 
                     let mut desc = String::new();
                     let mut usage = String::new();
-                    let mut example = String::new();
 
                     for line in file_content.lines() {
                         if line.starts_with("# COCMD-DESC:") {
                             desc = line.replace("# COCMD-DESC:", "").trim().to_string();
                         } else if line.starts_with("# COCMD-USAGE:") {
                             usage = line.replace("# COCMD-USAGE:", "").trim().to_string();
-                        } else if line.starts_with("# COCMD-EXAMPLE:") {
-                            example = line.replace("# COCMD-EXAMPLE:", "").trim().to_string();
                         }
                     }
 
                     output += &format!(
-                        "| {} | {} | {} | {} |\n",
+                        "| {} | {} | {} |\n",
                         file_name.to_str().unwrap(),
                         desc,
-                        usage,
-                        example
+                        usage
                     );
                 }
 
