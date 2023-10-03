@@ -119,4 +119,4 @@ dependencies=["create-app-image"]
 
 [tasks.test-output]
 command = "cargo"
-args = ["test", "--workspace", "--exclude", "cocmd-modulo", "--exclude", "cocmd-ipc", "--no-default-features", "--", "--nocapture"]
+args = ["test", "--workspace", "--", "--nocapture"]

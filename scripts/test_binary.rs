@@ -29,10 +29,6 @@ fn main() {
 
     args.push("test");
     args.push("--workspace");
-    args.push("--exclude");
-    args.push("cocmd-modulo");
-    args.push("--exclude");
-    args.push("cocmd-ipc");
 
     if profile == Profile::Release {
         args.push("--release");
