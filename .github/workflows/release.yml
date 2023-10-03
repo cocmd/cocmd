@@ -107,32 +107,32 @@ jobs:
   #       run: |
   #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber target/windows/installer/Cocmd-Win-Installer-x86_64.exe target/windows/Cocmd-Win-Portable-x86_64.zip target/windows/installer/Cocmd-Win-Installer-x86_64.exe.sha256.txt target/windows/Cocmd-Win-Portable-x86_64.zip.sha256.txt
   
-  linux-x11:
-    needs: ["extract-version", "create-release"]
-    runs-on: ubuntu-latest
+  # linux-x11:
+  #   needs: ["extract-version", "create-release"]
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Print target version
-        run: |
-          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
-      - name: Build docker image
-        run: |
-          sudo docker build -t cocmd-ubuntu . -f .github/scripts/ubuntu/Dockerfile
-      - name: Build AppImage
-        run: |
-          sudo docker run --rm -v "$(pwd):/shared" cocmd-ubuntu cocmd/.github/scripts/ubuntu/build_appimage.sh
-      - uses: actions/upload-artifact@v2
-        name: "Upload artifacts"
-        with:
-          name: Linux X11 Artifacts
-          path: |
-            Cocmd-X11.AppImage
-            Cocmd-X11.AppImage.sha256.txt
-      - name: Upload artifacts to Github Releases (if master)
-        if: ${{ github.ref == 'refs/heads/master' }}
-        run: |
-          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber Cocmd-X11.AppImage Cocmd-X11.AppImage.sha256.txt
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Print target version
+  #       run: |
+  #         echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+  #     - name: Build docker image
+  #       run: |
+  #         sudo docker build -t cocmd-ubuntu . -f .github/scripts/ubuntu/Dockerfile
+  #     - name: Build AppImage
+  #       run: |
+  #         sudo docker run --rm -v "$(pwd):/shared" cocmd-ubuntu cocmd/.github/scripts/ubuntu/build_appimage.sh
+  #     - uses: actions/upload-artifact@v2
+  #       name: "Upload artifacts"
+  #       with:
+  #         name: Linux X11 Artifacts
+  #         path: |
+  #           Cocmd-X11.AppImage
+  #           Cocmd-X11.AppImage.sha256.txt
+  #     - name: Upload artifacts to Github Releases (if master)
+  #       if: ${{ github.ref == 'refs/heads/master' }}
+  #       run: |
+  #         gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber Cocmd-X11.AppImage Cocmd-X11.AppImage.sha256.txt
   
   linux-deb:
     needs: ["extract-version", "create-release"]
@@ -155,11 +155,10 @@ jobs:
           name: Ubuntu-Debian Artifacts
           path: |
             cocmd-debian-x11-amd64.deb
-            cocmd-debian-wayland-amd64.deb
       - name: Upload artifacts to Github Releases (if master)
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber cocmd-debian-x11-amd64.deb cocmd-debian-wayland-amd64.deb cocmd-debian-x11-amd64-sha256.txt cocmd-debian-wayland-amd64-sha256.txt 
+          gh release upload ${{ needs.extract-version.outputs.cocmd_version }} --clobber cocmd-debian-x11-amd64.deb cocmd-debian-x11-amd64-sha256.txt
 
 
   macos-intel:
