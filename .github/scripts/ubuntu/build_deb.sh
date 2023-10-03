@@ -8,10 +8,10 @@ cargo install cargo-deb --version 1.34.0
 cd cocmd
 
 echo "Building X11 deb package"
-cargo deb -p cocmd -- --no-default-features --features "modulo vendored-tls"
+cargo deb -p cocmd -- --no-default-features
 
 echo "Building Wayland deb package"
-cargo deb -p cocmd --variant wayland -- --no-default-features --features "modulo wayland vendored-tls"
+cargo deb -p cocmd --variant wayland -- --no-default-features
 
 cd ..
 cp cocmd/target/debian/cocmd_*.deb cocmd-debian-x11-amd64.deb

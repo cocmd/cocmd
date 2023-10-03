@@ -136,13 +136,6 @@ jobs:
         run: |
           cargo install rust-script --version "0.7.0"
           cargo install cargo-make --version 0.34.0
-      - name: "Cache wxWidgets builds"
-        if: ${{ runner.os != 'Linux' }}
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{env.WX_WIDGETS_BUILD_OUT_DIR}}
-          key: ${{ github.job }}-${{ runner.os }}-${{ hashFiles('cocmd-modulo/build.rs') }}-${{ hashFiles('cocmd-modulo/vendor/*') }}
       - name: Build
         run: |
           cargo make build-macos-arm-binary

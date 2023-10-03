@@ -25,11 +25,6 @@ fn main() {
         println!("Using Wayland feature");
     }
 
-    let avoid_modulo = envmnt::get_or("NO_MODULO", "false") == "true";
-    if avoid_modulo {
-        println!("Skipping modulo feature");
-    }
-
     let mut args = Vec::new();
     args.push("build");
 
@@ -50,9 +45,7 @@ fn main() {
     if wayland {
         features.push("wayland");
     }
-    if !avoid_modulo {
-        features.push("modulo");
-    }
+
     // On linux, we don't want to rely on OpenSSL to avoid dependency issues
     // https://github.com/cocmd/cocmd/issues/1056
     if cfg!(target_os = "linux") {

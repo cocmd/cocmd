@@ -5,7 +5,6 @@ default_to_workspace = false
 DEBUG = true 
 RELEASE = false
 NO_X11 = false
-NO_MODULO = false
 EXEC_PATH = "target/debug/cocmd"
 BUILD_ARCH = "current"
 
