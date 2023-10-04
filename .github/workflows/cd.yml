@@ -48,7 +48,7 @@ jobs:
         with:
           command: build
           toolchain: ${{ matrix.rust }}
-          args: --release --target ${{ matrix.target }}
+          args: --release --target ${{ matrix.target }} -p cocmd
 
       - name: Packaging final binary
         shell: bash
@@ -90,4 +90,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty
+          args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty -p cocmd

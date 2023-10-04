@@ -1,18 +1,15 @@
 use std::collections::HashMap;
 use std::io::{self, BufRead};
 use std::process;
-use std::process::{Stdio};
+use std::process::Stdio;
 
 use anyhow::Result;
 use cocmd_core::models::script_model::StepParamModel;
-use cocmd_core::{
-    models::script_model::{StepModel},
-    packages_manager::PackagesManager,
-};
+use cocmd_core::{models::script_model::StepModel, packages_manager::PackagesManager};
 use cocmd_log::{cocmd_error, tracing};
 use cocmd_md::print_md;
 
-use dialoguer::{theme::ColorfulTheme};
+use dialoguer::theme::ColorfulTheme;
 use execute::shell;
 use minijinja::{Environment, Value};
 
