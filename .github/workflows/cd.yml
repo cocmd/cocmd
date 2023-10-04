@@ -7,8 +7,23 @@ on:
       - "v*.*.*"
 
 jobs:
+  extract-version:
+    name: extract-version
+    runs-on: ubuntu-latest
+    outputs:
+      cocmd_version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Extract version"
+        id: "version"
+        run: |
+          COCMD_VERSION=$(grep '^version' Cargo.toml | awk -F '"' '{ print $2 }')
+          echo version: $COCMD_VERSION
+          echo "::set-output name=version::v$COCMD_VERSION"
+
   publish:
     name: Publishing for ${{ matrix.os }}
+    needs: ["extract-version"]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -78,6 +93,7 @@ jobs:
 
   publish-cargo:
     name: Publishing to Cargo
+    needs: ["extract-version"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -102,7 +118,7 @@ jobs:
   
       - name: Print target version
         run: |
-          echo Using version ${{ needs.publish.outputs.cocmd_version }}
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
   
       - name: "Setup SSH deploy key"
         uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
@@ -112,18 +128,18 @@ jobs:
       - name: Create and Publish Homebrew Cask
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          VERSION="${{ needs.publish.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
 
           
   update-website:
-    needs: ["publish"]
+    needs: ["extract-version", "publish"]
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       - name: Print target version
         run: |
-          echo Using version ${{ needs.publish.outputs.cocmd_version }}
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
 
       - name: "Setup SSH deploy key"
         uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
@@ -137,6 +153,6 @@ jobs:
       - name: Update version in website
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          VERSION="${{ needs.publish.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
       
         
