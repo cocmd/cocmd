@@ -23,6 +23,7 @@ use std::{
 };
 
 use anyhow::{anyhow, Context, Result};
+use cocmd_log::{cocmd_info, tracing};
 use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
@@ -105,7 +106,7 @@ impl CocmdHubPackageProvider {
                 let current_unix = current_time.as_secs();
                 if old_index.cached_at >= (current_unix - PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS)
                 {
-                    info_println!("using cached package index");
+                    cocmd_info!("using cached package index");
                     return Ok(old_index.index);
                 }
             }
@@ -117,7 +118,7 @@ impl CocmdHubPackageProvider {
     }
 
     fn download_index() -> Result<PackageIndex> {
-        info_println!("fetching from hub...");
+        cocmd_info!("fetching from hub...");
         let json_body = read_string_from_url(COCMD_HUB_PACKAGE_INDEX_URL)?;
         let index: PackageIndex = serde_json::from_str(&json_body)?;
         Ok(index)

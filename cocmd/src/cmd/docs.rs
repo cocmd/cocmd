@@ -1,14 +1,15 @@
+
+
 use anyhow::{bail, Result};
-use cocmd::core::packages_manager::PackagesManager;
-use termimad::MadSkin;
+use cocmd_core::packages_manager::PackagesManager;
+
+use super::CmdExit;
 
 pub fn run_docs(
     packages_manager: &mut PackagesManager,
     specific_name: &String,
     raw_markdown: bool,
-) -> Result<cocmd::CmdExit> {
-    let _skin = MadSkin::default();
-
+) -> Result<CmdExit> {
     // load package with the specific name
 
     let package = packages_manager
@@ -21,7 +22,7 @@ pub fn run_docs(
 
     package.print_doc(&packages_manager.settings, !raw_markdown, false);
 
-    Ok(cocmd::CmdExit {
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })

@@ -2,14 +2,15 @@
 use std::collections::HashMap;
 
 use anyhow::{bail, Result};
-use cocmd::core::packages_manager::PackagesManager;
+use cocmd_core::packages_manager::PackagesManager;
+use cocmd_md::print_md;
 #[cfg(feature = "howto")]
 use levenshtein::levenshtein;
-use termimad;
 
-pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<cocmd::CmdExit> {
+use super::CmdExit;
+
+pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<CmdExit> {
     let mut table = String::new();
-    let skin = termimad::MadSkin::default();
 
     let packages = packages_manager.packages.values();
 
@@ -33,15 +34,15 @@ pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<cocmd::Cm
         table = String::from("No packages yet");
     }
 
-    skin.print_text(&table);
+    print_md(&table);
 
-    Ok(cocmd::CmdExit {
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })
 }
 
-pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Result<cocmd::CmdExit> {
+pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Result<CmdExit> {
     let package = packages_manager
         .get_package(uri.clone())
         .unwrap_or_else(|| panic!("Can't get package {}", &uri));
@@ -52,14 +53,14 @@ pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Resu
 
     package.print_doc(&packages_manager.settings, true, true);
 
-    Ok(cocmd::CmdExit {
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })
 }
 
 #[cfg(feature = "howto")]
-pub fn howto(packages_manager: &mut PackagesManager, query: String) -> Result<cocmd::CmdExit> {
+pub fn howto(packages_manager: &mut PackagesManager, query: String) -> Result<CmdExit> {
     // lookup in all descriptions of automation for what matches best to query variable
     // use tokenization and levenshtein distance to find best match
 
@@ -83,7 +84,7 @@ pub fn howto(packages_manager: &mut PackagesManager, query: String) -> Result<co
     let skin = termimad::MadSkin::default();
     skin.print_text(&best_match);
 
-    Ok(cocmd::CmdExit {
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })

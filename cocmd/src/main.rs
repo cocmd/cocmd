@@ -1,14 +1,15 @@
 #![allow(unused_must_use)]
+#![allow(clippy::missing_const_for_fn)]
+
 mod cmd;
 use clap::{Parser, Subcommand};
 use cmd::add;
-use cmd::tracing;
-use cocmd::core::packages_manager::PackagesManager;
-use cocmd::Settings;
+use cocmd_core::packages_manager::PackagesManager;
+use cocmd_core::Settings;
+use cocmd_log::{cocmd_error, cocmd_info, set_tracing, tracing};
+use cocmd_md::print_md;
 use cocmd_package::provider;
 use dialoguer::MultiSelect;
-use termimad::{self, MadSkin};
-use tracing::error;
 
 use crate::cmd::docs::run_docs;
 use crate::cmd::profile_loader::run_profile_loader;
@@ -17,6 +18,7 @@ use crate::cmd::setup::run_setup;
 #[cfg(feature = "howto")]
 use crate::cmd::show::howto;
 use crate::cmd::show::{show_package, show_packages};
+use crate::cmd::CmdExit;
 
 /// Main CLI struct with meta-information
 #[derive(Parser)]
@@ -113,17 +115,15 @@ struct SetupArgs {
 
 fn main() {
     let cli = Cli::parse();
-    tracing(cli.verbose);
+    set_tracing(cli.verbose);
 
     let settings = Settings::new(None, None);
     let mut packages_manager = PackagesManager::new(settings);
 
-    let mut res = Ok(cocmd::CmdExit {
+    let mut res = Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     });
-
-    let skin = MadSkin::default();
 
     match cli.command {
         Commands::Setup(args) => {
@@ -145,7 +145,7 @@ fn main() {
                 if raw_markdown {
                     println!("{}", md);
                 } else {
-                    skin.print_text(&md);
+                    print_md(&md);
                 }
             }
         },
@@ -189,7 +189,7 @@ fn main() {
                 // set packages into selected_names (Vec[String])
                 selected_names = selections.iter().map(|s| packages[*s].clone()).collect();
             }
-            println!("Ok, I will install: {}", selected_names.join(", "));
+            cocmd_info!("Ok, I will install: {}", selected_names.join(", "));
             for name in selected_names {
                 res = add::install_package(&mut packages_manager, &name, dont_ask);
             }
@@ -201,6 +201,6 @@ fn main() {
 
     // if res returned an error, print it to stderr
     if let Err(e) = res {
-        error!("{}", e);
+        cocmd_error!("{}", e);
     }
 }

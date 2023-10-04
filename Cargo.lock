@@ -238,24 +238,46 @@ dependencies = [
  "anyhow",
  "clap",
  "clap-markdown",
+ "cocmd-core",
+ "cocmd-log",
+ "cocmd-md",
  "cocmd-package",
+ "cocmd-runner",
  "console",
  "dialoguer",
- "dirs",
- "execute",
  "exitcode",
- "inline_colorization",
- "lazy_static",
  "levenshtein",
- "minijinja",
+]
+
+[[package]]
+name = "cocmd-core"
+version = "0.1.0"
+dependencies = [
+ "cocmd-log",
+ "cocmd-md",
+ "cocmd-package",
+ "dirs",
+ "lazy_static",
  "serde",
  "serde_derive",
  "serde_json",
  "serde_yaml 0.9.25",
- "termimad",
+]
+
+[[package]]
+name = "cocmd-log"
+version = "0.1.0"
+dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-tree",
+]
+
+[[package]]
+name = "cocmd-md"
+version = "0.1.0"
+dependencies = [
+ "termimad",
 ]
 
 [[package]]
@@ -263,11 +285,11 @@ name = "cocmd-package"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "cocmd-log",
  "fs_extra",
  "glob",
  "hex",
  "lazy_static",
- "log",
  "natord",
  "regex",
  "reqwest",
@@ -279,6 +301,21 @@ dependencies = [
  "tempdir",
  "thiserror",
  "zip",
+]
+
+[[package]]
+name = "cocmd-runner"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cocmd-core",
+ "cocmd-log",
+ "cocmd-md",
+ "dialoguer",
+ "execute",
+ "inline_colorization",
+ "minijinja",
+ "termimad",
 ]
 
 [[package]]

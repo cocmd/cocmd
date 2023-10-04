@@ -6,7 +6,7 @@
     "externalConsole":true ,
     "configurations": [
         {
-            "name": "install source",
+            "name": "install package",
             "type": "lldb",
             "request": "launch",
             "cargo": {
@@ -64,7 +64,7 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "show sources",
+            "name": "show packages",
             "type": "lldb",
             "request": "launch",
             "cargo": {
@@ -79,12 +79,12 @@
             },
             "args": [
                 "show",
-                "sources"
+                "packages"
             ],
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "show source",
+            "name": "show package",
             "type": "lldb",
             "request": "launch",
             "cargo": {
@@ -99,7 +99,7 @@
             },
             "args": [
                 "show",
-                "source",
+                "package",
                 "/Users/mosher/workspace/example-repo-template"
             ],
             "cwd": "${workspaceFolder}"

@@ -21,6 +21,7 @@ use std::io::{copy, Cursor};
 use std::path::Path;
 
 use anyhow::{bail, Context, Result};
+use cocmd_log::{cocmd_info, tracing};
 use sha2::{Digest, Sha256};
 
 pub fn download_and_extract_zip(url: &str, dest_dir: &Path) -> Result<()> {
@@ -34,7 +35,7 @@ pub fn download_and_extract_zip_verify_sha256(
 ) -> Result<()> {
     let data = download(url).context("error downloading archive")?;
     if let Some(sha256) = sha256 {
-        info_println!("validating sha256 signature...");
+        cocmd_info!("validating sha256 signature...");
         if !verify_sha256(&data, sha256) {
             bail!("signature mismatch");
         }

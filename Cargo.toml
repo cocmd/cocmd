@@ -2,4 +2,8 @@
 members = [
   "cocmd",
   "cocmd-package",
+  "cocmd-runner",
+  "cocmd-core",
+  "cocmd-log",
+  "cocmd-md"
 ]

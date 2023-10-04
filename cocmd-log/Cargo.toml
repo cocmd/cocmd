@@ -1,0 +1,14 @@
+[package]
+name = "cocmd-log"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tracing = "^0.1.37"
+tracing-tree = { version = "0.2.1" }
+tracing-subscriber = { version = "^0.3.11", features = ["env-filter"] }
+
+[lib]
+cocmd_info=true

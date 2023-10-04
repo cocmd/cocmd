@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
+use cocmd_log::{cocmd_error, tracing};
 use cocmd_package::get_provider;
-use tracing::error;
 
-use crate::core::models::package_config_model::Automation;
-use crate::core::package::Package;
+use crate::models::package_config_model::Automation;
+use crate::package::Package;
 use crate::utils::io::{file_read_lines, file_write_lines};
 use crate::Settings;
 
@@ -53,7 +53,7 @@ impl PackagesManager {
 
                     let provider = get_provider(&uri, &settings.runtime_dir);
                     if let Err(err) = provider {
-                        error!("failed to get location for {} - {}", uri, err);
+                        cocmd_error!("failed to get location for {} - {}", uri, err);
                         continue;
                     }
                     let package =
@@ -64,7 +64,7 @@ impl PackagesManager {
                 packages
             }
             Err(err) => {
-                error!("failed reading {} - {}", packages_file, err);
+                cocmd_error!("failed reading {} - {}", packages_file, err);
                 HashMap::new()
             }
         }

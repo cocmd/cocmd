@@ -1,20 +1,22 @@
 use std::path::Path;
 
 use anyhow::{bail, Result};
-use cocmd::core::package::Package;
-use cocmd::core::packages_manager::PackagesManager;
-use cocmd::utils::repository::find_cocmd_files;
+use cocmd_core::package::Package;
+use cocmd_core::packages_manager::PackagesManager;
+use cocmd_core::utils::repository::find_cocmd_files;
+use cocmd_log::{cocmd_info, tracing};
 use cocmd_package::{get_provider, LOCAL_PROVIDER};
 use console::Style;
 use dialoguer::Confirm;
-use tracing::info;
+
+use super::CmdExit;
 
 pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
     dont_ask: bool,
-) -> Result<cocmd::CmdExit> {
-    info!("Installing package {:?}", package);
+) -> Result<CmdExit> {
+    cocmd_info!("Installing package {:?}", package);
 
     let settings = &packages_manager.settings;
 
@@ -22,10 +24,10 @@ pub fn install_package(
     let localpath = provider.local_path();
 
     if !provider.is_exists_locally() {
-        info!("Package not found locally. Downloading...");
+        cocmd_info!("Package not found locally. Downloading...");
         match provider.download() {
             Ok(downloaded_path) => {
-                info!("Downloaded package to {:?}", downloaded_path);
+                cocmd_info!("Downloaded package to {:?}", downloaded_path);
             }
             Err(e) => {
                 bail!("Failed to download package: {}", e);
@@ -42,7 +44,7 @@ pub fn install_package(
     let lst_locs = locations.join("\n  - ");
     let style = Style::new().bold().green();
     if provider.name() == LOCAL_PROVIDER {
-        println!(
+        cocmd_info!(
             "found {} cocmd packages in this path:\n  - {}",
             locations.len(),
             lst_locs
@@ -68,26 +70,26 @@ pub fn install_package(
             );
             let uri = package.uri.clone();
             packages_manager.add_package(package.clone());
-            info!("Package '{}' was installed:", uri);
-            info!("- ✅ {} aliases available now", package.get_aliases_count());
-            info!(
+            cocmd_info!("Package '{}' was installed:", uri);
+            cocmd_info!("- ✅ {} aliases available now", package.get_aliases_count());
+            cocmd_info!(
                 "- ✅ {} automations available now",
                 package.get_automations_count(&packages_manager.settings)
             );
-            info!(
+            cocmd_info!(
                 "- ✅ {} paths available now in PATH env",
                 package.get_paths_count()
             );
-            info!(
+            cocmd_info!(
                 "- run `cocmd show package {}` for more details",
                 package.name()
             );
         }
     } else {
-        println!("{}", style.apply_to("Skipped. you answered 'NO'"));
+        cocmd_info!("{}", style.apply_to("Skipped. you answered 'NO'"));
     }
 
-    Ok(cocmd::CmdExit {
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })

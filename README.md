@@ -1,5 +1,6 @@
 
 ![Build](https://github.com/cargo-bins/cargo-binstall/workflows/Rust/badge.svg)
+![](https://img.shields.io/github/v/release/Rigellute/spotify-tui?color=%23c694ff)
 
 Cocmd is an open source tool for Developers to add Command line operations specification to their projects and 
 distribute them to their community.
@@ -63,3 +64,9 @@ Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/routines)
 Any project can have CMDOps (Command Line Operations). Lets say for example, your project requires some installation steps, or you want to add some shortcuts for your team or community to use.
 
 Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/cmdops)
+
+
+
+## Inspiration
+- Espanso - https://espanso.org/
+- https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml

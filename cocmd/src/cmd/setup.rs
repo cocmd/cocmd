@@ -1,15 +1,16 @@
 use anyhow::Result;
-use cocmd::core::packages_manager::PackagesManager;
+use cocmd_core::packages_manager::PackagesManager;
+use cocmd_log::{cocmd_error, cocmd_info, tracing};
 use dialoguer::{theme::ColorfulTheme, Select};
-use tracing;
 
+use super::CmdExit;
 // add to bashrc or zshrc the following line if not exists
 // eval "$(cocmd profile-loader)"
 // output to stdout with tracing::info what you did
 pub fn run_setup(
     _packages_manager: &mut PackagesManager,
     shell: Option<String>,
-) -> Result<cocmd::CmdExit> {
+) -> Result<CmdExit> {
     let mut shell = shell.unwrap_or_else(|| {
         if let Some(shell) = std::env::var_os("SHELL") {
             shell.to_string_lossy().to_string()
@@ -22,7 +23,7 @@ pub fn run_setup(
                 .default(0) // Set a default selection if needed
                 .interact_opt()
                 .unwrap_or_else(|_e| {
-                    tracing::error!("No shell selected.");
+                    cocmd_error!("No shell selected.");
                     panic!("No shell selected.");
                 });
             shell_choices[selected_shell.unwrap()].to_string()
@@ -64,8 +65,8 @@ eval "$(cocmd profile-loader)"
 
     // check if profile_loader is already in profile
     if profile.contains("cocmd profile-loader") {
-        tracing::info!("Already added profile-loader to {}", profile_path);
-        return Ok(cocmd::CmdExit {
+        cocmd_info!("Already added profile-loader to {}", profile_path);
+        return Ok(CmdExit {
             code: exitcode::OK,
             message: None,
         });
@@ -73,8 +74,8 @@ eval "$(cocmd profile-loader)"
 
     profile.push_str(&profile_loader);
     std::fs::write(&profile_path, profile)?;
-    tracing::info!("Added profile-loader to {}", profile_path);
-    Ok(cocmd::CmdExit {
+    cocmd_info!("Added profile-loader to {}", profile_path);
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })

@@ -5,7 +5,7 @@ authors = ["Moshe Roth <Moshe-Roth@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-log = "0.4.14"
+cocmd-log = { path = "../cocmd-log"}
 anyhow = "1.0.38"
 thiserror = "1.0.23"
 serde = { version = "1.0.123", features = ["derive"] }

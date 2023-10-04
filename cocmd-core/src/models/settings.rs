@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
 use std::path::{Path, PathBuf};
 
-use tracing::error;
+use cocmd_log::{cocmd_error, tracing};
 
 use crate::utils::io::from_yaml_file;
 use crate::utils::sys::get_os;
@@ -67,7 +67,7 @@ impl Settings {
             }
             Err(err) => {
                 // Handle the error, for example, log it
-                error!("{}: {}", params_file_path.to_str().unwrap(), err);
+                cocmd_error!("{}: {}", params_file_path.to_str().unwrap(), err);
                 HashMap::new()
             }
         }

@@ -3,11 +3,12 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use tracing::error;
+use cocmd_log::{cocmd_error, tracing};
+use cocmd_md::print_md;
 
 use crate::consts;
-use crate::core::models::package_config_model::Automation;
-use crate::core::models::package_config_model::PackageConfigModel;
+use crate::models::package_config_model::Automation;
+use crate::models::package_config_model::PackageConfigModel;
 use crate::utils::io::{from_yaml_file, normalize_path};
 use crate::utils::sys::OS;
 use crate::Settings;
@@ -41,17 +42,17 @@ impl Package {
                     }
                     Err(err) => {
                         // Handle the error, for example, log it
-                        error!("{}: {}", config_file_path.to_str().unwrap(), err);
+                        cocmd_error!("{}: {}", config_file_path.to_str().unwrap(), err);
                     }
                 };
             } else {
-                error!(
+                cocmd_error!(
                     "Config Path {:?} does not exist.",
                     config_file_path.to_str().unwrap(),
                 );
             }
         } else {
-            error!(
+            cocmd_error!(
                 "Package Path {} does not exist.",
                 package.location.to_str().unwrap()
             )
@@ -141,7 +142,7 @@ impl Package {
         &self.location
     }
 
-    pub fn print_doc(&self, settings: &Settings, print_as_md: bool, env_specific: bool) {
+    pub fn print_doc(&self, settings: &Settings, print_as_markdown: bool, env_specific: bool) {
         // i want to print this content as md(with skin) or raw text(just println):
 
         let mut output = String::new();
@@ -226,17 +227,11 @@ impl Package {
                         usage
                     );
                 }
-
-                // for entry in fs::read_dir(abs_p).unwrap() {
-                //     let entry = entry.unwrap();
-                //     output += &format!("  - {}\n", entry.file_name().to_str().unwrap());
-                // }
             }
         }
 
-        if print_as_md {
-            let skin = termimad::MadSkin::default();
-            skin.print_text(&output);
+        if print_as_markdown {
+            print_md(&output);
         } else {
             println!("{}", output);
         }

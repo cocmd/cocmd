@@ -1,7 +1,9 @@
 use anyhow::Result;
-use cocmd::core::packages_manager::PackagesManager;
+use cocmd_core::packages_manager::PackagesManager;
 
-pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<cocmd::CmdExit> {
+use super::CmdExit;
+
+pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<CmdExit> {
     for package in packages_manager.packages.values() {
         if !(package.is_legit_cocmd_package()) {
             println!("# Skipping package {}", &package.uri);
@@ -33,7 +35,7 @@ pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<cocm
         }
     }
 
-    Ok(cocmd::CmdExit {
+    Ok(CmdExit {
         code: exitcode::OK,
         message: None,
     })

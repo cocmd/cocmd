@@ -8,6 +8,8 @@
   ],
   "rust-analyzer.linkedProjects": [
     "./cocmd/Cargo.toml",
-    "./cocmd-package/Cargo.toml"
+    "./cocmd-package/Cargo.toml",
+    "./cocmd-core/Cargo.toml",
+    "./cocmd-core/Cargo.toml"
   ],
 }

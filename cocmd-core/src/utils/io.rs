@@ -3,7 +3,6 @@ use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::io::{BufRead, Write};
-use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
 
 use serde::de::DeserializeOwned;
@@ -120,15 +119,6 @@ pub fn get_tmp_file() -> Result<std::fs::File, std::io::Error> {
 /// The path to the temporary directory as a `PathBuf`.
 pub fn get_tmp() -> PathBuf {
     std::env::temp_dir()
-}
-
-/// Changes the file mode to be executable.
-///
-/// # Arguments
-///
-/// - `file`: The file path to modify.
-pub fn chmod_x(file: &str) {
-    fs::set_permissions(file, fs::Permissions::from_mode(0o755)).unwrap();
 }
 
 // Function to serialize a value to YAML and write it to a file
