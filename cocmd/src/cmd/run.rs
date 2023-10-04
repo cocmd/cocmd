@@ -1,12 +1,12 @@
 use std::process;
 
 use anyhow::Result;
-use cocmd_core::packages_manager::PackagesManager;
-use cocmd_log::{cocmd_error, tracing};
-use cocmd_runner::run_script;
 use dialoguer::{theme::ColorfulTheme, Select};
+use tracing::error;
 
 use super::CmdExit;
+use crate::core::packages_manager::PackagesManager;
+use crate::runner::run_script;
 pub fn run_automation(
     packages_manager: &mut PackagesManager,
     specific_name: Option<String>,
@@ -23,7 +23,7 @@ pub fn run_automation(
                 .default(0) // Set a default selection if needed
                 .interact_opt()
                 .unwrap_or_else(|_e| {
-                    cocmd_error!("No script selected.");
+                    error!("No script selected.");
                     process::exit(1)
                 });
 
@@ -48,7 +48,7 @@ pub fn run_automation(
 
         // info!("Script {} completed", automation.name);
     } else {
-        cocmd_error!("I don't know this script");
+        error!("I don't know this script");
     }
 
     Ok(CmdExit {

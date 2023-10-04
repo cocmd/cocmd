@@ -1,9 +1,7 @@
-
-
 use anyhow::{bail, Result};
-use cocmd_core::packages_manager::PackagesManager;
 
 use super::CmdExit;
+use crate::core::packages_manager::PackagesManager;
 
 pub fn run_docs(
     packages_manager: &mut PackagesManager,

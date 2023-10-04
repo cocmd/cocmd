@@ -18,16 +18,31 @@
  */
 
 use std::path::Path;
+use std::path::PathBuf;
 
 use anyhow::Result;
 
-pub mod provider;
 mod util;
-use provider::PackageProvider;
+
+pub mod git;
+pub mod hub;
+pub mod local;
 
 pub const LOCAL_PROVIDER: &str = "local";
 pub const GIT_PROVIDER: &str = "git";
 pub const COCMDHUB_PROVIDER: &str = "cocmd-hub";
+
+pub trait PackageProvider {
+    fn name(&self) -> String;
+    fn package(&self) -> String;
+    fn local_path(&self) -> PathBuf;
+    fn is_exists_locally(&self) -> bool {
+        // check for existsance of the local path
+        self.local_path().exists()
+    }
+    fn download(&self) -> Result<PathBuf>;
+    // TODO: fn check update available? (probably should be only available in the hub)
+}
 
 pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn PackageProvider>> {
     // parse "package" if it's a local path create a LocalPackageProvider
@@ -35,18 +50,18 @@ pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn Pack
     // otherwise look for it in the hub and create a HubPackageProvider
 
     if let Some(local_path) = util::path::extract_local_path(package) {
-        Ok(Box::new(provider::local::LocalPackageProvider::new(
+        Ok(Box::new(local::LocalPackageProvider::new(
             package,
             &local_path,
         )))
     } else if let Some(github_parts) = util::git::extract_git_url_parts(package) {
-        return Ok(Box::new(provider::git::GitPackageProvider::new(
+        return Ok(Box::new(git::GitPackageProvider::new(
             package,
             &github_parts,
             runtime_dir,
         )));
     } else {
-        return Ok(Box::new(provider::hub::CocmdHubPackageProvider::new(
+        return Ok(Box::new(hub::CocmdHubPackageProvider::new(
             package,
             runtime_dir,
         )));

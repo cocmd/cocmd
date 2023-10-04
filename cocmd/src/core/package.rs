@@ -3,14 +3,14 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use cocmd_log::{cocmd_error, tracing};
-use cocmd_md::print_md;
+use tracing::error;
 
-use crate::consts;
-use crate::models::package_config_model::Automation;
-use crate::models::package_config_model::PackageConfigModel;
-use crate::utils::io::{from_yaml_file, normalize_path};
-use crate::utils::sys::OS;
+use crate::core::consts;
+use crate::core::models::package_config_model::Automation;
+use crate::core::models::package_config_model::PackageConfigModel;
+use crate::core::utils::io::{from_yaml_file, normalize_path};
+use crate::core::utils::sys::OS;
+use crate::output::print_md;
 use crate::Settings;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -42,17 +42,17 @@ impl Package {
                     }
                     Err(err) => {
                         // Handle the error, for example, log it
-                        cocmd_error!("{}: {}", config_file_path.to_str().unwrap(), err);
+                        error!("{}: {}", config_file_path.to_str().unwrap(), err);
                     }
                 };
             } else {
-                cocmd_error!(
+                error!(
                     "Config Path {:?} does not exist.",
                     config_file_path.to_str().unwrap(),
                 );
             }
         } else {
-            cocmd_error!(
+            error!(
                 "Package Path {} does not exist.",
                 package.location.to_str().unwrap()
             )

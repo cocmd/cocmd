@@ -2,12 +2,12 @@
 use std::collections::HashMap;
 
 use anyhow::{bail, Result};
-use cocmd_core::packages_manager::PackagesManager;
-use cocmd_md::print_md;
 #[cfg(feature = "howto")]
 use levenshtein::levenshtein;
 
 use super::CmdExit;
+use crate::core::packages_manager::PackagesManager;
+use crate::output::print_md;
 
 pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<CmdExit> {
     let mut table = String::new();

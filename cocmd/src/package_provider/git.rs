@@ -22,7 +22,7 @@ use std::{path::Path, path::PathBuf, process::Command};
 use anyhow::{bail, Context, Result};
 
 use super::PackageProvider;
-use crate::{util::git::GitParts, GIT_PROVIDER};
+use super::{util::git::GitParts, GIT_PROVIDER};
 
 pub struct GitPackageProvider {
     package: String,

@@ -1,9 +1,9 @@
-use cocmd_core::utils::sys::OS;
-use cocmd_core::{
+use crate::core::utils::sys::OS;
+use crate::core::{
     models::script_model::{ScriptModel, StepRunnerType},
     packages_manager::PackagesManager,
 };
-use cocmd_md::print_md;
+use crate::output::print_md;
 mod shell;
 mod step_runner;
 

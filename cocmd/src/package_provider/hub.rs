@@ -23,11 +23,14 @@ use std::{
 };
 
 use anyhow::{anyhow, Context, Result};
-use cocmd_log::{cocmd_info, tracing};
 use serde::{Deserialize, Serialize};
+use tracing::info;
 
 use super::PackageProvider;
-use crate::{util::download::read_string_from_url, COCMDHUB_PROVIDER};
+use super::{
+    util::download::download_and_extract_zip_verify_sha256, util::download::read_string_from_url,
+    COCMDHUB_PROVIDER,
+};
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
     "https://github.com/cocmd/hub/releases/latest/download/package_index.json";
@@ -72,7 +75,7 @@ impl PackageProvider for CocmdHubPackageProvider {
 
         let local_path = self.local_path.clone(); // Clone the PathBuf
 
-        crate::util::download::download_and_extract_zip_verify_sha256(
+        download_and_extract_zip_verify_sha256(
             &package_info.archive_url,
             &local_path,
             Some(&archive_sha256),
@@ -106,7 +109,7 @@ impl CocmdHubPackageProvider {
                 let current_unix = current_time.as_secs();
                 if old_index.cached_at >= (current_unix - PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS)
                 {
-                    cocmd_info!("using cached package index");
+                    info!("using cached package index");
                     return Ok(old_index.index);
                 }
             }
@@ -118,7 +121,7 @@ impl CocmdHubPackageProvider {
     }
 
     fn download_index() -> Result<PackageIndex> {
-        cocmd_info!("fetching from hub...");
+        info!("fetching from hub...");
         let json_body = read_string_from_url(COCMD_HUB_PACKAGE_INDEX_URL)?;
         let index: PackageIndex = serde_json::from_str(&json_body)?;
         Ok(index)

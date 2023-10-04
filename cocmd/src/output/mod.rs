@@ -1,4 +1,4 @@
-pub use tracing;
+use termimad::MadSkin;
 use tracing::metadata::LevelFilter;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -21,23 +21,8 @@ pub fn set_tracing(verbose: bool) {
         .init();
 }
 
-#[macro_export]
-macro_rules! cocmd_info {
-  ($($tts:tt)*) => {
-    tracing::info!($($tts)*);
-  }
-}
-
-#[macro_export]
-macro_rules! cocmd_warn {
-  ($($tts:tt)*) => {
-    tracing::warn!($($tts)*);
-  }
-}
-
-#[macro_export]
-macro_rules! cocmd_error {
-  ($($tts:tt)*) => {
-    tracing::error!($($tts)*);
-  }
+pub fn print_md(markdown: &String) {
+    // print with termimad to stdout
+    let skin = MadSkin::default();
+    skin.print_text(markdown);
 }

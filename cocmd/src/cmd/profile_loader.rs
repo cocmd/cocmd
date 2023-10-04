@@ -1,7 +1,7 @@
 use anyhow::Result;
-use cocmd_core::packages_manager::PackagesManager;
 
 use super::CmdExit;
+use crate::core::packages_manager::PackagesManager;
 
 pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<CmdExit> {
     for package in packages_manager.packages.values() {

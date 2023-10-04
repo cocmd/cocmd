@@ -1,24 +1,29 @@
 #![allow(unused_must_use)]
 #![allow(clippy::missing_const_for_fn)]
 
-mod cmd;
+pub(crate) mod cmd;
+pub(crate) mod core;
+pub(crate) mod output;
+pub(crate) mod package_provider;
+pub(crate) mod runner;
+
 use clap::{Parser, Subcommand};
 use cmd::add;
-use cocmd_core::packages_manager::PackagesManager;
-use cocmd_core::Settings;
-use cocmd_log::{cocmd_error, cocmd_info, set_tracing, tracing};
-use cocmd_md::print_md;
-use cocmd_package::provider;
-use dialoguer::MultiSelect;
-
-use crate::cmd::docs::run_docs;
-use crate::cmd::profile_loader::run_profile_loader;
-use crate::cmd::run::run_automation;
-use crate::cmd::setup::run_setup;
+use cmd::docs::run_docs;
+use cmd::profile_loader::run_profile_loader;
+use cmd::run::run_automation;
+use cmd::setup::run_setup;
 #[cfg(feature = "howto")]
-use crate::cmd::show::howto;
-use crate::cmd::show::{show_package, show_packages};
-use crate::cmd::CmdExit;
+use cmd::show::howto;
+use cmd::show::{show_package, show_packages};
+use cmd::CmdExit;
+use dialoguer::MultiSelect;
+use tracing::{error, info};
+
+pub(crate) use crate::core::models::settings::Settings;
+use crate::core::packages_manager::PackagesManager;
+use crate::output::print_md;
+use crate::output::set_tracing;
 
 /// Main CLI struct with meta-information
 #[derive(Parser)]
@@ -169,7 +174,7 @@ fn main() {
             if let Some(names) = names {
                 selected_names = names.clone();
             } else {
-                let hub_provider = provider::hub::CocmdHubPackageProvider::new(
+                let hub_provider = package_provider::hub::CocmdHubPackageProvider::new(
                     &"placeholder".to_string(),
                     &packages_manager.settings.runtime_dir,
                 );
@@ -189,7 +194,7 @@ fn main() {
                 // set packages into selected_names (Vec[String])
                 selected_names = selections.iter().map(|s| packages[*s].clone()).collect();
             }
-            cocmd_info!("Ok, I will install: {}", selected_names.join(", "));
+            info!("Ok, I will install: {}", selected_names.join(", "));
             for name in selected_names {
                 res = add::install_package(&mut packages_manager, &name, dont_ask);
             }
@@ -201,6 +206,6 @@ fn main() {
 
     // if res returned an error, print it to stderr
     if let Err(e) = res {
-        cocmd_error!("{}", e);
+        error!("{}", e);
     }
 }

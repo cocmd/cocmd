@@ -22,7 +22,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 
 use super::PackageProvider;
-use crate::LOCAL_PROVIDER;
+use super::LOCAL_PROVIDER;
 
 pub struct LocalPackageProvider {
     package: String,

@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
-use cocmd_log::{cocmd_error, tracing};
 use serde_derive::{Deserialize as De, Serialize as Se};
+use tracing::error;
 
 use super::script_model::{ScriptModel, StepModel};
-use crate::utils::io::{from_file, from_yaml_file, normalize_path};
-use crate::utils::sys::OS;
+use crate::core::utils::io::{from_file, from_yaml_file, normalize_path};
+use crate::core::utils::sys::OS;
 
 #[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
 pub struct Automation {
@@ -37,7 +37,7 @@ impl Automation {
                                     }
                                     Err(err) => {
                                         // Handle the error if needed
-                                        cocmd_error!(err);
+                                        error!(err);
                                         step.clone() // Return the original step on error
                                     }
                                 }
@@ -54,7 +54,7 @@ impl Automation {
                 }
                 Err(err) => {
                     // Handle the error if needed
-                    cocmd_error!(err);
+                    error!(err);
                 }
             }
         }

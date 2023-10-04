@@ -1,20 +1,15 @@
+use std::process::Command;
 
-use std::io::{BufRead};
+use dialoguer::Confirm;
 
-use std::process::{Command};
-
-
-use cocmd_core::models::script_model::StepParamModel;
-use cocmd_core::utils::sys::OS;
-use cocmd_core::{
+use super::shell::interactive_shell;
+use crate::core::models::script_model::StepParamModel;
+use crate::core::utils::sys::OS;
+use crate::core::{
     models::script_model::{StepModel, StepRunnerType},
     packages_manager::PackagesManager,
 };
-
-use cocmd_md::print_md;
-use dialoguer::Confirm;
-
-use crate::shell::interactive_shell;
+use crate::output::print_md;
 
 pub fn handle_step(
     step: &StepModel,

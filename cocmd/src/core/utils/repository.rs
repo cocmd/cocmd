@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use crate::consts;
+use super::super::consts;
 
 pub fn find_cocmd_files(package_label: &Path, scan_depth: usize) -> Vec<String> {
     let mut result = Vec::new();

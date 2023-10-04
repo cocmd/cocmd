@@ -2,11 +2,11 @@ use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
 use std::path::{Path, PathBuf};
 
-use cocmd_log::{cocmd_error, tracing};
+use tracing::error;
 
-use crate::utils::io::from_yaml_file;
-use crate::utils::sys::get_os;
-use crate::{consts, utils::sys::OS};
+use crate::core::utils::io::from_yaml_file;
+use crate::core::utils::sys::get_os;
+use crate::core::{consts, utils::sys::OS};
 
 #[derive(PartialEq, Eq)]
 pub struct Settings {
@@ -67,7 +67,7 @@ impl Settings {
             }
             Err(err) => {
                 // Handle the error, for example, log it
-                cocmd_error!("{}: {}", params_file_path.to_str().unwrap(), err);
+                error!("{}: {}", params_file_path.to_str().unwrap(), err);
                 HashMap::new()
             }
         }
