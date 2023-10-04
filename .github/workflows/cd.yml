@@ -2,8 +2,9 @@ name: Continuous Deployment
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches: master
+    # tags:
+    #   - "v*.*.*"
 
 jobs:
   publish:
@@ -91,3 +92,51 @@ jobs:
         with:
           command: publish
           args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty -p cocmd
+  
+  macos-publish-homebrew:
+    needs: ["publish"]
+    runs-on: macos-11
+  
+    steps:
+      - uses: actions/checkout@v2
+  
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.publish.outputs.cocmd_version }}
+  
+      - name: "Setup SSH deploy key"
+        uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: ${{ secrets.HOMEBREW_CASK_SSH_PRIVATE_KEY }}
+      
+      - name: Create and Publish Homebrew Cask
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          VERSION="${{ needs.publish.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
+
+          
+  update-website:
+    needs: ["publish"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.publish.outputs.cocmd_version }}
+
+      - name: "Setup SSH deploy key"
+        uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: ${{ secrets.COCMD_WEBSITE_SSH_PRIVATE_KEY }}
+      - name: git config
+        run: |
+          git config --global user.email "cocmd@cocmd.org"
+          git config --global user.name "Github Actions"
+
+      - name: Update version in website
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          VERSION="${{ needs.publish.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
+      
+        
