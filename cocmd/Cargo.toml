@@ -8,10 +8,6 @@ homepage = "https://cocmd.org"
 
 
 
-[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
-pkg-url = "{ repo }/releases/download/v{ version }/cocmd-x86_64-windows.zip"
-bin-dir = "cocmd-x86_64-windows/cocmd.exe"
-pkg-fmt = "zip"
 
 [package.metadata.binstall.overrides.x86_64-apple-darwin]
 pkg-url = "{ repo }/releases/download/v{ version }/cocmd-x86_64-macos.tar.xz"

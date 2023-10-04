@@ -1,4 +1,5 @@
 
+![Build](https://github.com/cargo-bins/cargo-binstall/workflows/Rust/badge.svg)
 
 Cocmd is an open source tool for Developers to add Command line operations specification to their projects and 
 distribute them to their community.
