@@ -1,5 +1,3 @@
-
-
 use anyhow::{bail, Result};
 use cocmd_core::packages_manager::PackagesManager;
 
