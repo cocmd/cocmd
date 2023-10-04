@@ -1,4 +1,4 @@
-name: cocmd-temp
+name: cocmd
 base: core18
 adopt-info: cocmd
 summary: Cocmd
@@ -24,7 +24,7 @@ parts:
       snapcraftctl set-version "${VERSION}"
 
 apps:
-  cocmd-temp:
+  cocmd:
     command: cocmd
     plugs:
       - desktop
