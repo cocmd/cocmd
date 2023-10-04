@@ -1,0 +1,32 @@
+name: cocmd-temp
+base: core18
+adopt-info: cocmd
+summary: Cocmd
+description: |
+  cmdops tool for dev teams
+
+grade: stable
+confinement: strict
+
+parts:
+  cocmd:
+    plugin: rust
+    source: .
+    build-packages:
+      - libssl-dev
+      - pkg-config
+    override-pull: |
+      snapcraftctl pull
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      echo $last_committed_tag
+      VERSION="$(git describe --first-parent --tags --always)"
+      echo "Setting version to $VERSION"
+      snapcraftctl set-version "${VERSION}"
+
+apps:
+  cocmd-temp:
+    command: cocmd
+    plugs:
+      - desktop
+      - network
+      - network-bind

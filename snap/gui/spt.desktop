@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Cocmd
+Exec=cocmd
+Comment=cmdops tool for dev teams
+Icon=${SNAP}/meta/gui/cocmd.png
+Type=Application
+Terminal=true
+StartupNotify=false
+Categories=Developers;
