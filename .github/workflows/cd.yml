@@ -109,8 +109,9 @@ jobs:
           command: publish
           args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty -p cocmd
   
+
   macos-publish-homebrew:
-    needs: ["publish"]
+    needs: ["publish", "extract-version"]
     runs-on: macos-11
   
     steps:
@@ -132,7 +133,7 @@ jobs:
 
           
   update-website:
-    needs: ["extract-version", "publish"]
+    needs: ["extract-version", "publish", "macos-publish-homebrew"]
     runs-on: ubuntu-latest
 
     steps:
