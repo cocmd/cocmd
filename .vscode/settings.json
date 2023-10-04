@@ -10,6 +10,12 @@
     "./cocmd/Cargo.toml",
     "./cocmd-package/Cargo.toml",
     "./cocmd-core/Cargo.toml",
-    "./cocmd-core/Cargo.toml"
+    "./cocmd-core/Cargo.toml",
+    "./cocmd/Cargo.toml",
+    "./cocmd/Cargo.toml",
+    "./cocmd/Cargo.toml",
+    "./cocmd/Cargo.toml",
+    "./cocmd/Cargo.toml"
   ],
+  "rust-analyzer.showUnlinkedFileNotification": false,
 }
