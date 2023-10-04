@@ -1,8 +1,6 @@
+use std::io::BufRead;
 
-use std::io::{BufRead};
-
-use std::process::{Command};
-
+use std::process::Command;
 
 use cocmd_core::models::script_model::StepParamModel;
 use cocmd_core::utils::sys::OS;

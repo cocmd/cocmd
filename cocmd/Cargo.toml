@@ -27,11 +27,11 @@ pkg-fmt = "txz"
 # </cargo binstall>
 
 [dependencies]
-cocmd-package = { path = "../cocmd-package"}
-cocmd-core = { path = "../cocmd-core"}
-cocmd-runner = { path = "../cocmd-runner"}
-cocmd-log = { path = "../cocmd-log"}
-cocmd-md = { path= "../cocmd-md" }
+cocmd-package = { path = "../cocmd-package", version = "0.1.0"}
+cocmd-core = { path = "../cocmd-core", version = "0.1.0"}
+cocmd-runner = { path = "../cocmd-runner", version = "0.1.0"}
+cocmd-log = { path = "../cocmd-log", version = "0.1.0"}
+cocmd-md = { path= "../cocmd-md", version = "0.1.0"}
 clap = { version = "4", features = ["cargo", "derive"], optional = true }
 anyhow = "1"
 console = "^0.15.0"
