@@ -55,7 +55,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+          sudo apt-get install -y -qq pkg-config libssl-dev
       - name: Checking out sources
         uses: actions/checkout@v1
       - name: Running cargo build
@@ -128,7 +128,7 @@ jobs:
       - name: Create and Publish Homebrew Cask
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_homebrew_version.sh
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_homebrew_version.sh
   update-website:
     needs: ["extract-version", "publish", "macos-publish-homebrew"]
     runs-on: ubuntu-latest
@@ -148,9 +148,16 @@ jobs:
           git config --global user.email "cocmd@cocmd.org"
           git config --global user.name "Github Actions"
 
+      - name: install latest cocmd
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          toolchain: stable
+          args: --path cocmd
+
       - name: Update version in website
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
-          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./scripts/publish_website_version.sh
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_website_version.sh
       
         

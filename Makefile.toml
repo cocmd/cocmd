@@ -17,7 +17,67 @@ EXEC_PATH = "target/release/cocmd"
 [tasks.update-cli-docs]
 script_runner = "@shell"
 script = '''
-cargo install --path cocmd && cocmd docs > ../cocmd-website/docs/cli-docs.md
+cargo run -- docs > ../cocmd-website/docs/cli-docs.md
+'''
+
+[tasks.version-bump]
+script_runner = "@shell"
+script = '''
+bump_version() {
+    # Extract the current version from Cargo.toml
+    current_version=$(grep '^version =' Cargo.toml | sed -E 's/[^0-9.]+//g')
+
+    # Split the current version into major, minor, and patch parts
+    IFS='.' read -ra version_parts <<< "$current_version"
+    major="${version_parts[0]}"
+    minor="${version_parts[1]}"
+    patch="${version_parts[2]}"
+
+    # Increment the patch version by 1
+    ((patch++))
+
+    # Update the version variable
+    version="$major.$minor.$patch"
+}
+
+echo "Please enter a version number (x.y.z) or ENTER: "
+read version
+
+# If the user didn't provide an input, bump the version automatically
+if [ -z "$version" ]; then
+    bump_version
+    echo "Automatically bumped version to: $version"
+else
+    # Validate the version number format (e.g., using regular expressions)
+    if [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Valid version number: $version"
+    else
+        echo "Invalid version number: $version"
+        exit 1
+    fi
+fi
+
+# Update Cargo.toml with the chosen or bumped version
+sed "s/^version = .*/version = \"$version\"/" Cargo.toml > Cargo.toml.bak
+mv Cargo.toml.bak Cargo.toml
+
+
+# Ask the user for confirmation before proceeding
+read -p "Do you want to GIT commit+tag+push for version $version? (y/n): " confirmation
+
+if [ "$confirmation" == "y" ]; then
+    
+    # Commit the change
+    git add Cargo.toml
+    git commit -m "Bump version to $version"
+
+    # Create a Git tag for the new version
+    git tag -a "v$version" -m "v$version"
+
+    git push --tags
+else
+    echo "Not commited"
+fi
 '''
 
 # Build variants
@@ -35,84 +95,6 @@ dependencies = ["build-binary"]
 [tasks.test-binary]
 script_runner = "@rust"
 script = { file = "scripts/test_binary.rs" }
-
-# Windows
-
-[tasks.build-windows-resources]
-script_runner = "@rust"
-script = { file = "scripts/build_windows_resources.rs" }
-dependencies = ["build-binary"]
-
-[tasks.build-windows-portable]
-script_runner = "@rust"
-script = { file = "scripts/build_windows_portable.rs" }
-dependencies = ["build-windows-resources"]
-
-[tasks.build-windows-installer]
-script_runner = "@rust"
-script = { file = "scripts/build_windows_installer.rs" }
-dependencies = ["build-windows-resources"]
-
-[tasks.build-windows-all]
-dependencies = ["build-windows-portable", "build-windows-installer"]
-
-[tasks.sign-windows-resources]
-env = { "TARGET_SIGNTOOL_FILE" = "target/windows/resources/cocmdd.exe" }
-script_runner = "@rust"
-script = { file = "scripts/sign_windows_exe.rs" }
-
-[tasks.sign-windows-installer]
-env = { "TARGET_SIGNTOOL_FILE" = "target/windows/installer/Cocmd-Win-Installer-x86_64.exe" }
-script_runner = "@rust"
-script = { file = "scripts/sign_windows_exe.rs" }
-
-# macOS
-
-[tasks.build-macos-arm-binary]
-env = { "BUILD_ARCH" = "aarch64-apple-darwin" }
-run_task = [
-  { name = "build-binary" }
-]
-
-[tasks.build-macos-x86-binary]
-env = { "BUILD_ARCH" = "x86_64-apple-darwin" }
-run_task = [
-  { name = "build-binary" }
-]
-
-[tasks.build-universal-binary]
-script = { file = "scripts/join_universal_binary.sh"}
-dependencies=["build-macos-arm-binary", "build-macos-x86-binary"]
-
-[tasks.create-bundle]
-script = { file = "scripts/create_bundle.sh" }
-dependencies=["build-binary"]
-
-[tasks.create-universal-bundle]
-env = { "EXEC_PATH" = "target/universal/cocmd" }
-script = { file = "scripts/create_bundle.sh" }
-dependencies=["build-universal-binary"]
-
-[tasks.run-bundle]
-command="target/mac/Cocmd.app/Contents/MacOS/cocmd"
-args=["${@}"]
-dependencies=["create-bundle"]
-
-# Linux
-
-[tasks.create-app-image]
-script = { file = "scripts/create_app_image.sh" }
-dependencies=["build-binary"]
-
-[tasks.run-app-image]
-args=["${@}"]
-script='''
-#!/usr/bin/env bash
-set -e
-echo Launching AppImage with args: "$@"
-./target/linux/AppImage/out/Cocmd-*.AppImage "$@"
-'''
-dependencies=["create-app-image"]
 
 # Test runs
 
