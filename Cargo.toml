@@ -1,6 +1,6 @@
 [package]
 name = "cocmd"
-version = "1.0.23"
+version = "1.0.25"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
@@ -39,6 +39,8 @@ hex = "0.4.3"
 reqwest = { version = "0.11.20", features = ["blocking", "json"]}
 minijinja = "1.0.8"
 execute = "0.2.12"
+crossterm = "0.26.1"
+tui = { package = "ratatui", version = "0.21.0" }
 
 
 [features]

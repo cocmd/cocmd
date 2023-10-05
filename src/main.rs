@@ -6,6 +6,7 @@ pub(crate) mod core;
 pub(crate) mod output;
 pub(crate) mod package_provider;
 pub(crate) mod runner;
+mod tui;
 
 use clap::{Parser, Subcommand};
 use cmd::add;
@@ -19,6 +20,7 @@ use cmd::show::{show_package, show_packages};
 use cmd::CmdExit;
 use dialoguer::MultiSelect;
 use tracing::{error, info};
+use tui::tui;
 
 pub(crate) use crate::core::models::settings::Settings;
 use crate::core::packages_manager::PackagesManager;
@@ -28,8 +30,8 @@ use crate::output::set_tracing;
 /// Main CLI struct with meta-information
 #[derive(Parser)]
 #[command(
-    author = "Moshe Roth",                             // Author of the CLI tool
-    version = "1.1.0",                               // Version of the CLI tool
+    author = "Moshe Roth",
+    version = "1.0.25",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -47,6 +49,9 @@ struct Cli {
 /// Subcommands enum with meta-information
 #[derive(Subcommand)]
 enum Commands {
+    /// Terminal UI for cocmd
+    Tui,
+
     /// Profile Loader command - Loads profiles
     ProfileLoader,
 
@@ -131,6 +136,9 @@ fn main() {
     });
 
     match cli.command {
+        Commands::Tui => {
+            tui();
+        }
         Commands::Setup(args) => {
             res = run_setup(&mut packages_manager, args.shell);
         }

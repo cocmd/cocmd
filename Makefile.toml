@@ -61,6 +61,12 @@ fi
 sed "s/^version = .*/version = \"$version\"/" Cargo.toml > Cargo.toml.bak
 mv Cargo.toml.bak Cargo.toml
 
+# Update rust main.rs cli printout
+sed "s/version = .*,/version = \"$version\",/" src/main.rs > src/main.rs.bak
+mv src/main.rs.bak src/main.rs
+
+    
+
 
 # Ask the user for confirmation before proceeding
 read -p "Do you want to GIT commit+tag+push with version $version? (y/n): " confirmation
@@ -79,24 +85,6 @@ else
     echo "Not commited"
 fi
 '''
-
-# Build variants
-
-# This one was written in Rust instead of bash because it has to run on Windows as well
-[tasks.build-binary]
-script_runner = "@rust"
-script = { file = "scripts/build_binary.rs" }
-
-[tasks.run-binary]
-command = "${EXEC_PATH}"
-args = ["${@}"]
-dependencies = ["build-binary"]
-
-[tasks.test-binary]
-script_runner = "@rust"
-script = { file = "scripts/test_binary.rs" }
-
-# Test runs
 
 [tasks.test-output]
 command = "cargo"
