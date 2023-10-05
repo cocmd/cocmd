@@ -13,18 +13,22 @@ pub mod tui_struct;
 /// Event handler.
 pub mod handler;
 
+pub mod helpers;
+
 use std::io;
 
 use app::{App, AppResult};
 use event::{Event, EventHandler};
 use handler::handle_key_events;
-use tui::backend::CrosstermBackend;
-use tui::Terminal;
+use ratatui::backend::CrosstermBackend;
+use ratatui::Terminal;
 use tui_struct::Tui;
 
-pub fn tui_runner() -> AppResult<()> {
+use crate::core::packages_manager::PackagesManager;
+
+pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<()> {
     // Create an application.
-    let mut app = App::new();
+    let mut app = App::new(packages_manager);
 
     // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());

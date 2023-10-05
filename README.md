@@ -73,3 +73,4 @@ Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/cmdops)
 ## Inspiration
 - Espanso - https://espanso.org/
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
+- https://github.com/pvolok/mprocs#npm-linux-macos-windows

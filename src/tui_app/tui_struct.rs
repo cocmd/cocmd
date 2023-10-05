@@ -3,8 +3,8 @@ use std::panic;
 
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
-use tui::backend::Backend;
-use tui::Terminal;
+use ratatui::backend::Backend;
+use ratatui::Terminal;
 
 use super::app::{App, AppResult};
 use super::event::EventHandler;

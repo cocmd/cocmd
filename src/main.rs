@@ -137,7 +137,7 @@ fn main() {
 
     match cli.command {
         Commands::Tui => {
-            tui_runner();
+            tui_runner(packages_manager);
         }
         Commands::Setup(args) => {
             res = run_setup(&mut packages_manager, args.shell);

@@ -1,30 +1,47 @@
 use std::error;
 
+use super::helpers::StatefulList;
+use crate::core::models::package_config_model::Automation;
+use crate::core::models::script_model::StepModel;
+use crate::core::package::Package;
+use crate::core::packages_manager::PackagesManager;
 /// Application result type.
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum AppFocus {
+    Packages,
+    Automations,
+    Execution,
+}
 
 /// Application.
 #[derive(Debug)]
 pub struct App {
-    /// Is the application running?
     pub running: bool,
-    /// counter
-    pub counter: u8,
-}
-
-impl Default for App {
-    fn default() -> Self {
-        Self {
-            running: true,
-            counter: 0,
-        }
-    }
+    pub focus: AppFocus,
+    pub packages_manager: PackagesManager,
+    pub packages_list: StatefulList<Package>,
+    pub automations_list: StatefulList<Automation>,
+    pub steps_list: StatefulList<StepModel>,
 }
 
 impl App {
     /// Constructs a new instance of [`App`].
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(packages_manager: PackagesManager) -> Self {
+        let items = packages_manager
+            .packages
+            .values()
+            .map(|p| p.clone())
+            .collect();
+        Self {
+            focus: AppFocus::Packages,
+            running: true,
+            packages_manager,
+            packages_list: StatefulList::with_items(items),
+            automations_list: StatefulList::with_items(vec![]),
+            steps_list: StatefulList::with_items(vec![]),
+        }
     }
 
     /// Handles the tick event of the terminal.
@@ -35,15 +52,43 @@ impl App {
         self.running = false;
     }
 
-    pub fn increment_counter(&mut self) {
-        if let Some(res) = self.counter.checked_add(1) {
-            self.counter = res;
+    pub fn refresh_automations(&mut self) {
+        if self.packages_list.state.selected().is_none() {
+            return;
         }
+        let selected_package = self
+            .packages_list
+            .items
+            .get(self.packages_list.state.selected().unwrap())
+            .unwrap();
+
+        let settings = &self.packages_manager.settings;
+        let automations = selected_package.automations(settings, Some(true));
+
+        self.automations_list = StatefulList::with_items(automations);
+        self.automations_list.next();
     }
 
-    pub fn decrement_counter(&mut self) {
-        if let Some(res) = self.counter.checked_sub(1) {
-            self.counter = res;
+    pub fn refresh_steps(&mut self) {
+        if self.automations_list.state.selected().is_none() {
+            return;
         }
+        let selected_automation = self
+            .automations_list
+            .items
+            .get(self.automations_list.state.selected().unwrap())
+            .unwrap();
+
+        let steps = selected_automation
+            .content
+            .as_ref()
+            .unwrap()
+            .steps
+            .iter()
+            .map(|s| s.clone())
+            .collect();
+
+        self.steps_list = StatefulList::with_items(steps);
+        self.steps_list.next();
     }
 }
