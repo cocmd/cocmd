@@ -27,6 +27,5 @@ apps:
   cocmd:
     command: cocmd
     plugs:
-      - desktop
       - network
       - network-bind
