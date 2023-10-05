@@ -6,7 +6,7 @@ pub(crate) mod core;
 pub(crate) mod output;
 pub(crate) mod package_provider;
 pub(crate) mod runner;
-mod tui;
+pub(crate) mod tui_app;
 
 use clap::{Parser, Subcommand};
 use cmd::add;
@@ -20,7 +20,7 @@ use cmd::show::{show_package, show_packages};
 use cmd::CmdExit;
 use dialoguer::MultiSelect;
 use tracing::{error, info};
-use tui::tui;
+use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
 use crate::core::packages_manager::PackagesManager;
@@ -137,7 +137,7 @@ fn main() {
 
     match cli.command {
         Commands::Tui => {
-            tui();
+            tui_runner();
         }
         Commands::Setup(args) => {
             res = run_setup(&mut packages_manager, args.shell);

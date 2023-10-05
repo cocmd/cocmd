@@ -147,6 +147,26 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "tui",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "tui"
+                
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "howto",
             "type": "lldb",
             "request": "launch",
