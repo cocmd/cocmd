@@ -153,6 +153,7 @@ jobs:
         with:
           command: install
           toolchain: stable
+          args: --path .
 
       - name: Update version in website
         if: ${{ github.ref == 'refs/heads/master' }}
