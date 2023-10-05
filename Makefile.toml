@@ -63,12 +63,12 @@ mv Cargo.toml.bak Cargo.toml
 
 
 # Ask the user for confirmation before proceeding
-read -p "Do you want to GIT commit+tag+push for version $version? (y/n): " confirmation
+read -p "Do you want to GIT commit+tag+push with version $version? (y/n): " confirmation
 
 if [ "$confirmation" == "y" ]; then
     
     # Commit the change
-    git add Cargo.toml Cargo.lock
+    git add -A
     git commit -m "Bump version to $version"
 
     # Create a Git tag for the new version
