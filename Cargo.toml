@@ -1,6 +1,6 @@
 [package]
 name = "cocmd"
-version = "1.0.25"
+version = "1.0.26"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
@@ -41,6 +41,8 @@ minijinja = "1.0.8"
 execute = "0.2.12"
 crossterm = "0.26.1"
 ratatui = "0.23.0"
+mprocs-pty = "0.1.0"
+mprocs-vt100 = "0.1.1"
 
 [features]
 default = ["cli"]
