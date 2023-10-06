@@ -132,8 +132,21 @@ jobs:
   
   snap-build-publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture:
+          - s390x
+          - ppc64el
+          - arm64
+          - armhf
+          - amd64
+          - i386
     steps:
     - uses: actions/checkout@v2
+    - name: Modify snapcraft.yaml
+      run: |
+        sed -i "s/run-on: \[CHANGE_ME\]/run-on: \[${{ matrix.architecture }}\]/" snapcraft.yaml
+
     - uses: snapcore/action-build@v1
       id: build
     - uses: snapcore/action-publish@v1
