@@ -8,6 +8,7 @@ description: |
 grade: stable
 confinement: strict
 
+
 parts:
   cocmd:
     plugin: rust
@@ -22,17 +23,16 @@ parts:
       VERSION="$(git describe --first-parent --tags --always)"
       echo "Setting version to $VERSION"
       snapcraftctl set-version "${VERSION}"
+    build-attributes:
+      - build-on: s390x
+      - build-on: ppc64el
+      - build-on: arm64
+      - build-on: armhf
+      - build-on: amd64
+      - build-on: i386
 
 apps:
   cocmd:
     command: cocmd
     plugs:
       - network
-
-architectures:
-  - build-on: s390x
-  - build-on: ppc64el
-  - build-on: arm64
-  - build-on: armhf
-  - build-on: amd64
-  - build-on: i386
