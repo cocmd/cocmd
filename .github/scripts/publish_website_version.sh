@@ -25,13 +25,13 @@ mv docusaurus.config.js.bak docusaurus.config.js
 sed "s/RELEASE_TAG=.*/RELEASE_TAG=\"v$VERSION\"/" ./static/linux/install.sh > ./static/linux/install.sh.bak
 mv ./static/linux/install.sh.bak ./static/linux/install.sh
 
-cocmd docs > ./docs/cli-docs.md
+cocmd docs > ./docs/cli-docs.mdx
 
 yarn
 yarn build && yarn deploy
 
 echo "Committing version update"
-git add docusaurus.config.js
+git add -A
 git commit -m "Version bump: $VERSION"
 
 echo "Pushing changes"
