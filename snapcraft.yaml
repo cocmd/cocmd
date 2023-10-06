@@ -28,4 +28,3 @@ apps:
     command: cocmd
     plugs:
       - network
-      - network-bind
