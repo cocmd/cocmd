@@ -129,6 +129,20 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_homebrew_version.sh
+  
+  snap-build-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: snapcore/action-build@v1
+      id: build
+    - uses: snapcore/action-publish@v1
+      env:
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
+      with:
+        snap: ${{ steps.build.outputs.snap }}
+        release: stable
+        
   update-website:
     needs: ["extract-version", "publish", "macos-publish-homebrew"]
     runs-on: ubuntu-latest
