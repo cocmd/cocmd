@@ -22,8 +22,8 @@ pushd website
 sed "s/CURRENT_STABLE_VERSION = .*/CURRENT_STABLE_VERSION = 'v$VERSION';/" docusaurus.config.js > docusaurus.config.js.bak
 mv docusaurus.config.js.bak docusaurus.config.js
 
-sed "s/RELEASE_TAG=.*/RELEASE_TAG=\"v$VERSION\"/" static/linux/install.sh > static/linux/install.sh.bak
-mv static/linux/install.sh.bak static/linux/install.sh
+sed "s/RELEASE_TAG=.*/RELEASE_TAG=\"v$VERSION\"/" ./static/linux/install.sh > ./static/linux/install.sh.bak
+mv ./static/linux/install.sh.bak ./static/linux/install.sh
 
 cocmd docs > ./docs/cli-docs.md
 
