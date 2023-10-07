@@ -57,14 +57,14 @@ jobs:
           artifact_prefix: linux
           target: arm-unknown-linux-gnueabi
           binary_postfix: ""
-        # - os: ubuntu-latest
-        #   artifact_prefix: linux
-        #   target: armv7-unknown-linux-musleabihf
-        #   binary_postfix: ""
-        # - os: ubuntu-latest
-        #   artifact_prefix: linux
-        #   target: aarch64-unknown-linux-musl
-        #   binary_postfix: ""
+        - os: ubuntu-latest
+          artifact_prefix: linux
+          target: armv7-unknown-linux-musleabihf
+          binary_postfix: ""
+        - os: ubuntu-latest
+          artifact_prefix: linux
+          target: aarch64-unknown-linux-musl
+          binary_postfix: ""
         - os: windows-latest
           artifact_prefix: windows
           target: x86_64-pc-windows-msvc
