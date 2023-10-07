@@ -145,81 +145,81 @@ jobs:
   #         args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty -p cocmd
   
 
-  # macos-publish-homebrew:
-  #   needs: ["extract-version"]
-  #   runs-on: macos-11
+  macos-publish-homebrew:
+    needs: ["extract-version"]
+    runs-on: macos-11
   
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
   
-  #     - name: Print target version
-  #       run: |
-  #         echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
   
-  #     - name: "Setup SSH deploy key"
-  #       uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
-  #       with:
-  #         ssh-private-key: ${{ secrets.HOMEBREW_CASK_SSH_PRIVATE_KEY }}
+      - name: "Setup SSH deploy key"
+        uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: ${{ secrets.HOMEBREW_CASK_SSH_PRIVATE_KEY }}
       
-  #     - name: Create and Publish Homebrew Cask
-  #       if: ${{ github.ref == 'refs/heads/master' }}
-  #       run: |
-  #         VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_homebrew_version.sh
+      - name: Create and Publish Homebrew Cask
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_homebrew_version.sh
   
-  # snap-build-publish:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       architecture:
-  #         - s390x
-  #         - ppc64el
-  #         - arm64
-  #         - armhf
-  #         - amd64
-  #         - i386
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Modify snapcraft.yaml
-  #     run: |
-  #       sed -i "s/run-on: \[CHANGE_ME\]/run-on: \[${{ matrix.architecture }}\]/" snapcraft.yaml
+  snap-build-publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture:
+          - s390x
+          - ppc64el
+          - arm64
+          - armhf
+          - amd64
+          - i386
+    steps:
+    - uses: actions/checkout@v2
+    - name: Modify snapcraft.yaml
+      run: |
+        sed -i "s/run-on: \[CHANGE_ME\]/run-on: \[${{ matrix.architecture }}\]/" snapcraft.yaml
 
-  #   - uses: snapcore/action-build@v1
-  #     id: build
-  #   - uses: snapcore/action-publish@v1
-  #     env:
-  #       SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
-  #     with:
-  #       snap: ${{ steps.build.outputs.snap }}
-  #       release: stable
+    - uses: snapcore/action-build@v1
+      id: build
+    - uses: snapcore/action-publish@v1
+      env:
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
+      with:
+        snap: ${{ steps.build.outputs.snap }}
+        release: stable
         
-  # update-website:
-  #   needs: ["extract-version", "publish", "macos-publish-homebrew", "snap-build-publish"]
-  #   runs-on: ubuntu-latest
+  update-website:
+    needs: ["extract-version", "publish", "macos-publish-homebrew", "snap-build-publish"]
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Print target version
-  #       run: |
-  #         echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print target version
+        run: |
+          echo Using version ${{ needs.extract-version.outputs.cocmd_version }}
 
-  #     - name: "Setup SSH deploy key"
-  #       uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
-  #       with:
-  #         ssh-private-key: ${{ secrets.COCMD_WEBSITE_SSH_PRIVATE_KEY }}
-  #     - name: git config
-  #       run: |
-  #         git config --global user.email "cocmd@cocmd.org"
-  #         git config --global user.name "Github Actions"
+      - name: "Setup SSH deploy key"
+        uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: ${{ secrets.COCMD_WEBSITE_SSH_PRIVATE_KEY }}
+      - name: git config
+        run: |
+          git config --global user.email "cocmd@cocmd.org"
+          git config --global user.name "Github Actions"
 
-  #     - name: install latest cocmd
-  #       uses: actions-rs/cargo@v1
-  #       with:
-  #         command: install
-  #         toolchain: stable
-  #         args: --path .
+      - name: install latest cocmd
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          toolchain: stable
+          args: --path .
 
-  #     - name: Update version in website
-  #       run: |
-  #         VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_website_version.sh
+      - name: Update version in website
+        run: |
+          VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_website_version.sh
       
         
