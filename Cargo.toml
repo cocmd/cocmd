@@ -1,6 +1,6 @@
 [package]
 name = "cocmd"
-version = "1.0.40"
+version = "1.0.41"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
@@ -43,6 +43,7 @@ crossterm = "0.26.1"
 ratatui = "0.23.0"
 mprocs-pty = "0.1.0"
 mprocs-vt100 = "0.1.1"
+openssl = { version = "0.10", features = ["vendored"] }
 
 [features]
 default = ["cli"]
