@@ -75,6 +75,7 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           override: true
+          profile: minimal
           target: ${{ matrix.target }}
       - name: Setup MUSL
         if: matrix.os == 'ubuntu-latest'
@@ -112,6 +113,7 @@ jobs:
       - name: Running cargo build
         uses: actions-rs/cargo@v1
         with:
+          use-cross: true
           command: build
           toolchain: ${{ matrix.rust }}
           args: --release --target ${{ matrix.target }} -p cocmd
