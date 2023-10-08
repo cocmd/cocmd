@@ -165,6 +165,8 @@ jobs:
           ssh-private-key: ${{ secrets.HOMEBREW_CASK_SSH_PRIVATE_KEY }}
       
       - name: Create and Publish Homebrew Cask
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_homebrew_version.sh
   
