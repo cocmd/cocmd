@@ -149,7 +149,7 @@ jobs:
   
 
   macos-publish-homebrew:
-    needs: ["extract-version"]
+    needs: ["extract-version", "publish"]
     runs-on: macos-11
   
     steps:

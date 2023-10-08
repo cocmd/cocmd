@@ -19,7 +19,7 @@ type Backend = ProxyBackend;
 pub fn render_term(
     area: Rect,
     frame: &mut Frame<Backend>,
-    state: &mut State,
+    proc: &Proc,
     cursor_style: &mut CursorStyle,
 ) {
     if area.width < 3 || area.height < 3 {
@@ -28,10 +28,7 @@ pub fn render_term(
 
     let theme = Theme::default();
 
-    let active = match state.scope {
-        Scope::Procs => false,
-        Scope::Term | Scope::TermZoom => true,
-    };
+    let active = true;
 
     if let Some(proc) = state.get_current_proc() {
         let mut title = Vec::with_capacity(4);

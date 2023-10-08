@@ -31,7 +31,7 @@ use crate::output::set_tracing;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.59",
+    version = "1.0.60",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
