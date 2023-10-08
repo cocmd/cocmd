@@ -30,7 +30,7 @@ git clone git@github.com:cocmd/homebrew-cocmd.git
 pushd homebrew-cocmd
 echo "Rendering formula template"
 
-cat ../../../scripts/resources/macos/formula_template.rb | sed "s/{{{VERSION}}}/$VERSION/g" | \
+cat ../../../.github/scripts/resources/macos/formula_template.rb | sed "s/{{{VERSION}}}/$VERSION/g" | \
   sed "s/{{{INTEL_SHA}}}/$INTEL_SHA/g" | sed "s/{{{M1_SHA}}}/$M1_SHA/g" > ./Casks/cocmd.rb
 
 echo "Committing version update"
