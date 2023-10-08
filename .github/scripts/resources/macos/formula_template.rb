@@ -13,7 +13,7 @@ cask "cocmd" do
   desc "Streamlined Command Line Operations for Dev Teams"
   homepage "https://cocmd.org/"
 
-  app "Cocmd.app"
+  app "cocmd"
 
   zap trash: "~/Library/Caches/cocmd"
 end
