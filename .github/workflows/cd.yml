@@ -129,23 +129,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # publish-cargo:
-  #   name: Publishing to Cargo
-  #   needs: ["extract-version"]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         override: true
-  #     - run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-  #     - uses: actions-rs/cargo@v1
-  #       with:
-  #         command: publish
-  #         args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty -p cocmd
+  publish-cargo:
+    name: Publishing to Cargo
+    needs: ["extract-version"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty -p cocmd
   
 
   macos-publish-homebrew:
@@ -165,7 +165,6 @@ jobs:
           ssh-private-key: ${{ secrets.HOMEBREW_CASK_SSH_PRIVATE_KEY }}
       
       - name: Create and Publish Homebrew Cask
-        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           VERSION="${{ needs.extract-version.outputs.cocmd_version }}" ./.github/scripts/publish_homebrew_version.sh
   

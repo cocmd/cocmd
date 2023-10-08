@@ -2,10 +2,10 @@ cask "cocmd" do
   version "{{{VERSION}}}"
 
   if Hardware::CPU.intel?
-    url "https://github.com/cocmd/cocmd/releases/download/v#{version}/Cocmd-Mac-Intel.zip"
+    url "https://github.com/cocmd/cocmd/releases/download/v#{version}/cocmd-x86_64-apple-darwin.tar.gz"
     sha256 "{{{INTEL_SHA}}}"
   else
-    url "https://github.com/cocmd/cocmd/releases/download/v#{version}/Cocmd-Mac-M1.zip"
+    url "https://github.com/cocmd/cocmd/releases/download/v#{version}/cocmd-aarch64-apple-darwin.tar.gz"
     sha256 "{{{M1_SHA}}}"
   end
 

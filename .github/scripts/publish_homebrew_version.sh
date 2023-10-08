@@ -16,11 +16,11 @@ mkdir -p target/homebrew/artifacts
 echo "Targeting version $VERSION"
 echo "Downloading macOS artifacts"
 
-gh release download v$VERSION --pattern "Cocmd-Mac*" --dir target/homebrew/artifacts
+gh release download v$VERSION --pattern "*apple*" --dir target/homebrew/artifacts
 
 echo "Reading artifacts hashes"
-INTEL_SHA=$(cat target/homebrew/artifacts/Cocmd-Mac-Intel.zip.sha256.txt | awk -F ' ' '{print $1}')
-M1_SHA=$(cat target/homebrew/artifacts/Cocmd-Mac-M1.zip.sha256.txt | awk -F ' ' '{print $1}')
+INTEL_SHA=$(cat target/homebrew/artifacts/cocmd-x86_64-apple-darwin.sha256 | awk -F ' ' '{print $1}')
+M1_SHA=$(cat target/homebrew/artifacts/cocmd-aarch64-apple-darwin.sha256 | awk -F ' ' '{print $1}')
 
 echo "Cloning tap repository"
 
