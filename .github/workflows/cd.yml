@@ -109,7 +109,7 @@ jobs:
 
           BINARY_NAME=cocmd${{ matrix.binary_postfix }}
 
-          RELEASE_NAME=cocmd-${{ matrix.artifact_prefix }}-${{ matrix.target }}
+          RELEASE_NAME=cocmd-${{ matrix.target }}
           tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
 
           if [[ ${{ runner.os }} == 'Windows' ]]; then
@@ -121,8 +121,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/${{ matrix.target }}/release/cocmd-${{ matrix.artifact_prefix }}-${{ matrix.target }}.tar.gz
-            target/${{ matrix.target }}/release/cocmd-${{ matrix.artifact_prefix }}-${{ matrix.target }}.sha256
+            target/${{ matrix.target }}/release/cocmd-${{ matrix.target }}.tar.gz
+            target/${{ matrix.target }}/release/cocmd-${{ matrix.target }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
