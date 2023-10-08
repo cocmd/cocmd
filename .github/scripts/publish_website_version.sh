@@ -25,7 +25,7 @@ mv docusaurus.config.js.bak docusaurus.config.js
 sed "s/RELEASE_TAG=.*/RELEASE_TAG=\"v$VERSION\"/" ./static/linux/install.sh > ./static/linux/install.sh.bak
 mv ./static/linux/install.sh.bak ./static/linux/install.sh
 
-cocmd docs > ./docs/cli-docs.mdx
+cocmd docs --raw-markdown> ./docs/cli-docs.mdx
 
 yarn
 yarn build && yarn deploy
