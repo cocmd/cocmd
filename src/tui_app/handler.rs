@@ -25,6 +25,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                 app.refresh_automations();
             } else if app.focus == AppFocus::Automations {
                 app.automations_list.previous();
+                app.refresh_steps();
             }
         }
         KeyCode::Down => {
@@ -33,25 +34,30 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                 app.refresh_automations();
             } else if app.focus == AppFocus::Automations {
                 app.automations_list.next();
+                app.refresh_steps();
             }
         }
 
         KeyCode::Right => {
-            if app.focus == AppFocus::Packages {
+            if app.focus == AppFocus::Packages && app.packages_list.state.selected().is_some() {
                 app.focus = AppFocus::Automations;
+            } else if app.focus == AppFocus::Automations {
+                app.focus = AppFocus::AutomationDetails;
             }
         }
 
         KeyCode::Left => {
             if app.focus == AppFocus::Automations {
                 app.focus = AppFocus::Packages;
+                app.refresh_steps();
+            } else if app.focus == AppFocus::AutomationDetails {
+                app.focus = AppFocus::Automations;
             }
         }
 
         KeyCode::Enter => {
             if app.focus == AppFocus::Automations {
                 app.focus = AppFocus::Execution;
-                app.refresh_steps();
             }
         }
 

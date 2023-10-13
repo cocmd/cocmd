@@ -18,62 +18,38 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
     // - https://github.com/ratatui-org/ratatui/tree/master/examples
 
     let area = frame.size();
-    // render a list of packages on the left based on package.name() in app.packages_manager.packages
-    if app.focus == AppFocus::Packages || app.focus == AppFocus::Automations {
-        let chunks = Layout::default()
+    let chunks = if app.focus == AppFocus::Packages {
+        Layout::default()
             .constraints([
-                Constraint::Length(15),
-                Constraint::Min(8),
-                Constraint::Length(7),
+                Constraint::Min(25),
+                Constraint::Max(10),
+                Constraint::Max(10),
             ])
             .direction(Direction::Horizontal)
-            .split(area);
-
-        draw_packages_list(frame, app, chunks[0]);
-        draw_automations_list(frame, app, chunks[1]);
-    } else {
-        let automation = app
-            .automations_list
-            .items
-            .get(app.automations_list.state.selected().unwrap())
-            .unwrap()
-            .clone();
-
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
-            .split(area);
-
-        frame.render_widget(
-            Paragraph::new(format!(
-                "{}",
-                automation
-                    .content
-                    .as_ref()
-                    .unwrap()
-                    .description
-                    .as_ref()
-                    .unwrap_or(&"Not provided".to_string())
-            ))
-            .block(
-                Block::default()
-                    .title(format!("{}", &automation.name))
-                    .title_alignment(Alignment::Center)
-                    .borders(Borders::ALL)
-                    .border_type(BorderType::Rounded),
-            )
-            .style(Style::default().fg(Color::Yellow).bg(Color::Black))
-            .alignment(Alignment::Left),
-            chunks[0],
-        );
-
-        let chunks = Layout::default()
+            .split(area)
+    } else if app.focus == AppFocus::Automations {
+        Layout::default()
+            .constraints([
+                Constraint::Max(10),
+                Constraint::Min(25),
+                Constraint::Min(35),
+            ])
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Length(20), Constraint::Min(1)].as_ref())
-            .split(chunks[1]);
+            .split(area)
+    } else {
+        Layout::default()
+            .constraints([
+                Constraint::Max(10),
+                Constraint::Max(10),
+                Constraint::Min(36),
+            ])
+            .direction(Direction::Horizontal)
+            .split(area)
+    };
 
-        draw_steps_list(frame, app, chunks[0]);
-    }
+    draw_packages_list(frame, app, chunks[0]);
+    draw_automations_list(frame, app, chunks[1]);
+    draw_steps_list(frame, app, chunks[2]);
 }
 
 fn draw_packages_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) {
@@ -148,32 +124,75 @@ fn draw_automations_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: 
 }
 
 fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) {
-    if app.packages_list.state.selected().is_none()
-        || app.automations_list.state.selected().is_none()
-    {
+    let selected_automation = app.get_selected_automation();
+
+    if selected_automation.is_none() {
         return;
     }
 
-    let tasks: Vec<ListItem> = app
-        .steps_list
-        .items
+    let package = app.get_selected_package().unwrap();
+    let automation = selected_automation.unwrap();
+
+    let binding = "No description provided".to_string();
+
+    let name = format!("{}.{}", package.name(), automation.name);
+    // Render a bordered block that is yellow if app.focus == AppFocus::AutomationDetails
+    // in the block write the automation name and description
+    // and the steps list with a title and description to each step
+
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::Yellow))
+        .title(name.to_string())
+        .title_style(Style::default().fg(Color::Yellow))
+        .border_type(BorderType::Rounded);
+
+    let block = if app.focus == AppFocus::AutomationDetails {
+        block
+    } else {
+        block.border_style(Style::default())
+    };
+
+    f.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .constraints([Constraint::Min(4), Constraint::Min(10)])
+        .direction(Direction::Vertical)
+        .split(area);
+
+    let description = automation
+        .content
+        .as_ref()
+        .unwrap()
+        .description
+        .as_ref()
+        .unwrap_or(&binding);
+
+    // render description in chunks[0]
+    let description = Paragraph::new(description.to_string())
+        .block(Block::default())
+        .alignment(Alignment::Left)
+        .wrap(Wrap { trim: true });
+
+    f.render_widget(description, chunks[0]);
+
+    // add a list of the steps and descriptions
+    let tasks: Vec<ListItem> = automation
+        .content
+        .as_ref()
+        .unwrap()
+        .steps
         .iter()
-        .map(|i| ListItem::new(vec![text::Line::from(Span::raw(i.title.to_string()))]))
+        .map(|i| {
+            let text = vec![text::Span::raw(i.title.to_string())];
+            ListItem::new(vec![text::Line::from(text)])
+        })
         .collect();
-
-    let title = Span::styled(
-        format!("Steps ({})", tasks.len()).to_string(),
-        Style::default(),
-    );
-
-    // set style to yellow border if app.focus == AppFocus::Automations
+    // render a non-stateful list in chunks[1]
     let tasks = List::new(tasks)
-        .block(
-            Block::default()
-                .borders(Borders::NONE)
-                .title(title)
-                .border_style(Style::default().fg(Color::Yellow)),
-        )
-        .highlight_style(Style::default().add_modifier(Modifier::BOLD));
-    f.render_stateful_widget(tasks, area, &mut app.steps_list.state);
+        .block(Block::default())
+        .highlight_style(Style::default().add_modifier(Modifier::BOLD))
+        .highlight_symbol("> ");
+
+    f.render_widget(tasks, chunks[1]);
 }

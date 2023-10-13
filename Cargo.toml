@@ -41,8 +41,6 @@ minijinja = "1.0.8"
 execute = "0.2.12"
 crossterm = "0.26.1"
 ratatui = "0.23.0"
-mprocs-pty = "0.1.0"
-mprocs-vt100 = "0.1.1"
 openssl = { version = "0.10", features = ["vendored"] }
 
 [features]

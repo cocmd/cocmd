@@ -12,6 +12,7 @@ pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 pub enum AppFocus {
     Packages,
     Automations,
+    AutomationDetails,
     Execution,
 }
 
@@ -66,7 +67,6 @@ impl App {
         let automations = selected_package.automations(settings, Some(true));
 
         self.automations_list = StatefulList::with_items(automations);
-        self.automations_list.next();
     }
 
     pub fn refresh_steps(&mut self) {
@@ -89,6 +89,35 @@ impl App {
             .collect();
 
         self.steps_list = StatefulList::with_items(steps);
-        self.steps_list.next();
+    }
+
+    pub fn get_selected_package(&self) -> Option<Package> {
+        if self.packages_list.items.is_empty() || self.packages_list.state.selected().is_none() {
+            return None;
+        }
+
+        let selected_package = self
+            .packages_list
+            .items
+            .get(self.packages_list.state.selected().unwrap())
+            .unwrap();
+
+        Some(selected_package.clone())
+    }
+
+    pub fn get_selected_automation(&self) -> Option<Automation> {
+        if self.automations_list.items.is_empty()
+            || self.automations_list.state.selected().is_none()
+        {
+            return None;
+        }
+
+        let selected_automation = self
+            .automations_list
+            .items
+            .get(self.automations_list.state.selected().unwrap())
+            .unwrap();
+
+        Some(selected_automation.clone())
     }
 }
