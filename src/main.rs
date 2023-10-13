@@ -18,7 +18,7 @@ use cmd::setup::run_setup;
 use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use cmd::CmdExit;
-use dialoguer::MultiSelect;
+use dialoguer::{Confirm, MultiSelect};
 use tracing::{error, info};
 use tui_app::tui_runner;
 
@@ -137,7 +137,22 @@ fn main() {
 
     match cli.command {
         Commands::Tui => {
-            tui_runner(packages_manager);
+            while let tui_res = tui_runner(packages_manager.clone()) {
+                if let Some(automation_name) = tui_res.unwrap() {
+                    res = run_automation(&mut packages_manager, Some(automation_name));
+                    if Confirm::new()
+                        .with_prompt("Do you want to continue with TUI?")
+                        .interact()
+                        .unwrap()
+                    {
+                        continue;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
         }
         Commands::Setup(args) => {
             res = run_setup(&mut packages_manager, args.shell);

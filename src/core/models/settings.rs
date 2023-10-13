@@ -8,7 +8,7 @@ use crate::core::utils::io::from_yaml_file;
 use crate::core::utils::sys::get_os;
 use crate::core::{consts, utils::sys::OS};
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Settings {
     pub home: String,
     pub terminal: String,

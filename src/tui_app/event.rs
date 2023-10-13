@@ -1,4 +1,5 @@
 use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -17,18 +18,17 @@ pub enum Event {
     Mouse(MouseEvent),
     /// Terminal resize.
     Resize(u16, u16),
+    /// Termination event to stop the main loop.
+    Terminate,
 }
 
 /// Terminal event handler.
 #[allow(dead_code)]
-#[derive(Debug)]
+
 pub struct EventHandler {
-    /// Event sender channel.
     sender: mpsc::Sender<Event>,
-    /// Event receiver channel.
-    receiver: mpsc::Receiver<Event>,
-    /// Event handler thread.
     handler: thread::JoinHandle<()>,
+    receiver: Arc<Mutex<mpsc::Receiver<Event>>>,
 }
 
 impl EventHandler {
@@ -36,8 +36,11 @@ impl EventHandler {
     pub fn new(tick_rate: u64) -> Self {
         let tick_rate = Duration::from_millis(tick_rate);
         let (sender, receiver) = mpsc::channel();
+        let receiver = Arc::new(Mutex::new(receiver));
+
         let handler = {
             let sender = sender.clone();
+            let receiver = Arc::clone(&receiver);
             thread::spawn(move || {
                 let mut last_tick = Instant::now();
                 loop {
@@ -59,13 +62,18 @@ impl EventHandler {
                         sender.send(Event::Tick).expect("failed to send tick event");
                         last_tick = Instant::now();
                     }
+
+                    // Check if the termination event was received.
+                    if let Ok(Event::Terminate) = receiver.lock().unwrap().try_recv() {
+                        break; // Break the loop to stop event handling.
+                    }
                 }
             })
         };
         Self {
             sender,
-            receiver,
             handler,
+            receiver,
         }
     }
 
@@ -74,6 +82,14 @@ impl EventHandler {
     /// This function will always block the current thread if
     /// there is no data available and it's possible for more data to be sent.
     pub fn next(&self) -> AppResult<Event> {
-        Ok(self.receiver.recv()?)
+        Ok(self.receiver.lock().unwrap().recv()?)
+    }
+
+    /// Stop the main loop in the event handler.
+    pub fn stop(&self) {
+        // Send the termination event to stop the main loop.
+        self.sender
+            .send(Event::Terminate)
+            .expect("failed to send termination event");
     }
 }

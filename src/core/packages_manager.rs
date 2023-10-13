@@ -8,7 +8,7 @@ use crate::core::utils::io::{file_read_lines, file_write_lines};
 use crate::package_provider::get_provider;
 use crate::Settings;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PackagesManager {
     pub settings: Settings,
     pub packages_file: String,

@@ -17,7 +17,7 @@ pub mod helpers;
 
 use std::io;
 
-use app::{App, AppResult};
+use app::{App, AppFocus, AppResult};
 use event::{Event, EventHandler};
 use handler::handle_key_events;
 use ratatui::backend::CrosstermBackend;
@@ -26,7 +26,7 @@ use tui_struct::Tui;
 
 use crate::core::packages_manager::PackagesManager;
 
-pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<()> {
+pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<Option<String>> {
     // Create an application.
     let mut app = App::new(packages_manager);
 
@@ -39,6 +39,29 @@ pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<()> {
 
     // Start the main loop.
     while app.running {
+        if app.focus == AppFocus::Execution {
+            let package = app
+                .packages_list
+                .items
+                .get(app.packages_list.state.selected().unwrap())
+                .unwrap()
+                .clone();
+
+            let automation = app
+                .automations_list
+                .items
+                .get(app.automations_list.state.selected().unwrap())
+                .unwrap()
+                .clone();
+            tui.events.stop();
+            tui.exit()?;
+            return Ok(Some(format!(
+                "{}.{}",
+                package.name().to_string(),
+                automation.name.to_string()
+            )));
+        }
+
         // Render the user interface.
         tui.draw(&mut app)?;
         // Handle events.
@@ -47,10 +70,14 @@ pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<()> {
             Event::Key(key_event) => handle_key_events(key_event, &mut app)?,
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
+            Event::Terminate => {
+                tui.exit()?;
+                return Ok(None);
+            }
         }
     }
 
     // Exit the user interface.
     tui.exit()?;
-    Ok(())
+    Ok(None)
 }
