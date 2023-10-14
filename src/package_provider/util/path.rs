@@ -26,7 +26,7 @@ pub fn extract_local_path(package: &String) -> Option<PathBuf> {
             if let Ok(canonical_path) = fs::canonicalize(abs_path) {
                 // Convert the result to a PathBuf
                 let result_path: PathBuf = canonical_path;
-                println!("{:?}", result_path);
+                // println!("{:?}", result_path);
                 return Some(result_path);
             }
         }

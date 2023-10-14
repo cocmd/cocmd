@@ -8,9 +8,9 @@ pub enum StepRunnerType {
     SHELL,
     #[serde(alias = "markdown", alias = "MARKDOWN")]
     MARKDOWN,
-    #[serde(alias = "python", alias = "PYTHON")]
+    #[serde(alias = "python", alias = "PYTHON", alias = "py", alias = "PY")]
     PYTHON,
-    #[serde(alias = "link", alias = "LINK")]
+    #[serde(alias = "link", alias = "LINK", alias = "href", alias = "HREF")]
     LINK,
     #[serde(alias = "cocmd", alias = "COCMD")]
     COCMD,

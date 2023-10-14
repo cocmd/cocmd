@@ -15,8 +15,9 @@ use crate::output::print_md;
 
 pub fn interactive_shell(
     step: &StepModel,
-    params: Vec<StepParamModel>,
+    step_params: Vec<StepParamModel>,
     packages_manager: &mut PackagesManager,
+    params: HashMap<String, String>,
 ) -> Result<bool, String> {
     let command = step.content.as_ref().unwrap();
 
@@ -29,21 +30,32 @@ pub fn interactive_shell(
     let env = Environment::new();
     let mut params_map: HashMap<String, String> = HashMap::new();
 
-    for param in params {
-        let param_value = packages_manager.settings.get_param(&param.name);
-        // if param_value is None, get it from STDIN with some nice prompt
+    for param in step_params {
+        // look for param.name in params
+        // if found, use that value
+        // if not found, look for it in settings
+        // if not found, ask the user for it
+
+        let param_value = params.get(&param.name);
+
         let param_value = match param_value {
-            Some(value) => value,
+            Some(value) => value.clone(),
             None => {
-                let prompt = format!("Enter value for parameter '{}'", param.name);
-                let param_value = dialoguer::Input::with_theme(&ColorfulTheme::default())
-                    .with_prompt(&prompt)
-                    .interact_text()
-                    .unwrap_or_else(|_e| {
-                        error!("No value entered for parameter '{}'.", param.name);
-                        process::exit(1)
-                    });
-                param_value
+                let param_value = packages_manager.settings.get_param(&param.name);
+                match param_value {
+                    Some(value) => value,
+                    None => {
+                        let prompt = format!("Enter value for parameter '{}'", param.name);
+                        let param_value = dialoguer::Input::with_theme(&ColorfulTheme::default())
+                            .with_prompt(&prompt)
+                            .interact_text()
+                            .unwrap_or_else(|_e| {
+                                error!("No value entered for parameter '{}'.", param.name);
+                                process::exit(1)
+                            });
+                        param_value
+                    }
+                }
             }
         };
 

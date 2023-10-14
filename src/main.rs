@@ -31,7 +31,7 @@ use crate::output::set_tracing;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.61",
+    version = "1.0.62",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -71,6 +71,10 @@ enum Commands {
     Run {
         /// Optional name argument for specifying which automation to run
         name: Option<String>,
+
+        /// Optional argument for input parameters
+        #[arg(long = "param", short = 'p')]
+        params: Vec<String>,
     },
     #[cfg(feature = "howto")]
     Howto { query: String },
@@ -138,7 +142,7 @@ fn main() {
     match cli.command {
         Commands::Browse => {
             while let Ok(Some(automation_name)) = tui_runner(packages_manager.clone()) {
-                res = run_automation(&mut packages_manager, Some(automation_name));
+                res = run_automation(&mut packages_manager, Some(automation_name), None);
                 if Confirm::new()
                     .with_prompt("Do you want to continue with TUI?")
                     .interact()
@@ -173,8 +177,8 @@ fn main() {
                 }
             }
         },
-        Commands::Run { name } => {
-            res = run_automation(&mut packages_manager, name);
+        Commands::Run { name, params } => {
+            res = run_automation(&mut packages_manager, name, Some(params));
         }
         #[cfg(feature = "howto")]
         Commands::Howto { query } => {

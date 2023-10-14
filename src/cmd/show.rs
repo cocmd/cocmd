@@ -21,6 +21,9 @@ pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<CmdExit> 
 
         // Iterate through packages and append rows to the table
         for package in packages {
+            if !package.is_legit_cocmd_package() {
+                continue;
+            }
             table.push_str(&format!(
                 "| {} | {} | {} | {} | {} |\n",
                 package.name(),

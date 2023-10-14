@@ -40,7 +40,12 @@
             },
             "args": [
                 "run",
-                "omega.onboarding"
+                "prometheus.query-condition",
+                "--param", "url=\"https://csp-thanos-query-csp01-dev-us-west-2.vdp-int-dev.vmware.com\"",
+                "--param", "query = \"sum by (job) (rate(prometheus_http_requests_total{code=~\"2..\"}[5m]))\"",
+                "--param", "operator= <",
+                "--param", "threshold=1"
+                
             ],
             "cwd": "${workspaceFolder}"
         },
@@ -100,7 +105,7 @@
             "args": [
                 "show",
                 "package",
-                "/Users/mosher/workspace/example-repo-template"
+                "prometheus"
             ],
             "cwd": "${workspaceFolder}"
         },

@@ -42,6 +42,15 @@ pub fn install_package(
 
     let lst_locs = locations.join("\n  - ");
     let style = Style::new().bold().green();
+
+    if locations.is_empty() {
+        info!("No cocmd packages found in this path");
+        return Ok(CmdExit {
+            code: exitcode::OK,
+            message: None,
+        });
+    }
+
     if provider.name() == LOCAL_PROVIDER {
         info!(
             "found {} cocmd packages in this path:\n  - {}",
@@ -49,7 +58,6 @@ pub fn install_package(
             lst_locs
         );
     }
-
     if provider.name() != LOCAL_PROVIDER
         || dont_ask
         || Confirm::new()

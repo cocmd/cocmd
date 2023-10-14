@@ -1,6 +1,8 @@
+use std::collections::HashMap;
 use std::process::Command;
 
 use dialoguer::Confirm;
+use tracing::error;
 
 use super::shell::interactive_shell;
 use crate::core::models::script_model::StepParamModel;
@@ -16,9 +18,10 @@ pub fn handle_step(
     env: OS,
     script_params: Option<Vec<StepParamModel>>,
     packages_manager: &mut PackagesManager,
+    params: HashMap<String, String>,
 ) -> bool {
     let content = step.content.as_ref().unwrap().as_str();
-    let params = step.get_params(script_params);
+    let script_params = step.get_params(script_params);
 
     print_md(&format!("# running shell step - {}", &step.title));
     if let Some(msg) = step.approval_message.clone() {
@@ -29,7 +32,9 @@ pub fn handle_step(
 
     match &step.runner {
         StepRunnerType::SHELL => {
-            if let Err(_err) = interactive_shell(step, params.clone(), packages_manager) {
+            if let Err(_err) =
+                interactive_shell(step, script_params.clone(), packages_manager, params)
+            {
                 return false;
             }
         }
@@ -58,8 +63,9 @@ pub fn handle_step(
                         content: Some(format!("cocmd install {}", &provider_name)),
                         ..step.clone()
                     },
-                    params.clone(),
+                    script_params.clone(),
                     packages_manager,
+                    HashMap::new(),
                 ) {
                     return false;
                 }
@@ -69,8 +75,9 @@ pub fn handle_step(
                     content: Some(format!("cocmd run {}", &content)),
                     ..step.clone()
                 },
-                params.clone(),
+                script_params.clone(),
                 packages_manager,
+                HashMap::new(),
             ) {
                 return false;
             }
@@ -113,8 +120,9 @@ pub fn handle_step(
                         .spawn()
                         .expect("Failed to open link in the default browser.");
                 }
-                OS::Other => todo!(),
-                OS::ANY => todo!(),
+                _ => {
+                    error!("unable to open link in the default browser.")
+                }
             }
         }
     }

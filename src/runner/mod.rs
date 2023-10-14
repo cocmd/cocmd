@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::core::utils::sys::OS;
 use crate::core::{
     models::script_model::{ScriptModel, StepRunnerType},
@@ -12,11 +14,18 @@ pub fn run_script(
     script: &ScriptModel,
     env: OS,
     packages_manager: &mut PackagesManager,
+    params: HashMap<String, String>,
 ) {
     let mut step_statuses = Vec::new();
     let script_params = script.params.clone();
     for step in &script.steps {
-        let success = step_runner::handle_step(step, env, script_params.clone(), packages_manager);
+        let success = step_runner::handle_step(
+            step,
+            env,
+            script_params.clone(),
+            packages_manager,
+            params.clone(),
+        );
         // check if step runner is executable shell/cmd/python add it
         if step.runner == StepRunnerType::SHELL
             || step.runner == StepRunnerType::COCMD

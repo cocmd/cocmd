@@ -6,10 +6,12 @@ use tracing::error;
 
 use super::CmdExit;
 use crate::core::packages_manager::PackagesManager;
+use crate::core::utils::cmd::parse_params;
 use crate::runner::run_script;
 pub fn run_automation(
     packages_manager: &mut PackagesManager,
     specific_name: Option<String>,
+    params: Option<Vec<String>>,
 ) -> Result<CmdExit> {
     let available_automations = packages_manager.automations();
 
@@ -40,6 +42,7 @@ pub fn run_automation(
             automation.content.as_ref().unwrap(),
             packages_manager.settings.os,
             packages_manager,
+            parse_params(params),
         );
         // info!("[blue] Script executed:");
         // for line in output {
