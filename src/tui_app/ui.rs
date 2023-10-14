@@ -161,9 +161,9 @@ fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) 
         .constraints([
             Constraint::Max(4),
             Constraint::Length(1),
-            Constraint::Max(10),
+            Constraint::Min(20),
             // another chunk in the bottom for a button to run the automation
-            Constraint::Min(5),
+            Constraint::Length(5),
         ])
         .direction(Direction::Vertical)
         .split(inner);

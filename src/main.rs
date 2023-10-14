@@ -49,8 +49,8 @@ struct Cli {
 /// Subcommands enum with meta-information
 #[derive(Subcommand)]
 enum Commands {
-    /// Terminal UI for cocmd
-    Tui,
+    /// Terminal UI for browsing and running automations
+    Browse,
 
     /// Profile Loader command - Loads profiles
     ProfileLoader,
@@ -136,19 +136,15 @@ fn main() {
     });
 
     match cli.command {
-        Commands::Tui => {
-            while let tui_res = tui_runner(packages_manager.clone()) {
-                if let Some(automation_name) = tui_res.unwrap() {
-                    res = run_automation(&mut packages_manager, Some(automation_name));
-                    if Confirm::new()
-                        .with_prompt("Do you want to continue with TUI?")
-                        .interact()
-                        .unwrap()
-                    {
-                        continue;
-                    } else {
-                        break;
-                    }
+        Commands::Browse => {
+            while let Ok(Some(automation_name)) = tui_runner(packages_manager.clone()) {
+                res = run_automation(&mut packages_manager, Some(automation_name));
+                if Confirm::new()
+                    .with_prompt("Do you want to continue with TUI?")
+                    .interact()
+                    .unwrap()
+                {
+                    continue;
                 } else {
                     break;
                 }
