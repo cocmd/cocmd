@@ -1,6 +1,7 @@
 use std::process::Command;
 
 use dialoguer::Confirm;
+use tracing::error;
 
 use super::shell::interactive_shell;
 use crate::core::models::script_model::StepParamModel;
@@ -113,8 +114,9 @@ pub fn handle_step(
                         .spawn()
                         .expect("Failed to open link in the default browser.");
                 }
-                OS::Other => todo!(),
-                OS::ANY => todo!(),
+                _ => {
+                    error!("unable to open link in the default browser.")
+                }
             }
         }
     }
