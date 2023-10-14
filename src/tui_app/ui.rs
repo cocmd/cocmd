@@ -21,9 +21,9 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
     let chunks = if app.focus == AppFocus::Packages {
         Layout::default()
             .constraints([
-                Constraint::Min(25),
-                Constraint::Max(10),
-                Constraint::Max(10),
+                Constraint::Min(15),
+                Constraint::Min(15),
+                Constraint::Min(20),
             ])
             .direction(Direction::Horizontal)
             .split(area)
@@ -31,7 +31,7 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
         Layout::default()
             .constraints([
                 Constraint::Max(10),
-                Constraint::Min(25),
+                Constraint::Min(15),
                 Constraint::Min(35),
             ])
             .direction(Direction::Horizontal)
@@ -153,12 +153,20 @@ fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) 
         block.border_style(Style::default())
     };
 
+    let inner = block.inner(area);
+
     f.render_widget(block, area);
 
     let chunks = Layout::default()
-        .constraints([Constraint::Min(4), Constraint::Min(10)])
+        .constraints([
+            Constraint::Max(4),
+            Constraint::Length(1),
+            Constraint::Max(10),
+            // another chunk in the bottom for a button to run the automation
+            Constraint::Min(5),
+        ])
         .direction(Direction::Vertical)
-        .split(area);
+        .split(inner);
 
     let description = automation
         .content
@@ -168,6 +176,8 @@ fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) 
         .as_ref()
         .unwrap_or(&binding);
 
+    let description = "Description: \n".to_string() + description;
+
     // render description in chunks[0]
     let description = Paragraph::new(description.to_string())
         .block(Block::default())
@@ -175,6 +185,18 @@ fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) 
         .wrap(Wrap { trim: true });
 
     f.render_widget(description, chunks[0]);
+
+    // render in chunks[1] a string "Steps:"
+    let steps = format!(
+        "Steps ({}):",
+        automation.content.as_ref().unwrap().steps.len()
+    );
+    let steps = Paragraph::new(steps)
+        .block(Block::default())
+        .alignment(Alignment::Left)
+        .wrap(Wrap { trim: true });
+
+    f.render_widget(steps, chunks[1]);
 
     // add a list of the steps and descriptions
     let tasks: Vec<ListItem> = automation
@@ -184,15 +206,27 @@ fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) 
         .steps
         .iter()
         .map(|i| {
-            let text = vec![text::Span::raw(i.title.to_string())];
+            let text = vec![text::Span::raw(format!("- {}", i.title))];
             ListItem::new(vec![text::Line::from(text)])
         })
         .collect();
     // render a non-stateful list in chunks[1]
-    let tasks = List::new(tasks)
-        .block(Block::default())
-        .highlight_style(Style::default().add_modifier(Modifier::BOLD))
-        .highlight_symbol("> ");
+    let tasks = List::new(tasks).block(Block::default());
 
-    f.render_widget(tasks, chunks[1]);
+    f.render_widget(tasks, chunks[2]);
+
+    // render a button in chunks[3] with the text "Run↳"
+    // the button should be centralized in the area, occupying the entire width and hight and have a yellow background
+    // the button background should all be with yellow color
+    // the text should be in black
+    // the text should be center in width and height
+    // if the button is clicked, run the automation
+
+    let button = Paragraph::new("\nPress Enter ↳ to run")
+        .block(Block::default().borders(Borders::ALL))
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true })
+        .style(Style::default().fg(Color::Black).bg(Color::Yellow));
+
+    f.render_widget(button, chunks[3]);
 }

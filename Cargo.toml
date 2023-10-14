@@ -1,6 +1,6 @@
 [package]
 name = "cocmd"
-version = "1.0.60"
+version = "1.0.61"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
@@ -23,7 +23,6 @@ serde_yaml = "^0.9.0"
 tracing = "^0.1.37"
 tracing-tree = { version = "0.2.1" }
 tracing-subscriber = { version = "^0.3.11", features = ["env-filter"] }
-termimad = "0.25.2"
 anyhow = "1.0.38"
 thiserror = "1.0.23"
 tempdir = "0.3.7"
@@ -39,9 +38,11 @@ hex = "0.4.3"
 reqwest = { version = "0.11.20", features = ["blocking", "json"]}
 minijinja = "1.0.8"
 execute = "0.2.12"
-crossterm = "0.26.1"
+
 ratatui = "0.23.0"
 openssl = { version = "0.10", features = ["vendored"] }
+termimad = "0.24.0"
+crossterm = "0.27.0"
 
 [features]
 default = ["cli"]
