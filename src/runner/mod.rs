@@ -5,7 +5,7 @@ use crate::core::{
     models::script_model::{ScriptModel, StepRunnerType},
     packages_manager::PackagesManager,
 };
-use crate::output::print_md;
+use crate::output::print_md_debug;
 mod shell;
 mod step_runner;
 
@@ -35,12 +35,12 @@ pub fn run_script(
         }
     }
 
-    print_md(&format!(
+    print_md_debug(&format!(
         "\n\n\n## 🚀🚀🚀 {} completed 🚀🚀🚀",
         automation_name
     ));
     for (title, success) in &step_statuses {
         let status_str = if *success { "✅" } else { "❌" };
-        print_md(&format!("{} {}", status_str, title));
+        print_md_debug(&format!("{} {}", status_str, title));
     }
 }

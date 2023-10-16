@@ -11,7 +11,7 @@ use crate::core::{
     models::script_model::{StepModel, StepRunnerType},
     packages_manager::PackagesManager,
 };
-use crate::output::print_md;
+use crate::output::{print_md, print_md_debug};
 
 pub fn handle_step(
     step: &StepModel,
@@ -23,7 +23,7 @@ pub fn handle_step(
     let content = step.content.as_ref().unwrap().as_str();
     let script_params = step.get_params(script_params);
 
-    print_md(&format!("# running shell step - {}", &step.title));
+    print_md_debug(&format!("# running shell step - {}", &step.title));
     if let Some(msg) = step.approval_message.clone() {
         if !Confirm::new().with_prompt(msg).interact().unwrap() {
             return false;
@@ -39,7 +39,7 @@ pub fn handle_step(
             }
         }
         StepRunnerType::COCMD => {
-            print_md(&format!("# running cocmd step - {}", &step.title));
+            print_md_debug(&format!("# running cocmd step - {}", &step.title));
 
             let provider_name = content.split('.').next().unwrap();
 

@@ -31,15 +31,15 @@ use crate::output::set_tracing;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.62",
+    version = "1.0.63",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
 )]
 struct Cli {
-    /// Verbose flag for extra output
-    #[arg(short, long)]
-    verbose: bool,
+    /// No-Verbose flag for less output
+    #[arg(short, long, default_value_t = false)]
+    no_verbose: bool,
 
     /// Subcommands
     #[command(subcommand)]
@@ -129,7 +129,7 @@ struct SetupArgs {
 
 fn main() {
     let cli = Cli::parse();
-    set_tracing(cli.verbose);
+    set_tracing(!cli.no_verbose);
 
     let settings = Settings::new(None, None);
     let mut packages_manager = PackagesManager::new(settings);
