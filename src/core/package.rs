@@ -193,7 +193,7 @@ impl Package {
             for (rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
                 // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
                 // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
-                output += &format!("{}:\n", rel_p);
+                output += &format!("{}:\n\n", rel_p);
 
                 // write a markdown table for files in fs::read_dir(abs_p).unwrap()
                 // column 1 filename

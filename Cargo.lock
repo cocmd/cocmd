@@ -267,7 +267,7 @@ checksum = "cd7cc57abe963c6d3b9d8be5b06ba7c8957a930305ca90304f24ef040aa6f961"
 
 [[package]]
 name = "cocmd"
-version = "1.0.62"
+version = "1.0.63"
 dependencies = [
  "anyhow",
  "clap",
@@ -283,7 +283,6 @@ dependencies = [
  "hex",
  "lazy_static",
  "levenshtein",
- "minijinja",
  "natord",
  "openssl",
  "ratatui",
@@ -1076,15 +1075,6 @@ name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
-
-[[package]]
-name = "minijinja"
-version = "1.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80084fa3099f58b7afab51e5f92e24c2c2c68dcad26e96ad104bd6011570461d"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "minimad"

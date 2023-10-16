@@ -1,17 +1,18 @@
 use std::collections::HashMap;
 use std::io::{self, BufRead};
-use std::process;
 use std::process::Stdio;
+use std::{env, process};
 
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use execute::shell;
-use minijinja::{Environment, Value};
+use regex::Regex;
 use tracing::error;
 
 use crate::core::models::script_model::StepParamModel;
+use crate::core::utils::packages::get_all_paths;
 use crate::core::{models::script_model::StepModel, packages_manager::PackagesManager};
-use crate::output::print_md;
+use crate::output::print_md_debug;
 
 pub fn interactive_shell(
     step: &StepModel,
@@ -19,6 +20,8 @@ pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
     params: HashMap<String, String>,
 ) -> Result<bool, String> {
+    let paths_to_add = get_all_paths(&packages_manager);
+
     let command = step.content.as_ref().unwrap();
 
     // replace all {...} occurences in the command with the values from the params
@@ -27,7 +30,6 @@ pub fn interactive_shell(
 
     let mut cmd = "set -e\n".to_string() + command.clone().as_str();
 
-    let env = Environment::new();
     let mut params_map: HashMap<String, String> = HashMap::new();
 
     for param in step_params {
@@ -68,10 +70,36 @@ pub fn interactive_shell(
         }
     }
 
-    let ctx = Value::from_serializable(&params_map);
-    cmd = env.render_str(&cmd, ctx).unwrap();
+    // like in jinja2 parameters templating (but without using any jinja2 lib)
+    // replace in cmd ocorunces of {{\s*...\s*}} with the values from params_map. ignore spaces inside the brackets
+    // use regular expression to find all matches and ignore the spaces inside the brackets
+    // for each match, replace it with the value from params_map
+
+    // Compile regex to match {{ param }}
+    let re = Regex::new(r"\{\s*\{\s*([\w.]+)\s*\}\s*\}").unwrap();
+
+    // Find all parameter matches
+    for cap in re.captures_iter(cmd.clone().as_ref()) {
+        // Extract the parameter name
+        let param_name = &cap[1];
+
+        // Get the parameter value from params_map
+        if let Some(param_value) = params_map.get(param_name) {
+            // Replace match with param value
+            cmd = re.replace(&cmd, param_value).to_string();
+        } else {
+            // Param not found error
+        }
+    }
 
     let mut command = shell(cmd);
+
+    // Get the current PATH and add a directory to it
+    let mut new_path = paths_to_add.join(":");
+    if let Some(current_path) = env::var("PATH").ok() {
+        new_path.push_str(&current_path);
+    }
+    command.env("PATH", new_path);
 
     command.stdout(Stdio::piped());
     command.stderr(Stdio::piped());
@@ -115,10 +143,10 @@ pub fn interactive_shell(
     stderr_thread.join().expect("stderr thread panicked");
 
     if success {
-        print_md(&"## ✅ Success".to_string());
+        // print_md_debug(&"## ✅ Success".to_string());
         Ok(true)
     } else {
-        print_md(&"## ❌ Failed (stderr):\n".to_string());
+        print_md_debug(&"## ❌ Failed (stderr):\n".to_string());
         Err("Shell command failed.".to_string())
     }
 }

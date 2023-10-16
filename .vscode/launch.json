@@ -39,12 +39,11 @@
                 }
             },
             "args": [
+                "--no-verbose",
                 "run",
-                "prometheus.query-condition",
-                "--param", "url=\"https://csp-thanos-query-csp01-dev-us-west-2.vdp-int-dev.vmware.com\"",
-                "--param", "query = \"sum by (job) (rate(prometheus_http_requests_total{code=~\"2..\"}[5m]))\"",
-                "--param", "operator= <",
-                "--param", "threshold=1"
+                "k8s.check-pod-restarts",
+                "--param", "namespace=csp-app-dev",
+                "--param", "regex = data"
                 
             ],
             "cwd": "${workspaceFolder}"

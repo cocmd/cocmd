@@ -1,6 +1,6 @@
 [package]
 name = "cocmd"
-version = "1.0.62"
+version = "1.0.63"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
@@ -36,7 +36,6 @@ fs_extra = "1.2.0"
 sha2 = "0.10.8"
 hex = "0.4.3"
 reqwest = { version = "0.11.20", features = ["blocking", "json"]}
-minijinja = "1.0.8"
 execute = "0.2.12"
 
 ratatui = "0.23.0"
