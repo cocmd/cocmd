@@ -6,91 +6,19 @@ use std::{env, process};
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use execute::shell;
-use regex::Regex;
 use tracing::error;
 
-use crate::core::models::script_model::StepParamModel;
 use crate::core::utils::packages::get_all_paths;
 use crate::core::{models::script_model::StepModel, packages_manager::PackagesManager};
 use crate::output::print_md_debug;
 
 pub fn interactive_shell(
-    step: &StepModel,
-    step_params: Vec<StepParamModel>,
     packages_manager: &mut PackagesManager,
-    params: HashMap<String, String>,
+    command: String,
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(&packages_manager);
 
-    let command = step.content.as_ref().unwrap();
-
-    // replace all {...} occurences in the command with the values from the params
-    // get the value of the param by param.name and the function settings.get_param
-    // if param.save == true, call save_param with the param.name and the value
-
     let mut cmd = "set -e\n".to_string() + command.clone().as_str();
-
-    let mut params_map: HashMap<String, String> = HashMap::new();
-
-    for param in step_params {
-        // look for param.name in params
-        // if found, use that value
-        // if not found, look for it in settings
-        // if not found, ask the user for it
-
-        let param_value = params.get(&param.name);
-
-        let param_value = match param_value {
-            Some(value) => value.clone(),
-            None => {
-                let param_value = packages_manager.settings.get_param(&param.name);
-                match param_value {
-                    Some(value) => value,
-                    None => {
-                        let prompt = format!("Enter value for parameter '{}'", param.name);
-                        let param_value = dialoguer::Input::with_theme(&ColorfulTheme::default())
-                            .with_prompt(&prompt)
-                            .interact_text()
-                            .unwrap_or_else(|_e| {
-                                error!("No value entered for parameter '{}'.", param.name);
-                                process::exit(1)
-                            });
-                        param_value
-                    }
-                }
-            }
-        };
-
-        params_map.insert(param.name.clone(), param_value.clone());
-
-        if param.save {
-            packages_manager
-                .settings
-                .save_param(&param.name, &param_value);
-        }
-    }
-
-    // like in jinja2 parameters templating (but without using any jinja2 lib)
-    // replace in cmd ocorunces of {{\s*...\s*}} with the values from params_map. ignore spaces inside the brackets
-    // use regular expression to find all matches and ignore the spaces inside the brackets
-    // for each match, replace it with the value from params_map
-
-    // Compile regex to match {{ param }}
-    let re = Regex::new(r"\{\s*\{\s*([\w.]+)\s*\}\s*\}").unwrap();
-
-    // Find all parameter matches
-    for cap in re.captures_iter(cmd.clone().as_ref()) {
-        // Extract the parameter name
-        let param_name = &cap[1];
-
-        // Get the parameter value from params_map
-        if let Some(param_value) = params_map.get(param_name) {
-            // Replace match with param value
-            cmd = re.replace(&cmd, param_value).to_string();
-        } else {
-            // Param not found error
-        }
-    }
 
     let mut command = shell(cmd);
 

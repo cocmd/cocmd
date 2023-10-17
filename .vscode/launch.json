@@ -39,11 +39,8 @@
                 }
             },
             "args": [
-                "--no-verbose",
                 "run",
-                "k8s.check-pod-restarts",
-                "--param", "namespace=csp-app-dev",
-                "--param", "regex = data"
+                "omega.oncall"
                 
             ],
             "cwd": "${workspaceFolder}"

@@ -82,6 +82,11 @@ impl Settings {
     pub fn save_param(&mut self, param_name: &str, param_value: &str) {
         self.params
             .insert(param_name.to_string(), param_value.to_string());
+    }
+}
+
+impl Drop for Settings {
+    fn drop(&mut self) {
         let params_file_path = Path::new(&self.home).join(consts::PARAMS_FILE);
         let _ = fs::remove_file(&params_file_path);
         let _ = fs::File::create(&params_file_path);
