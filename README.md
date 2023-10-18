@@ -1,10 +1,12 @@
 
-![Build](https://github.com/cargo-bins/cargo-binstall/workflows/Rust/badge.svg)
+![espanso](images/logo_extended.png)
+
 [![Crates.io](https://img.shields.io/crates/v/cocmd.svg)](https://crates.io/crates/cocmd)
 ![](https://img.shields.io/github/v/release/cocmd/cocmd)
 
 > Onboarding and Playbooks as Code
-
+> Build with Rust
+> Dev Productivity Tool
 
 ![alt text](media/cocmd1.png)
 
