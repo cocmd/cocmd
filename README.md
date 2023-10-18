@@ -1,5 +1,5 @@
 
-![espanso](images/logo_extended.png)
+![cocmd](media/logo_extended.png)
 
 [![Crates.io](https://img.shields.io/crates/v/cocmd.svg)](https://crates.io/crates/cocmd)
 ![](https://img.shields.io/github/v/release/cocmd/cocmd)
