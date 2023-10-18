@@ -2,7 +2,9 @@
 ![cocmd](media/logo_extended.png)
 
 > Onboarding and Playbooks as Code
+
 > Build with Rust
+
 > Dev Productivity Tool
 
 [![Crates.io](https://img.shields.io/crates/v/cocmd.svg)](https://crates.io/crates/cocmd)
