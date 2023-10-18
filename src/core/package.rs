@@ -150,14 +150,6 @@ impl Package {
         // output += &format!("## {}\n", self.name());
         output += &format!("- location: {}\n", self.location().to_str().unwrap());
 
-        if let Some(alias) = &self.aliases() {
-            output += &format!(
-                "## aliases ({}):\n```\n{}\n```\n",
-                self.get_aliases_count(),
-                alias
-            );
-        }
-
         let automations = self.automations(settings, Some(env_specific));
         if !automations.is_empty() {
             output += &format!(
@@ -166,30 +158,39 @@ impl Package {
             );
 
             // write a markdown table for automation. columns are name, env, description, number of steps
-            output += "| name | env | description | steps |\n";
+            output += "| command | env | description | how to run? |\n";
             output += "| --- | --- | --- | --- |\n";
 
             for automation in &automations {
                 let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
                 output += &format!(
-                    "| {} | {} | {} | {} |\n",
+                    "| {}.{} | {} | {} | {} |\n",
+                    self.name(),
                     automation.name,
                     env,
-                    automation
-                        .content
-                        .as_ref()
-                        .unwrap()
-                        .description
-                        .as_ref()
-                        .unwrap_or(&"Not provided".to_string()),
-                    automation.content.as_ref().unwrap().steps.len()
+                    automation.get_detailed_description(),
+                    format!(
+                        "run `{}.{}` or `cocmd run {}.{}`",
+                        self.name(),
+                        automation.name,
+                        self.name(),
+                        automation.name
+                    )
                 );
             }
             output += "\n";
         }
 
+        if let Some(alias) = &self.aliases() {
+            output += &format!(
+                "## aliases ({}):\n```\n{}\n```\n",
+                self.get_aliases_count(),
+                alias
+            );
+        }
+
         if !self.paths(false).is_empty() {
-            output += &format!("## paths ({})\n", self.get_paths_count());
+            output += &format!("## Extending PATH ({})\n", self.get_paths_count());
             for (rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
                 // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
                 // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
@@ -200,7 +201,7 @@ impl Package {
                 // column 2 desc (pick up from comment line that starts with # COCMD-DESC: ...
                 // column 3 usage (pick up from comment line that starts with # COCMD-USAGE: ...
                 // column 4 example (pick up from comment line that starts with # COCMD-EXAMPLE: ...
-                output += "| filename | desc | usage \n";
+                output += "| command | desc | usage \n";
                 output += "| --- | --- | --- |\n";
 
                 for entry in fs::read_dir(abs_p).unwrap() {
@@ -221,7 +222,7 @@ impl Package {
                     }
 
                     output += &format!(
-                        "| {} | {} | {} |\n",
+                        "| `{}` | {} | run `{}` |\n",
                         file_name.to_str().unwrap(),
                         desc,
                         usage

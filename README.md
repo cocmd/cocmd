@@ -3,10 +3,11 @@
 [![Crates.io](https://img.shields.io/crates/v/cocmd.svg)](https://crates.io/crates/cocmd)
 ![](https://img.shields.io/github/v/release/cocmd/cocmd)
 
-Cocmd is an open source tool for Developers to add Command line operations specification to their projects and 
-distribute them to their community.
+> Onboarding and Playbooks as Code
 
-For example, lets say you have a lot of `git` commands you type in during the day. Use CoCMD to easily add `git` related scripts, shortcuts and automations to your terminal. 
+
+![alt text](media/cocmd1.png)
+
 
 # Getting Started
 
@@ -68,9 +69,12 @@ Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/cmdops)
 
 
 
-
-
-## Inspiration
+## Shoutouts
+Thank you for the inspiration and the great work!
 - Espanso - https://espanso.org/
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
 - https://github.com/pvolok/mprocs#npm-linux-macos-windows
+
+## License
+Cocmd was created by [Moshe Roth](https://www.linkedin.com/in/mosherot/)
+and is licensed under the [GPL-3.0 license](/LICENSE).

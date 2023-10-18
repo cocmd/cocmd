@@ -69,6 +69,28 @@ impl Automation {
         }
         true
     }
+
+    pub fn get_detailed_description(&self) -> String {
+        let mut description = self
+            .content
+            .as_ref()
+            .unwrap()
+            .description
+            .as_ref()
+            .unwrap_or(&"".to_string())
+            .to_string();
+        let steps = &self.content.as_ref().unwrap().steps;
+
+        if steps.len() > 1 {
+            description += ": ";
+
+            for step in steps {
+                description += &format!("{}. ", step.title);
+            }
+        }
+
+        description
+    }
 }
 
 #[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
