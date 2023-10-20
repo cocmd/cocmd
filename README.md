@@ -77,6 +77,9 @@ Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/cmdops)
 ## Shoutouts
 Thank you for the inspiration and the great work!
 - Espanso - https://espanso.org/
+- Spotify-UI! - https://github.com/Rigellute/spotify-tui
+
+Useuful stuff:
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
 - https://github.com/pvolok/mprocs#npm-linux-macos-windows
 
@@ -86,7 +89,7 @@ Thank you for the inspiration and the great work!
 We encourage you to reach out.
 
 - [Report an issue](https://github.com/cocmd/cocmd/issues/new)
-
+- Here's how to [contribute to cocmd] (https://github.com/cocmd/cocmd/blob/master/CONTRIBUTING.md)
 - Looking to contribute? See our cli [good first issues](https://github.com/cocmd/cocmd/contribute).
 - Looking to contribute cocmd-packages? See our hub [good first issues](https://github.com/cocmd/hub/contribute).
 

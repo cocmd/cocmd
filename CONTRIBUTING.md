@@ -18,6 +18,7 @@ First, thank you for contributing to Cocmd! The goal of this document is to prov
 
 1. [Fork the cocmd repository](https://github.com/cocmd/cocmd/fork) into your own GitHub account.
 1. [Create a new Git branch](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository).
+1. Checkout `dev` branch.
 1. Make your changes.
 1. [Submit the branch as a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork) to the main cocmd repo. An cocmd team member should comment and/or review your pull request within a few days. Although, depending on the circumstances, it may take longer.
 
@@ -55,26 +56,17 @@ cocmd run rust --install
 * The project was written with VSCode and has ready made launch configurations for debugging and running tests.
 
 
+# For Maintainers
 # To create a release
 
 The releases are automated via GitHub actions, using [this configuration file](https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml).
 
 The release is triggered by pushing a tag.
 
-1. Bump the version in `Cargo.toml` and run the app to update the `lock` file
 1. Update the "Unreleased" header for the new version in the `CHANGELOG`. Use `### Added/Fixed/Changed` headers as appropriate
-1. Commit the changes and push them.
-1. Create a new tag e.g. `git tag -a v0.7.0` and add the CHANGELOG to the commit body
-1. Push the tag `git push --tags`
-1. Wait for the build to finish on the [Actions page](https://github.com/Rigellute/spotify-tui/actions)
+1. Bump the version on `master` branch with `cargo make version-bump`.
+1. Wait for the build to finish on the [Actions page](https://github.com/cocmd/cocmd/actions)
 1. This should publish to cargo as well
-
-### Update `brew`
-
-1. `cd` to the [`tap` repo](https://github.com/Rigellute/homebrew-tap)
-1. Run script to update the Formula `sh scripts/spotify-tui.sh $VERSION`
-
-### Update `scoop` (Windows 10)
-
-1. `cd` to [the `scoop` repo](https://github.com/Rigellute/scoop-bucket)
-1. Run the script to update the manifest `sh scripts/spotify-tui.sh $VERSION`
+1. This should update homebrew as well
+1. This should update snap as well
+1. This should update the website as well
