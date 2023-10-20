@@ -3,8 +3,9 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use tracing::error;
+use tracing::{error, warn};
 
+use super::utils::io::exists;
 use crate::core::consts;
 use crate::core::models::package_config_model::Automation;
 use crate::core::models::package_config_model::PackageConfigModel;
@@ -108,7 +109,6 @@ impl Package {
                             paths
                                 .iter()
                                 .map(|p| normalize_path(p, &self.location))
-                                .filter(|p| Path::new(p).exists())
                                 .collect()
                         } else {
                             paths.iter().map(|p| p.to_string()).collect()
@@ -190,11 +190,19 @@ impl Package {
         }
 
         if !self.paths(false).is_empty() {
-            output += &format!("## Extending PATH ({})\n", self.get_paths_count());
+            output += &format!("## PATH additions ({})\n", self.get_paths_count());
             for (rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
                 // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
                 // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
-                output += &format!("{}:\n\n", rel_p);
+
+                output += &format!("{}", abs_p);
+
+                if !exists(abs_p) {
+                    output += " (not exists)";
+                    continue;
+                }
+
+                output += ":\n\n";
 
                 // write a markdown table for files in fs::read_dir(abs_p).unwrap()
                 // column 1 filename
@@ -208,25 +216,28 @@ impl Package {
                     let entry = entry.unwrap();
                     let file_name = entry.file_name();
                     let file_path = entry.path();
-                    let file_content = fs::read_to_string(&file_path).unwrap();
 
-                    let mut desc = String::new();
-                    let mut usage = String::new();
+                    if let Ok(file_content) = fs::read_to_string(&file_path) {
+                        let mut desc = String::new();
+                        let mut usage = String::new();
 
-                    for line in file_content.lines() {
-                        if line.starts_with("# COCMD-DESC:") {
-                            desc = line.replace("# COCMD-DESC:", "").trim().to_string();
-                        } else if line.starts_with("# COCMD-USAGE:") {
-                            usage = line.replace("# COCMD-USAGE:", "").trim().to_string();
+                        for line in file_content.lines() {
+                            if line.starts_with("# COCMD-DESC:") {
+                                desc = line.replace("# COCMD-DESC:", "").trim().to_string();
+                            } else if line.starts_with("# COCMD-USAGE:") {
+                                usage = line.replace("# COCMD-USAGE:", "").trim().to_string();
+                            }
                         }
-                    }
 
-                    output += &format!(
-                        "| `{}` | {} | run `{}` |\n",
-                        file_name.to_str().unwrap(),
-                        desc,
-                        usage
-                    );
+                        output += &format!(
+                            "| `{}` | {} | run `{}` |\n",
+                            file_name.to_str().unwrap(),
+                            desc,
+                            usage
+                        );
+                    } else {
+                        warn!("Unable to read file {}", file_path.to_str().unwrap());
+                    }
                 }
             }
         }
@@ -268,6 +279,7 @@ impl Package {
 
 impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.location.to_str().unwrap())
+        println!("{:}", self.location.to_string_lossy());
+        write!(f, "{}", self.location.to_string_lossy())
     }
 }

@@ -101,9 +101,9 @@
             "args": [
                 "show",
                 "package",
-                "prometheus"
+                "omega"
             ],
-            "cwd": "${workspaceFolder}"
+            "cwd": "/Users/mosher"//"${workspaceFolder}"
         },
         {
             "name": "setup",

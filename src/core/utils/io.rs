@@ -18,20 +18,22 @@ use serde::Serialize;
 /// # Returns
 ///
 /// A normalized absolute path as a `String`.
-pub fn normalize_path(relative_path: &str, base: &PathBuf) -> String {
-    // Join the base path with the relative path and then resolve to an absolute path
-    let abs_path = base.join(relative_path).canonicalize();
-    if let Ok(path) = abs_path {
-        return path.to_string_lossy().into_owned();
+pub fn normalize_path(relative_path: &str, base_path: &PathBuf) -> String {
+    let mut abs_path = base_path.clone();
+    for component in relative_path.split(std::path::is_separator) {
+        match component {
+            "." => continue,
+            ".." => {
+                abs_path.pop();
+            }
+            _ => abs_path.push(component),
+        }
     }
+    abs_path.to_string_lossy().to_string()
+}
 
-    // Resolve the relative path to an absolute path using the current working directory
-    if let Ok(abs_path) = Path::new(relative_path).canonicalize() {
-        return abs_path.to_string_lossy().into_owned();
-    }
-
-    // Return the original path if normalization fails
-    relative_path.to_owned()
+pub fn exists(path: &str) -> bool {
+    Path::new(path).exists()
 }
 
 /// Creates a directory and its parents if necessary.
@@ -152,4 +154,22 @@ pub fn from_file(file_path: &str) -> Result<String, Box<dyn Error>> {
     file.read_to_string(&mut content)?;
 
     Ok(content)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_path() {
+        let base_path = PathBuf::from("/home/user");
+        let relative_path = "file.txt";
+        let normalized_path = normalize_path(relative_path, &base_path);
+        assert_eq!(normalized_path, "/home/user/file.txt");
+
+        let base_path = PathBuf::from(r"/Users/user");
+        let relative_path = ".././file.txt";
+        let normalized_path = normalize_path(relative_path, &base_path);
+        assert_eq!(normalized_path, "/Users/file.txt");
+    }
 }

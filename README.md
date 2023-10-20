@@ -3,12 +3,13 @@
 
 > Onboarding and Playbooks as Code
 
-> Build with Rust
+> Built with Rust 
 
 > Dev Productivity Tool
 
 [![Crates.io](https://img.shields.io/crates/v/cocmd.svg)](https://crates.io/crates/cocmd)
 ![](https://img.shields.io/github/v/release/cocmd/cocmd)
+
 
 ![alt text](media/cocmd1.png)
 
@@ -78,6 +79,17 @@ Thank you for the inspiration and the great work!
 - Espanso - https://espanso.org/
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
 - https://github.com/pvolok/mprocs#npm-linux-macos-windows
+
+
+## Get Involved
+
+We encourage you to reach out.
+
+- [Report an issue](https://github.com/cocmd/cocmd/issues/new)
+
+- Looking to contribute? See our cli [good first issues](https://github.com/cocmd/cocmd/contribute).
+- Looking to contribute cocmd-packages? See our hub [good first issues](https://github.com/cocmd/hub/contribute).
+
 
 ## License
 Cocmd was created by [Moshe Roth](https://www.linkedin.com/in/mosherot/)

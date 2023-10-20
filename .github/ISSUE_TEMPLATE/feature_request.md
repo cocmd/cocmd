@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
-Feature requests have been moved to discussions, please open it there :)
+**Description**
 
-https://github.com/cocmd/cocmd/discussions/categories/feature-requests-and-ideas
+**tests**
+
+**Docs**
+
