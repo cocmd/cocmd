@@ -89,7 +89,7 @@ Useuful stuff:
 We encourage you to reach out.
 
 - [Report an issue](https://github.com/cocmd/cocmd/issues/new)
-- Here's how to [contribute to cocmd] (https://github.com/cocmd/cocmd/blob/master/CONTRIBUTING.md)
+- Here's how to [contribute to cocmd](https://github.com/cocmd/cocmd/blob/master/CONTRIBUTING.md)
 - Looking to contribute? See our cli [good first issues](https://github.com/cocmd/cocmd/contribute).
 - Looking to contribute cocmd-packages? See our hub [good first issues](https://github.com/cocmd/hub/contribute).
 
