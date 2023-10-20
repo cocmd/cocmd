@@ -1,18 +1,6 @@
 # Contributing
 
-First, thank you for contributing to Cocmd! The goal of this document is to provide everything you need to start contributing to cocmd. The following TOC is sorted progressively, starting with the basics and expanding into more specifics.
-
-- [Your First Contribution](#your-first-contribution)
-- [Workflow](#workflow)
-  - [Git Branches](#git-branches)
-  - [GitHub Pull Requests](#github-pull-requests)
-    - [Title](#title)
-    - [Reviews & Approvals](#reviews--approvals)
-    - [Merge Style](#merge-style)
-    - [CI](#ci)
-- [Setup](#setup)
-  - [Using a dev container environment](#using-a-dev-container-environment)
-  - [Bring your own toolbox](#bring-your-own-toolbox)
+First, thank you for contributing to Cocmd! The goal of this document is to provide everything you need to start contributing to cocmd. 
 
 ## Your First Contribution
 
