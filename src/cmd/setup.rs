@@ -1,16 +1,12 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use dialoguer::{theme::ColorfulTheme, Select};
 use tracing::{error, info};
 
-use super::CmdExit;
 use crate::core::packages_manager::PackagesManager;
 // add to bashrc or zshrc the following line if not exists
 // eval "$(cocmd profile-loader)"
 // output to stdout with tracing::info what you did
-pub fn run_setup(
-    _packages_manager: &mut PackagesManager,
-    shell: Option<String>,
-) -> Result<CmdExit> {
+pub fn run_setup(_packages_manager: &mut PackagesManager, shell: Option<String>) -> Result<()> {
     let mut shell = shell.unwrap_or_else(|| {
         if let Some(shell) = std::env::var_os("SHELL") {
             shell.to_string_lossy().to_string()
@@ -39,10 +35,7 @@ pub fn run_setup(
         "zsh" => "zsh",
         "/bin/zsh" => "zsh",
         _ => {
-            return Err(anyhow::anyhow!(
-                "Unsupported shell: {}. Supported shells: bash, zsh",
-                shell
-            ))
+            bail!("Unsupported shell: {}. Supported shells: bash, zsh", shell);
         }
     };
     let profile_loader = r#"
@@ -61,22 +54,18 @@ eval "$(cocmd profile-loader)"
         }
         _ => unreachable!(),
     };
-    let mut profile = std::fs::read_to_string(&profile_path)?;
+    let mut profile = std::fs::read_to_string(&profile_path).unwrap();
 
     // check if profile_loader is already in profile
     if profile.contains("cocmd profile-loader") {
         info!("Already added profile-loader to {}", profile_path);
-        return Ok(CmdExit {
-            code: exitcode::OK,
-            message: None,
-        });
+        return Ok(());
     }
 
     profile.push_str(&profile_loader);
-    std::fs::write(&profile_path, profile)?;
+    if let Err(e) = std::fs::write(&profile_path, profile) {
+        bail!("Failed to write to {}: {}", profile_path, e);
+    }
     info!("Added profile-loader to {}", profile_path);
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }

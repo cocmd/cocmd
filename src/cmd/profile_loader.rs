@@ -1,9 +1,8 @@
 use anyhow::Result;
 
-use super::CmdExit;
 use crate::core::packages_manager::PackagesManager;
 
-pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<CmdExit> {
+pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<()> {
     for package in packages_manager.packages.values() {
         if !(package.is_legit_cocmd_package()) {
             println!("# Skipping package {}", &package.uri);
@@ -35,8 +34,5 @@ pub fn run_profile_loader(packages_manager: &mut PackagesManager) -> Result<CmdE
         }
     }
 
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }

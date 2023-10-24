@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use anyhow::{Error, Result};
+
 use crate::core::utils::sys::OS;
 use crate::core::{
     models::script_model::{ScriptModel, StepRunnerType},
@@ -15,7 +17,7 @@ pub fn run_script(
     env: OS,
     packages_manager: &mut PackagesManager,
     params: HashMap<String, String>,
-) {
+) -> Result<()> {
     let mut step_statuses = Vec::new();
     let script_params = script.params.clone();
     for step in &script.steps {
@@ -43,4 +45,12 @@ pub fn run_script(
         let status_str = if *success { "✅" } else { "❌" };
         print_md_debug(&format!("{} {}", status_str, title));
     }
+
+    // if any status is false return false
+    let any_failed = step_statuses.iter().any(|(_, success)| !success);
+    if any_failed {
+        return Err(Error::msg("Some steps failed"));
+    }
+
+    Ok(())
 }

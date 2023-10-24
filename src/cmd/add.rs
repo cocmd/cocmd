@@ -1,11 +1,10 @@
 use std::path::Path;
 
-use anyhow::{bail, Result};
+use anyhow::{Error, Result};
 use console::Style;
 use dialoguer::Confirm;
 use tracing::info;
 
-use super::CmdExit;
 use crate::core::package::Package;
 use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::repository::find_cocmd_files;
@@ -14,7 +13,7 @@ pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
     dont_ask: bool,
-) -> Result<CmdExit> {
+) -> Result<(), Error> {
     info!("Installing package {:?}", package);
 
     let settings = &packages_manager.settings;
@@ -29,7 +28,7 @@ pub fn install_package(
                 info!("Downloaded package to {:?}", downloaded_path);
             }
             Err(e) => {
-                bail!("Failed to download package: {}", e);
+                return Err(e);
             }
         }
     }
@@ -45,10 +44,7 @@ pub fn install_package(
 
     if locations.is_empty() {
         info!("No cocmd packages found in this path");
-        return Ok(CmdExit {
-            code: exitcode::OK,
-            message: None,
-        });
+        return Ok(());
     }
 
     if provider.name() == LOCAL_PROVIDER {
@@ -62,7 +58,8 @@ pub fn install_package(
         || dont_ask
         || Confirm::new()
             .with_prompt("Do you want to continue?")
-            .interact()?
+            .interact()
+            .unwrap()
     {
         for loc in locations {
             let package: Package = Package::new(
@@ -96,8 +93,5 @@ pub fn install_package(
         info!("{}", style.apply_to("Skipped. you answered 'NO'"));
     }
 
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }

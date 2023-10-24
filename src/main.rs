@@ -7,7 +7,9 @@ pub(crate) mod output;
 pub(crate) mod package_provider;
 pub(crate) mod runner;
 pub(crate) mod tui_app;
+use std::process::ExitCode;
 
+use anyhow::Error;
 use clap::{Parser, Subcommand};
 use cmd::add;
 use cmd::docs::run_docs;
@@ -17,7 +19,6 @@ use cmd::setup::run_setup;
 #[cfg(feature = "howto")]
 use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
-use cmd::CmdExit;
 use dialoguer::{Confirm, MultiSelect};
 use tracing::{error, info};
 use tui_app::tui_runner;
@@ -31,7 +32,7 @@ use crate::output::set_tracing;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.64",
+    version = "1.0.65",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -127,24 +128,21 @@ struct SetupArgs {
     shell: Option<String>,
 }
 
-fn main() {
+fn main() -> ExitCode {
     let cli = Cli::parse();
     set_tracing(!cli.no_verbose);
 
     let settings = Settings::new(None, None);
     let mut packages_manager = PackagesManager::new(settings);
 
-    let mut res = Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    });
+    let mut res: Result<(), Error> = Ok(());
 
     match cli.command {
         Commands::Browse => {
             while let Ok(Some(automation_name)) = tui_runner(packages_manager.clone()) {
                 res = run_automation(&mut packages_manager, Some(automation_name), None);
                 if Confirm::new()
-                    .with_prompt("Do you want to continue with TUI?")
+                    .with_prompt("Do you want to continue browsing?")
                     .interact()
                     .unwrap()
                 {
@@ -229,6 +227,9 @@ fn main() {
 
     // if res returned an error, print it to stderr
     if let Err(e) = res {
-        error!("{}", e);
+        // error!("{}", e);
+        ExitCode::from(1)
+    } else {
+        ExitCode::from(0)
     }
 }

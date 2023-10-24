@@ -40,7 +40,12 @@
             },
             "args": [
                 "run",
-                "omega.oncall"
+                "prometheus.query-condition",
+                "-p", "url=1",
+                "-p", "query=1",
+                "-p", "operator=1",
+                "-p", "threshold=1"
+
                 
             ],
             "cwd": "${workspaceFolder}"

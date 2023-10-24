@@ -1,13 +1,12 @@
 use anyhow::{bail, Result};
 
-use super::CmdExit;
 use crate::core::packages_manager::PackagesManager;
 
 pub fn run_docs(
     packages_manager: &mut PackagesManager,
     specific_name: &String,
     raw_markdown: bool,
-) -> Result<CmdExit> {
+) -> Result<()> {
     // load package with the specific name
 
     let package = packages_manager
@@ -20,8 +19,5 @@ pub fn run_docs(
 
     package.print_doc(&packages_manager.settings, !raw_markdown, false);
 
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }

@@ -5,11 +5,10 @@ use anyhow::{bail, Result};
 #[cfg(feature = "howto")]
 use levenshtein::levenshtein;
 
-use super::CmdExit;
 use crate::core::packages_manager::PackagesManager;
 use crate::output::print_md;
 
-pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<CmdExit> {
+pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<()> {
     let mut table = String::new();
 
     let packages = packages_manager.packages.values();
@@ -39,13 +38,10 @@ pub fn show_packages(packages_manager: &mut PackagesManager) -> Result<CmdExit> 
 
     print_md(&table);
 
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }
 
-pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Result<CmdExit> {
+pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Result<()> {
     let package = packages_manager
         .get_package(uri.clone())
         .unwrap_or_else(|| panic!("Can't get package {}", &uri));
@@ -56,14 +52,11 @@ pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Resu
 
     package.print_doc(&packages_manager.settings, true, true);
 
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }
 
 #[cfg(feature = "howto")]
-pub fn howto(packages_manager: &mut PackagesManager, query: String) -> Result<CmdExit> {
+pub fn howto(packages_manager: &mut PackagesManager, query: String) -> Result<()> {
     // lookup in all descriptions of automation for what matches best to query variable
     // use tokenization and levenshtein distance to find best match
 
@@ -87,8 +80,5 @@ pub fn howto(packages_manager: &mut PackagesManager, query: String) -> Result<Cm
     let skin = termimad::MadSkin::default();
     skin.print_text(&best_match);
 
-    Ok(CmdExit {
-        code: exitcode::OK,
-        message: None,
-    })
+    Ok(())
 }
