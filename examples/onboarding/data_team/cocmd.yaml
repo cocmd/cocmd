@@ -29,7 +29,7 @@ automations:
         - title: start docker
           runner: cocmd
           content: docker.start
-        - title: local docker
+        - title: run local postgres
           runner: shell
           content: |
             # run local postgres docker with user alice and password alice-pass with port 5432
@@ -40,7 +40,10 @@ automations:
               echo "jaffle_shop docker not running"
               docker run --rm --name jaffle_shop -e POSTGRES_USER=alice -e POSTGRES_PASSWORD=alice-pass -p 5432:5432 -d postgres
             fi
-
+          
+        - title: create postgres database
+          runner: shell
+          content: |
             # make sure database jaffle_shop exists if not create it
             if docker exec jaffle_shop psql -U alice -lqt | cut -d \| -f 1 | grep -qw jaffle_shop; then
               echo "jaffle_shop database already exists"
