@@ -30,7 +30,7 @@ pub fn handle_step(
     print_md_debug(&format!("## {}", &step.title));
     if let Some(msg) = step.approval_message.clone() {
         if !Confirm::new().with_prompt(msg).interact().unwrap() {
-            return false;
+            return true;
         }
     }
 

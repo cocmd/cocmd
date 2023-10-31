@@ -8,9 +8,6 @@ automations:
         - title: git
           runner: cocmd
           content: git.setup
-        - title: python
-          runner: cocmd
-          content: python.setup
         - title: dbt
           runner: cocmd
           content: dbt.setup
@@ -22,13 +19,35 @@ automations:
           content: |
             mkdir -p ~/workspace
             cd  ~/workspace
-            git clone git@github.com:dbt-labs/jaffle_shop.git
-
+            # check it doesn't exist
+            if [ -d jaffle_shop ]; then
+              echo "jaffle_shop project already exists"
+            else
+              echo "jaffle_shop doesn't exist"
+              git clone git@github.com:dbt-labs/jaffle_shop.git
+            fi
+        - title: start docker
+          runner: cocmd
+          content: docker.start
         - title: local docker
           runner: shell
           content: |
             # run local postgres docker with user alice and password alice-pass with port 5432
-            docker run --rm --name jaffle_shop -e POSTGRES_USER=alice -e POSTGRES_PASSWORD=alice-pass -p 5432:5432 -d postgres
+            # check that docker jaffle_shop not running
+            if docker ps -a | grep -q jaffle_shop; then
+              echo "jaffle_shop docker already running"
+            else
+              echo "jaffle_shop docker not running"
+              docker run --rm --name jaffle_shop -e POSTGRES_USER=alice -e POSTGRES_PASSWORD=alice-pass -p 5432:5432 -d postgres
+            fi
+
+            # make sure database jaffle_shop exists if not create it
+            if docker exec jaffle_shop psql -U alice -lqt | cut -d \| -f 1 | grep -qw jaffle_shop; then
+              echo "jaffle_shop database already exists"
+            else
+              echo "jaffle_shop database doesn't exist"
+              docker exec jaffle_shop psql -U alice -c "CREATE DATABASE jaffle_shop;"
+            fi
         
         - title: add profile to dbt
           runner: shell
@@ -40,22 +59,22 @@ automations:
               echo "jaffle_shop already in ~/.dbt/profiles.yml"
             else
               echo "jaffle_shop not in ~/.dbt/profiles.yml"
-              cat <<EOF 
-              
-              jaffle_shop:
-                target: dev
-                outputs:
-                  dev:
-                    type: postgres
-                    host: localhost
-                    user: alice
-                    password: alice-pass
-                    port: 5432
-                    dbname: jaffle_shop
-                    schema: dbt_alice
-                    threads: 4
-              >> ~/.dbt/profiles.yml
-
+              cat <<EOF >> ~/.dbt/profiles.yml
+            jaffle_shop:
+              target: dev
+              outputs:
+                dev:
+                  type: postgres
+                  host: localhost
+                  user: alice
+                  password: alice-pass
+                  port: 5432
+                  dbname: jaffle_shop
+                  schema: dbt_alice
+                  threads: 4
+            EOF
+            echo "added jaffle_shop to ~/.dbt/profiles.yml"
+            fi
         - title: dbt operations
           runner: shell
           content: |
