@@ -29,9 +29,12 @@ pub fn interactive_shell(
     }
     command.env("PATH", new_path);
 
+    // Ensure stdin is connected to the terminal
+    command.stdin(Stdio::inherit());
+
     command.stdout(Stdio::piped());
     command.stderr(Stdio::piped());
-    command.stdin(Stdio::piped());
+    // command.stdin(Stdio::piped());
 
     let mut child = command
         .spawn()
