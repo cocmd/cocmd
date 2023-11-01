@@ -20,7 +20,7 @@ serde = "1"
 serde_json = "1"
 serde_derive = "1"
 serde_yaml = "^0.9.0"
-tracing = "^0.1.37"
+tracing = "^0.1.40"
 tracing-tree = { version = "0.2.1" }
 tracing-subscriber = { version = "^0.3.11", features = ["env-filter"] }
 anyhow = "1.0.38"
