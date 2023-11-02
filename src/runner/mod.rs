@@ -29,12 +29,7 @@ pub fn run_script(
             params.clone(),
         );
         // check if step runner is executable shell/cmd/python add it
-        if step.runner == StepRunnerType::SHELL
-            || step.runner == StepRunnerType::COCMD
-            || step.runner == StepRunnerType::PYTHON
-        {
-            step_statuses.push((step.title.clone(), success));
-        }
+        step_statuses.push((step.title.clone(), success));
     }
 
     print_md_debug(&format!(
