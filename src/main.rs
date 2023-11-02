@@ -32,7 +32,7 @@ use crate::output::set_tracing;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.67",
+    version = "1.0.68",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -130,7 +130,12 @@ struct SetupArgs {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
-    set_tracing(!cli.no_verbose);
+
+    if let Commands::Install { .. } = cli.command {
+        set_tracing(false);
+    } else {
+        set_tracing(!cli.no_verbose);
+    }
 
     let settings = Settings::new(None, None);
     let mut packages_manager = PackagesManager::new(settings);
@@ -159,7 +164,7 @@ fn main() -> ExitCode {
             res = run_profile_loader(&mut packages_manager);
         }
         Commands::Refresh => {
-            println!("'cocmd refresh' was used");
+            todo!("Refresh command not implemented yet")
         }
         Commands::Docs { name, raw_markdown } => match name {
             Some(name) => {
