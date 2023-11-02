@@ -5,16 +5,16 @@ automations:
       description: "onboarding for example project https://github.com/dbt-labs/jaffle_shop"
       env: osx
       steps:
-        - title: git
+        - title: install git
           runner: cocmd
           content: git.setup
-        - title: dbt
+        - title: install dbt
           runner: cocmd
           content: dbt.setup
-        - title: docker
+        - title: install docker
           runner: cocmd
           content: docker.setup
-        - title: project clone
+        - title: clone project
           runner: shell
           content: |
             mkdir -p ~/workspace
@@ -52,7 +52,7 @@ automations:
               docker exec jaffle_shop psql -U alice -c "CREATE DATABASE jaffle_shop;"
             fi
         
-        - title: add profile to dbt
+        - title: setup dbt profile
           runner: shell
           content: |
             mkdir -p ~/.dbt
@@ -78,7 +78,7 @@ automations:
             EOF
             echo "added jaffle_shop to ~/.dbt/profiles.yml"
             fi
-        - title: dbt operations
+        - title: run dbt operations
           runner: shell
           content: |
             cd ~/workspace/jaffle_shop
@@ -88,5 +88,4 @@ automations:
             dbt run
             dbt test
             dbt docs generate
-            dbt docs serve
         
