@@ -331,9 +331,9 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 
 [[package]]
 name = "coolor"
-version = "0.5.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af4d7a805ca0d92f8c61a31c809d4323fdaa939b0b440e544d21db7797c5aaad"
+checksum = "95ce3e41909f18d5860fe1e6699651fcca2cb2576ee68c6984c93c2b26d059ea"
 dependencies = [
  "crossterm 0.23.2",
 ]
@@ -1855,9 +1855,9 @@ dependencies = [
 
 [[package]]
 name = "termimad"
-version = "0.24.1"
+version = "0.25.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3f1b37b6c42513bd3ed17c94c7d644ec72054d5bb972bd557f645a6658d7df2"
+checksum = "c1d090fe2d927c784b92ef54daddd9df070c856057715002d484bc7f49ae47d0"
 dependencies = [
  "coolor",
  "crossbeam",
