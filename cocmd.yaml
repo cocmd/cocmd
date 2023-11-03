@@ -27,6 +27,30 @@ automations:
               fi
             done
 
+        - title: add git hooks
+          runner: shell
+          content: |
+            cd cocmd-project/cocmd
+            touch .git/hooks/pre-push
+            chmod +x .git/hooks/pre-push
+            # add multiline  text to the pre-push
+            cat << 'EOF' > .git/hooks/pre-push
+            #!/bin/bash
+
+            # Run cargo clippy, cargo fix, and cargo fmt
+            cargo clippy --all-features -- -D warnings && cargo fix --allow-dirty && cargo fmt --all
+
+            # Check if there are any changes
+            if git diff --quiet; then
+                echo "No code changes detected."
+            else
+                # Automatically commit and push the changes
+                git add .
+                git commit -m "Auto-fix with cargo clippy and cargo fmt"
+                git push
+            fi
+            EOF
+
         - title: run website
           runner: shell
           content: |
