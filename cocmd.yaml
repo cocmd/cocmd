@@ -51,6 +51,9 @@ automations:
             fi
             EOF
 
+            echo "pre-push hook added"
+            cat .git/hooks/pre-push
+
         - title: run website
           runner: shell
           content: |
