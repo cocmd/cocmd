@@ -11,7 +11,6 @@ use crate::core::utils::sys::OS;
 use crate::core::{models::script_model::StepModel, packages_manager::PackagesManager};
 use crate::output::print_md_debug;
 
-
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
     command: String,
@@ -27,14 +26,10 @@ pub fn interactive_shell(
     }
 
     // Detect the OS based on your package_manager.settings.os
-    let binding = env::var("SHELL")
-                .unwrap_or("/bin/sh".to_string());
+    let binding = env::var("SHELL").unwrap_or("/bin/sh".to_string());
     let (shell, cmd_arg) = match &packages_manager.settings.os {
         OS::Windows => ("cmd.exe", "/C"),
-        _ => (
-            &*binding,
-            "-c",
-        ),
+        _ => (&*binding, "-c"),
     };
 
     let status = Command::new(&shell)
@@ -51,7 +46,6 @@ pub fn interactive_shell(
         Err("Shell command failed.".to_string())
     }
 }
-
 
 #[cfg(target_os = "windows")]
 mod windows_tests {
