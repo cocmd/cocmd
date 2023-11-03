@@ -79,7 +79,7 @@ Thank you for the inspiration and the great work!
 - Espanso - https://espanso.org/
 - Spotify-UI! - https://github.com/Rigellute/spotify-tui
 
-Useuful stuff:
+Usefull Links:
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
 - https://github.com/pvolok/mprocs#npm-linux-macos-windows
 
@@ -96,4 +96,4 @@ We encourage you to reach out.
 
 ## License
 Cocmd was created by [Moshe Roth](https://www.linkedin.com/in/mosherot/)
-and is licensed under the [GPL-3.0 license](/LICENSE).
+and is licensed under the [GPL-3.0 license](LICENSE).
