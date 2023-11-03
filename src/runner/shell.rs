@@ -7,8 +7,10 @@ use dialoguer::theme::ColorfulTheme;
 use tracing::error;
 
 use crate::core::utils::packages::get_all_paths;
+use crate::core::utils::sys::OS;
 use crate::core::{models::script_model::StepModel, packages_manager::PackagesManager};
 use crate::output::print_md_debug;
+
 
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
@@ -24,10 +26,19 @@ pub fn interactive_shell(
         new_path.push_str(&current_path);
     }
 
-    let shell = env::var("SHELL").unwrap_or("/bin/sh".to_string());  // Use /bin/sh as the default if SHELL is not set
+    // Detect the OS based on your package_manager.settings.os
+    let binding = env::var("SHELL")
+                .unwrap_or("/bin/sh".to_string());
+    let (shell, cmd_arg) = match &packages_manager.settings.os {
+        OS::Windows => ("cmd.exe", "/C"),
+        _ => (
+            &*binding,
+            "-c",
+        ),
+    };
 
     let status = Command::new(&shell)
-        .arg("-c")
+        .arg(cmd_arg)
         .arg(cmd)
         .env("PATH", new_path)
         .status()
