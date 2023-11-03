@@ -11,6 +11,9 @@ automations:
         - title: install rust
           runner: cocmd
           content: rust.setup
+        - title: install node
+          runner: cocmd
+          content: node.setup
         - title: git clones
           runner: shell
           content: |
@@ -28,29 +31,33 @@ automations:
             done
 
         - title: add git hooks
+          description: pre-commit and pre-push hooks for rust fmt and clippy
           runner: shell
           content: |
             cd cocmd-project/cocmd
+            touch .git/hooks/pre-commit
+            chmod +x .git/hooks/pre-commit
+
+            cat << 'EOF' > .git/hooks/pre-commit
+            #!/bin/bash
+            cargo clippy --fix --allow-dirty
+            cargo fmt
+            cargo fix --allow-dirty 
+
+            # Add any changes made by the formatting commands
+            git add .
+            EOF
+
+            echo "pre-push hook added"
+            cat .git/hooks/pre-commit
+
+
             touch .git/hooks/pre-push
             chmod +x .git/hooks/pre-push
-            # add multiline  text to the pre-push
+            
             cat << 'EOF' > .git/hooks/pre-push
             #!/bin/bash
-
-            # Run cargo clippy, cargo fix, and cargo fmt
-            cargo clippy --fix && \
-              cargo clippy && \
-              cargo fix --allow-dirty && \ 
-              cargo fmt --all 
-
-            # Check if there are any changes
-            if git diff --quiet; then
-                echo "No code changes detected."
-            else
-                # Automatically commit and push the changes
-                git add .
-                git commit -a --amend --no-edit
-            fi
+            cargo clippy
             EOF
 
             echo "pre-push hook added"
@@ -80,7 +87,13 @@ automations:
           runner: shell
           approval_message: To open the code with VSCode?
           content: |
-            cocmd --no-verbose run vscode.setup
+            # check if vscode not installed
+            if ! command -v code &> /dev/null
+            then
+                echo "vscode could not be found. installing..."
+                cocmd --no-verbose run vscode.setup
+            fi
+            
             code cocmd-project
             
             
