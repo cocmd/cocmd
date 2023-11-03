@@ -51,3 +51,60 @@ pub fn interactive_shell(
         Err("Shell command failed.".to_string())
     }
 }
+
+
+#[cfg(target_os = "windows")]
+mod windows_tests {
+    use super::*;
+
+    #[test]
+    fn test_interactive_shell_windows() {
+        let settings = Settings::new(None, None);
+        let mut packages_manager = PackagesManager::new(settings);
+
+        // Call the interactive_shell function with test data for Windows
+        let command = "echo Hello, Windows".to_string();
+        let result = interactive_shell(&mut packages_manager, command);
+
+        // Assert that the result is as expected
+        assert_eq!(result, Ok(true));
+    }
+}
+
+#[cfg(target_os = "linux")]
+mod linux_tests {
+    use super::*;
+
+    #[test]
+    fn test_interactive_shell_linux() {
+        let settings = Settings::new(None, None);
+        let mut packages_manager = PackagesManager::new(settings);
+
+        // Call the interactive_shell function with test data for Linux
+        let command = "echo Hello, Linux".to_string();
+        let result = interactive_shell(&mut packages_manager, command);
+
+        // Assert that the result is as expected
+        assert_eq!(result, Ok(true));
+    }
+}
+
+#[cfg(target_os = "macos")]
+mod macos_tests {
+    use crate::core::Settings;
+
+    use super::*;
+
+    #[test]
+    fn test_interactive_shell_macos() {
+        let settings = Settings::new(None, None);
+        let mut packages_manager = PackagesManager::new(settings);
+
+        // Call the interactive_shell function with test data for macOS
+        let command = "echo Hello, macOS".to_string();
+        let result = interactive_shell(&mut packages_manager, command);
+
+        // Assert that the result is as expected
+        assert_eq!(result, Ok(true));
+    }
+}
