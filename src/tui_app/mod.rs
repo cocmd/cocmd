@@ -55,11 +55,7 @@ pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<Option<String>
                 .clone();
             tui.events.stop();
             tui.exit()?;
-            return Ok(Some(format!(
-                "{}.{}",
-                package.name().to_string(),
-                automation.name.to_string()
-            )));
+            return Ok(Some(format!("{}.{}", package.name(), automation.name)));
         }
 
         // Render the user interface.

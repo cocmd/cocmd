@@ -1,10 +1,10 @@
 use std::collections::HashMap;
+use std::process;
 use std::process::Command;
-use std::{env, process};
 
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
-use execute::shell;
+
 use regex::Regex;
 use tracing::error;
 
