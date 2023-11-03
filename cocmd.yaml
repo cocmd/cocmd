@@ -50,6 +50,7 @@ automations:
                 # Automatically commit and push the changes
                 git add .
                 git commit -am "Auto-fix rust code"
+                
             fi
             EOF
 
