@@ -6,7 +6,8 @@
 
 use std::collections::HashMap;
 
-pub fn parse_params(params: Option<Vec<String>>) -> HashMap<String, String> {
+pub fn parse_params(
+    params: Option<Vec<String>>) -> HashMap<String, String> {
     let mut params_map: HashMap<String, String> = HashMap::new();
 
     if params.is_none() {
