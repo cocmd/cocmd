@@ -79,10 +79,7 @@ impl App {
             .content
             .as_ref()
             .unwrap()
-            .steps
-            .iter()
-            .cloned()
-            .collect();
+            .steps.to_vec();
 
         self.steps_list = StatefulList::with_items(steps);
     }
