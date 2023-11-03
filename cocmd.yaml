@@ -49,8 +49,7 @@ automations:
             else
                 # Automatically commit and push the changes
                 git add .
-                git commit -am "Auto-fix rust code"
-                
+                git commit -a --amend --no-edit
             fi
             EOF
 
