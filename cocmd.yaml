@@ -10,7 +10,7 @@ automations:
           content: git.setup
         - title: install rust
           runner: cocmd 
-          content: rust.setup
+          content: rust.setup 
         - title: install node
           runner: cocmd
           content: node.setup
