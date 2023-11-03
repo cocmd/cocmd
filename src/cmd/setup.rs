@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{bail, Result};
 use dialoguer::{theme::ColorfulTheme, Select};
 use tracing::{error, info};
@@ -54,7 +56,17 @@ eval "$(cocmd profile-loader)"
         }
         _ => unreachable!(),
     };
-    let mut profile = std::fs::read_to_string(&profile_path).unwrap();
+    let mut profile = match std::fs::read_to_string(&profile_path) {
+        Ok(content) => content,
+        Err(e) => {
+            eprintln!(
+                "Failed to read the file at {}: {}",
+                Path::new(&profile_path).display(),
+                e
+            );
+            return Err(anyhow::Error::new(e));
+        }
+    };
 
     // check if profile_loader is already in profile
     if profile.contains("cocmd profile-loader") {
