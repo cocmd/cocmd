@@ -1,4 +1,4 @@
-use ratatui::widgets::{canvas::*, *};
+use ratatui::widgets::{*};
 use ratatui::{
     backend::Backend,
     layout::Alignment,
@@ -96,7 +96,7 @@ fn draw_automations_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: 
         .map(|i| ListItem::new(vec![text::Line::from(Span::raw(i.name.to_string()))]))
         .collect();
 
-    let title = Span::styled(format!("Workflows").to_string(), Style::default());
+    let title = Span::styled("Workflows".to_string().to_string(), Style::default());
 
     // set style to yellow border if app.focus == AppFocus::Automations
     let tasks = if app.focus == AppFocus::Automations {

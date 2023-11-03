@@ -32,8 +32,7 @@ impl App {
     pub fn new(packages_manager: PackagesManager) -> Self {
         let items = packages_manager
             .packages
-            .values()
-            .map(|p| p.clone())
+            .values().cloned()
             .collect();
         Self {
             focus: AppFocus::Packages,
@@ -84,8 +83,7 @@ impl App {
             .as_ref()
             .unwrap()
             .steps
-            .iter()
-            .map(|s| s.clone())
+            .iter().cloned()
             .collect();
 
         self.steps_list = StatefulList::with_items(steps);

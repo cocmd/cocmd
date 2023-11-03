@@ -1,27 +1,27 @@
-use std::collections::HashMap;
+
 use std::process::Command;
-use std::{env, process};
+use std::{env};
 
 use anyhow::Result;
-use dialoguer::theme::ColorfulTheme;
-use tracing::error;
+
+
 
 use crate::core::utils::packages::get_all_paths;
 use crate::core::utils::sys::OS;
-use crate::core::{models::script_model::StepModel, packages_manager::PackagesManager};
+use crate::core::{packages_manager::PackagesManager};
 use crate::output::print_md_debug;
 
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
     command: String,
 ) -> Result<bool, String> {
-    let paths_to_add = get_all_paths(&packages_manager);
+    let paths_to_add = get_all_paths(packages_manager);
 
     let cmd = "set -e\n".to_string() + command.as_str();
 
     // Get the current PATH and add a directory to it
     let mut new_path = paths_to_add.join(":");
-    if let Some(current_path) = env::var("PATH").ok() {
+    if let Ok(current_path) = env::var("PATH") {
         new_path.push_str(&current_path);
     }
 
@@ -32,7 +32,7 @@ pub fn interactive_shell(
         _ => (&*binding, "-c"),
     };
 
-    let status = Command::new(&shell)
+    let status = Command::new(shell)
         .arg(cmd_arg)
         .arg(cmd)
         .env("PATH", new_path)
@@ -85,9 +85,9 @@ mod linux_tests {
 
 #[cfg(target_os = "macos")]
 mod macos_tests {
-    use crate::core::Settings;
+    
 
-    use super::*;
+    
 
     #[test]
     fn test_interactive_shell_macos() {

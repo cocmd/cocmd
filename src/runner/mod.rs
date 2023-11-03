@@ -4,7 +4,7 @@ use anyhow::{Error, Result};
 
 use crate::core::utils::sys::OS;
 use crate::core::{
-    models::script_model::{ScriptModel, StepRunnerType},
+    models::script_model::{ScriptModel},
     packages_manager::PackagesManager,
 };
 use crate::output::print_md_debug;

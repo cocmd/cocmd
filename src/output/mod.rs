@@ -1,8 +1,8 @@
 use termimad::MadSkin;
-use tracing::debug;
+
 use tracing::metadata::LevelFilter;
 use tracing::Level;
-use tracing_subscriber::{fmt, prelude::*};
+use tracing_subscriber::{prelude::*};
 
 // Global variable to store the log level.
 static mut LOG_LEVEL: Level = Level::INFO; // Initialize with a default level.

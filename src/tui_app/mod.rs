@@ -57,8 +57,8 @@ pub fn tui_runner(packages_manager: PackagesManager) -> AppResult<Option<String>
             tui.exit()?;
             return Ok(Some(format!(
                 "{}.{}",
-                package.name().to_string(),
-                automation.name.to_string()
+                package.name(),
+                automation.name
             )));
         }
 
