@@ -24,7 +24,9 @@ pub fn interactive_shell(
         new_path.push_str(&current_path);
     }
 
-    let status = Command::new("sh")
+    let shell = env::var("SHELL").unwrap_or("/bin/sh".to_string());  // Use /bin/sh as the default if SHELL is not set
+
+    let status = Command::new(&shell)
         .arg("-c")
         .arg(cmd)
         .env("PATH", new_path)
