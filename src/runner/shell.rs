@@ -10,6 +10,7 @@ use crate::output::print_md_debug;
 
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
+
     command: String,
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(packages_manager);
@@ -84,8 +85,6 @@ mod linux_tests {
 
 #[cfg(target_os = "macos")]
 mod macos_tests {
-    use super::*;
-    use crate::core::{models::settings::Settings, packages_manager::PackagesManager};
 
     #[test]
     fn test_interactive_shell_macos() {

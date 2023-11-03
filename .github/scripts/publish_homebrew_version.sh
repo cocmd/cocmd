@@ -25,16 +25,16 @@ M1_SHA=$(cat target/homebrew/artifacts/cocmd-aarch64-apple-darwin.sha256 | awk -
 echo "Cloning tap repository"
 
 pushd target/homebrew
-git clone git@github.com:cocmd/homebrew-cocmd.git
+git clone git@github.com:cocmd/homebrew-tap.git
 
-pushd homebrew-cocmd
+pushd homebrew-tap
 echo "Rendering formula template"
 
 cat ../../../.github/scripts/resources/macos/formula_template.rb | sed "s/{{{VERSION}}}/$VERSION/g" | \
-  sed "s/{{{INTEL_SHA}}}/$INTEL_SHA/g" | sed "s/{{{M1_SHA}}}/$M1_SHA/g" > ./Casks/cocmd.rb
+  sed "s/{{{INTEL_SHA}}}/$INTEL_SHA/g" | sed "s/{{{M1_SHA}}}/$M1_SHA/g" > ./Formula/cocmd.rb
 
 echo "Committing version update"
-git add Casks/cocmd.rb
+git add Formula/cocmd.rb
 git commit -m "Version bump: $VERSION"
 
 echo "Pushing changes"

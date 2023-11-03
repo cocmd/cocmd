@@ -6,22 +6,10 @@ on:
 name: Continuous Integration
 
 jobs:
-  # Workaround for making Github Actions skip based on commit message `[skip ci]`
-  # Source https://gist.github.com/ybiquitous/c80f15c18319c63cae8447a3be341267
-  check_skip:
-    runs-on: ubuntu-latest
-    if: |
-      !contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[skip ci]')
-    steps:
-      - run: |
-          echo 'github.event_name: ${{ github.event_name }}'
-          echo 'github.event:'
-          echo '${{ toJson(github.event) }}'
-
   check:
     name: Check
     runs-on: ubuntu-latest
-    needs: check_skip
+
     steps:
       - uses: actions/checkout@master
       - uses: actions-rs/toolchain@v1
@@ -36,7 +24,7 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
-    needs: check_skip
+
     steps:
       - uses: actions/checkout@master
       - uses: actions-rs/toolchain@v1
@@ -54,7 +42,7 @@ jobs:
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
-    needs: check_skip
+
     steps:
       - uses: actions/checkout@master
       - uses: actions-rs/toolchain@v1
@@ -72,7 +60,7 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
-    needs: check_skip
+
     steps:
       - uses: actions/checkout@master
       - uses: actions-rs/toolchain@v1
