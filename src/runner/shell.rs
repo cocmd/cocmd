@@ -16,7 +16,7 @@ pub fn interactive_shell(
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(&packages_manager);
 
-    let mut cmd = "set -e\n".to_string() + command.as_str();
+    let cmd = "set -e\n".to_string() + command.as_str();
 
     // Get the current PATH and add a directory to it
     let mut new_path = paths_to_add.join(":");
