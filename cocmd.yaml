@@ -38,7 +38,10 @@ automations:
             #!/bin/bash
 
             # Run cargo clippy, cargo fix, and cargo fmt
-            cargo clippy --all-features -- -D warnings && cargo fix --allow-dirty && cargo fmt --all
+            cargo clippy --fix && \
+            cargo clippy && \
+              cargo fix --allow-dirty && \ 
+              cargo fmt --all 
 
             # Check if there are any changes
             if git diff --quiet; then
