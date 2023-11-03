@@ -9,15 +9,9 @@ use crate::core::utils::sys::OS;
 use crate::output::print_md_debug;
 
 pub fn interactive_shell(
-    packages_manager: &mut PackagesManager,
+                packages_manager: &mut PackagesManager,
 
     command: String,
-
-
-
-
-
-    
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(packages_manager);
 
