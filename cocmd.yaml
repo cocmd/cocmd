@@ -49,7 +49,7 @@ automations:
             else
                 # Automatically commit and push the changes
                 git add .
-                git commit -m "Auto-fix with cargo clippy and cargo fmt"
+                git commit -am "Auto-fix rust code"
             fi
             EOF
 
