@@ -48,7 +48,7 @@ Thank you for the inspiration and the great work!
 - Espanso - https://espanso.org/
 - Spotify-UI! - https://github.com/Rigellute/spotify-tui
 
-Useuful stuff:
+Usefull Links:
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
 - https://github.com/pvolok/mprocs#npm-linux-macos-windows
 
