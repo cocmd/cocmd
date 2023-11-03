@@ -191,11 +191,11 @@ impl Package {
 
         if !self.paths(false).is_empty() {
             output += &format!("## PATH additions ({})\n", self.get_paths_count());
-            for (rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
+            for (_rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
                 // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
                 // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
 
-                output += &format!("{}", abs_p);
+                output += &abs_p.to_string();
 
                 if !exists(abs_p) {
                     output += " (not exists)";
