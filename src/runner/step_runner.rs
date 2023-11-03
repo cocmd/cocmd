@@ -1,6 +1,6 @@
 use std::collections::HashMap;
+use std::process;
 use std::process::Command;
-use std::{process};
 
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;

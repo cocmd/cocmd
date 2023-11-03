@@ -30,10 +30,7 @@ pub struct App {
 impl App {
     /// Constructs a new instance of [`App`].
     pub fn new(packages_manager: PackagesManager) -> Self {
-        let items = packages_manager
-            .packages
-            .values().cloned()
-            .collect();
+        let items = packages_manager.packages.values().cloned().collect();
         Self {
             focus: AppFocus::Packages,
             running: true,
@@ -83,7 +80,8 @@ impl App {
             .as_ref()
             .unwrap()
             .steps
-            .iter().cloned()
+            .iter()
+            .cloned()
             .collect();
 
         self.steps_list = StatefulList::with_items(steps);

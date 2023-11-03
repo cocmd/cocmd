@@ -1,14 +1,11 @@
-
+use std::env;
 use std::process::Command;
-use std::{env};
 
 use anyhow::Result;
 
-
-
+use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::packages::get_all_paths;
 use crate::core::utils::sys::OS;
-use crate::core::{packages_manager::PackagesManager};
 use crate::output::print_md_debug;
 
 pub fn interactive_shell(
@@ -85,9 +82,6 @@ mod linux_tests {
 
 #[cfg(target_os = "macos")]
 mod macos_tests {
-    
-
-    
 
     #[test]
     fn test_interactive_shell_macos() {

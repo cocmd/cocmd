@@ -1,4 +1,4 @@
-use ratatui::widgets::{*};
+use ratatui::widgets::*;
 use ratatui::{
     backend::Backend,
     layout::Alignment,

@@ -20,7 +20,7 @@ use cmd::setup::run_setup;
 use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use dialoguer::{Confirm, MultiSelect};
-use tracing::{info};
+use tracing::info;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
