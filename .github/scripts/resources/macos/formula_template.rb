@@ -15,6 +15,4 @@ class Cocmd < Formula
   def install
     bin.install "cocmd"
   end
-
-  zap trash: "~/Library/Caches/cocmd"
 end
