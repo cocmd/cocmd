@@ -12,6 +12,12 @@ pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
 
     command: String,
+
+
+
+
+
+    
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(packages_manager);
 
