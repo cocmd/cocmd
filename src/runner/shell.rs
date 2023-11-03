@@ -47,6 +47,7 @@ pub fn interactive_shell(
 #[cfg(target_os = "windows")]
 mod windows_tests {
     use super::*;
+    use crate::core::{models::settings::Settings, packages_manager::PackagesManager};
 
     #[test]
     fn test_interactive_shell_windows() {
@@ -65,6 +66,7 @@ mod windows_tests {
 #[cfg(target_os = "linux")]
 mod linux_tests {
     use super::*;
+    use crate::core::{models::settings::Settings, packages_manager::PackagesManager};
 
     #[test]
     fn test_interactive_shell_linux() {
