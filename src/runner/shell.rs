@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 use std::env;
 use std::process::Command;
 
@@ -85,7 +86,8 @@ mod linux_tests {
 
 #[cfg(target_os = "macos")]
 mod macos_tests {
-
+    use super::*;
+    use crate::core::{models::settings::Settings, packages_manager::PackagesManager};
     #[test]
     fn test_interactive_shell_macos() {
         let settings = Settings::new(None, None);
