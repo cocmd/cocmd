@@ -68,7 +68,7 @@ pub fn handle_step(
                 // if yes, download the package
                 if let Err(_err) = interactive_shell(
                     packages_manager,
-                    format!("cocmd install {}", &provider_name),
+                    format!("cocmd --no-verbose install {}", &provider_name),
                 ) {
                     return false;
                 }
