@@ -84,8 +84,6 @@ mod linux_tests {
 
 #[cfg(target_os = "macos")]
 mod macos_tests {
-    
-    
 
     #[test]
     fn test_interactive_shell_macos() {

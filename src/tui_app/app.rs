@@ -75,11 +75,7 @@ impl App {
             .get(self.automations_list.state.selected().unwrap())
             .unwrap();
 
-        let steps = selected_automation
-            .content
-            .as_ref()
-            .unwrap()
-            .steps.to_vec();
+        let steps = selected_automation.content.as_ref().unwrap().steps.to_vec();
 
         self.steps_list = StatefulList::with_items(steps);
     }
