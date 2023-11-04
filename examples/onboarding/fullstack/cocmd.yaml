@@ -1,0 +1,66 @@
+name: fullstack
+automations:
+  - name: onboarding
+    content:
+      description: "onboarding for project https://github.com/JKHeadley/appy"
+      env: osx
+      steps:
+        - title: install git
+          runner: cocmd
+          content: git.setup
+        - title: install node
+          runner: cocmd
+          content: node.setup
+        - title: install docker
+          runner: cocmd
+          content: docker.setup
+        - title: clone project
+          runner: shell
+          content: |
+            mkdir -p ~/workspace
+            cd  ~/workspace
+            # check it doesn't exist
+            if [ -d appy ]; then
+              echo "appy project already exists"
+            else
+              echo "appy doesn't exist"
+              git clone git@github.com:JKHeadley/appy.git
+            fi
+        - title: start docker
+          runner: cocmd
+          content: docker.start
+
+        - title: edit the env file
+          runner: shell
+          content: |
+            cd ~/workspace/appy
+            cp ./backend/.env-docker-sample ./backend/.env-docker
+            
+            # ask if you want to edit the env file, if yes open it with vi 
+            read -p "Do you want to edit the env file? (y/n)" -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]
+            then
+              vi ./backend/.env-docker
+            fi
+
+        - title: seed the data
+          runner: shell
+          content: |
+            cd ~/workspace/appy
+            source ./backend/.env-docker
+            export SERVER_PORT=${SERVER_PORT}
+            docker-compose build && docker-compose run --rm api npm run seed
+
+        - title: run docker-compose
+          runner: shell
+          content: |
+            cd ~/workspace/appy
+            source ./backend/.env-docker
+            export SERVER_PORT=${SERVER_PORT}
+            docker-compose up --build -d
+        
+        - title: open swagger
+          runner: link
+          content: http://localhost:8080
+        

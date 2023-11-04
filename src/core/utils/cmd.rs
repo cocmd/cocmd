@@ -9,7 +9,7 @@ use std::collections::HashMap;
 pub fn parse_params(params: Option<Vec<String>>) -> HashMap<String, String> {
     let mut params_map: HashMap<String, String> = HashMap::new();
 
-    if let None = params {
+    if params.is_none() {
         return params_map;
     }
     for param in params.unwrap() {

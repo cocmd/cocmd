@@ -20,7 +20,7 @@ use cmd::setup::run_setup;
 use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use dialoguer::{Confirm, MultiSelect};
-use tracing::{error, info};
+use tracing::info;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
@@ -32,7 +32,7 @@ use crate::output::set_tracing;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.68",
+    version = "1.0.73",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -231,7 +231,7 @@ fn main() -> ExitCode {
     }
 
     // if res returned an error, print it to stderr
-    if let Err(e) = res {
+    if let Err(_e) = res {
         // error!("{}", e);
         ExitCode::from(1)
     } else {

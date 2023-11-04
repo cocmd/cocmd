@@ -30,11 +30,7 @@ pub struct App {
 impl App {
     /// Constructs a new instance of [`App`].
     pub fn new(packages_manager: PackagesManager) -> Self {
-        let items = packages_manager
-            .packages
-            .values()
-            .map(|p| p.clone())
-            .collect();
+        let items = packages_manager.packages.values().cloned().collect();
         Self {
             focus: AppFocus::Packages,
             running: true,
@@ -79,14 +75,7 @@ impl App {
             .get(self.automations_list.state.selected().unwrap())
             .unwrap();
 
-        let steps = selected_automation
-            .content
-            .as_ref()
-            .unwrap()
-            .steps
-            .iter()
-            .map(|s| s.clone())
-            .collect();
+        let steps = selected_automation.content.as_ref().unwrap().steps.to_vec();
 
         self.steps_list = StatefulList::with_items(steps);
     }

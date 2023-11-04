@@ -1,4 +1,4 @@
-cask "cocmd" do
+class Cocmd < Formula
   version "{{{VERSION}}}"
 
   if Hardware::CPU.intel?
@@ -9,11 +9,10 @@ cask "cocmd" do
     sha256 "{{{M1_SHA}}}"
   end
 
-  name "Cocmd"
   desc "Streamlined Command Line Operations for Dev Teams"
   homepage "https://cocmd.org/"
 
-  app "cocmd"
-
-  zap trash: "~/Library/Caches/cocmd"
+  def install
+    bin.install "cocmd"
+  end
 end

@@ -1,10 +1,10 @@
 use std::collections::HashMap;
+use std::process;
 use std::process::Command;
-use std::{env, process};
 
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
-use execute::shell;
+
 use regex::Regex;
 use tracing::error;
 
@@ -68,7 +68,7 @@ pub fn handle_step(
                 // if yes, download the package
                 if let Err(_err) = interactive_shell(
                     packages_manager,
-                    format!("cocmd install {}", &provider_name),
+                    format!("cocmd --no-verbose install {}", &provider_name),
                 ) {
                     return false;
                 }

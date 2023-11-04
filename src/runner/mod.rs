@@ -3,10 +3,7 @@ use std::collections::HashMap;
 use anyhow::{Error, Result};
 
 use crate::core::utils::sys::OS;
-use crate::core::{
-    models::script_model::{ScriptModel, StepRunnerType},
-    packages_manager::PackagesManager,
-};
+use crate::core::{models::script_model::ScriptModel, packages_manager::PackagesManager};
 use crate::output::print_md_debug;
 mod shell;
 mod step_runner;
@@ -29,12 +26,7 @@ pub fn run_script(
             params.clone(),
         );
         // check if step runner is executable shell/cmd/python add it
-        if step.runner == StepRunnerType::SHELL
-            || step.runner == StepRunnerType::COCMD
-            || step.runner == StepRunnerType::PYTHON
-        {
-            step_statuses.push((step.title.clone(), success));
-        }
+        step_statuses.push((step.title.clone(), success));
     }
 
     print_md_debug(&format!(

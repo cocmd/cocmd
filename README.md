@@ -16,38 +16,7 @@
 
 # Getting Started
 
-## Installation
-
-### Step 1 - Install CoCMD
-* MacOs - 
-Best way to install is with brew:
-```shell
-brew tap cocmd/cocmd
-brew install cocmd
-```
-
-* Linux - not supported yet
-* Windows - not supported yet
-
-### Step 2 - Add CoCMD to your shell
-
-Run in terminal:
-```shell
-cocmd setup zsh
-or 
-cocmd setup bash
-```
-
-what this does is adding a loader of all aliases and automations shortcuts to your shell and lets you call any of them directly.
-
-## Add Packages
-
-You can start right away with `cocmd install`.
-See all packages options in [Hub](https://cocmd.org/docs/packages/from_hub).
-
-If you want to create your own read [Here](https://cocmd.org/docs/packages/package-specification)
-
-
+For installation and first step instructions, visit our [docs](https://cocmd.org/docs/intro)
 
 # Showcase
 
@@ -79,7 +48,7 @@ Thank you for the inspiration and the great work!
 - Espanso - https://espanso.org/
 - Spotify-UI! - https://github.com/Rigellute/spotify-tui
 
-Useuful stuff:
+Usefull Links:
 - https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
 - https://github.com/pvolok/mprocs#npm-linux-macos-windows
 

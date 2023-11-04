@@ -1,0 +1,99 @@
+name: cocmd
+automations:
+  - name: contrib-onboarding
+    content:
+      description: "onboarding for project https://github.com/JKHeadley/appy"
+      env: osx
+      steps:
+        - title: install git
+          runner: cocmd
+          content: git.setup
+        - title: install rust
+          runner: cocmd 
+          content: rust.setup 
+        - title: install node
+          runner: cocmd
+          content: node.setup
+        - title: git clones
+          runner: shell
+          content: |
+            mkdir -p cocmd-project
+            cd cocmd-project
+            for name in homebrew-tap cocmd website hub example-repo-template; do
+              repo="git@github.com:cocmd/$name.git"
+              echo "cloning $name"
+              if [ -d ./$name ]; then
+                echo "$name project already exists"
+              else
+                echo "$repo doesn't exist"
+                git clone $repo
+              fi
+            done
+
+        - title: add git hooks
+          description: pre-commit and pre-push hooks for rust fmt and clippy
+          runner: shell
+          content: |
+            cd cocmd-project/cocmd
+            touch .git/hooks/pre-commit
+            chmod +x .git/hooks/pre-commit
+
+            cat << 'EOF' > .git/hooks/pre-commit
+            #!/bin/bash
+            cargo clippy --fix --allow-dirty
+            cargo fmt
+            cargo fix --allow-dirty 
+
+            # Add any changes made by the formatting commands
+            git add .
+            EOF
+
+            echo "pre-push hook added"
+            cat .git/hooks/pre-commit
+
+
+            touch .git/hooks/pre-push
+            chmod +x .git/hooks/pre-push
+            
+            cat << 'EOF' > .git/hooks/pre-push
+            #!/bin/bash
+            cargo clippy
+            EOF
+
+            echo "pre-push hook added"
+            cat .git/hooks/pre-push
+
+        - title: run website
+          runner: shell
+          content: |
+            cd cocmd-project/website
+            yarn install
+            
+            echo "website ready to run - yarn start"
+        - title: add 
+          runner: shell
+          content: |
+            cd cocmd-project/website
+            
+        - title: build cli
+          runner: shell
+          content: |
+            cd cocmd-project/cocmd
+            cargo build
+            cargo test
+            cargo run -- --version
+
+        - title: open IDEs
+          runner: shell
+          approval_message: To open the code with VSCode?
+          content: |
+            # check if vscode not installed
+            if ! command -v code &> /dev/null
+            then
+                echo "vscode could not be found. installing..."
+                cocmd --no-verbose run vscode.setup
+            fi
+            
+            code cocmd-project
+            
+            
