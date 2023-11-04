@@ -27,7 +27,7 @@ use tui_app::tui_runner;
 pub(crate) use crate::core::models::settings::Settings;
 use crate::core::packages_manager::PackagesManager;
 use crate::output::print_md;
-use crate::output::set_tracing;
+use crate::output::set_logging_level;
 
 /// Main CLI struct with meta-information
 #[derive(Parser)]
@@ -138,9 +138,9 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
 
     if let Commands::Install { .. } = cli.command {
-        set_tracing(false);
+        set_logging_level(false);
     } else {
-        set_tracing(!cli.no_verbose);
+        set_logging_level(!cli.no_verbose);
     }
 
     let settings = Settings::new(None, None);
