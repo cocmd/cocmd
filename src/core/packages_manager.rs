@@ -65,11 +65,6 @@ impl PackagesManager {
         }
     }
 
-    fn save_packages(packages_file: &str, packages: &HashMap<String, Package>) {
-        let package_strings: Vec<String> = packages.values().map(|s| s.uri.to_string()).collect();
-        let _ = file_write_lines(packages_file, &package_strings);
-    }
-
     fn load_packages(packages_file: &str, settings: &Settings) -> HashMap<String, Package> {
         match file_read_lines(packages_file) {
             Ok(lines) => {
