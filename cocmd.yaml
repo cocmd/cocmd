@@ -5,6 +5,23 @@ automations:
       description: "onboarding for project https://github.com/JKHeadley/appy"
       env: osx
       steps:
+        - title: hello message
+          runner: markdown
+          content: |
+                                   __
+            _______  ______ _  ___/ /
+            / __/ _ \/ __/  ' \/ _  / 
+            \__/\___/\__/_/_/_/\_,_/  
+                                      
+            ## Welcome to Cocmd Contributor onboarding 🎉🎉🎉
+            
+            This is a guide to getting started with cocmd development.
+
+        - title: ready?
+          runner: shell
+          approval_message: Ready to start?
+          content: echo lets start
+            
         - title: install git
           runner: cocmd
           content: git.setup
@@ -83,6 +100,7 @@ automations:
             cargo test
             cargo run -- --version
 
+        
         - title: open IDEs
           runner: shell
           approval_message: To open the code with VSCode?
@@ -95,5 +113,20 @@ automations:
             fi
             
             code cocmd-project
+
+        - title: final message
+          runner: markdown
+          content: |
+            ## All done!
+            You're all set up to contribute to cocmd. 
+            ### How can you help?
+              - [Add an Idea 💡💡💡 for a new playbook](https://github.com/cocmd/hub/issues/new)
+              - [Code with us - 🔥features / 🔥bugs](https://github.com/cocmd/cocmd/contribute)
+              - [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
+            Thank you for your help! 🙏🙏🙏
+
+            Join us on [Discord](https://discord.gg/PzaBZade)
+
+        
             
             
