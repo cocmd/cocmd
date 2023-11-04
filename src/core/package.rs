@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use tracing::{error, warn};
+use log::{error, warn};
 
 use super::utils::io::exists;
 use crate::core::consts;
@@ -59,10 +59,6 @@ impl Package {
             )
         }
         package
-    }
-
-    pub fn is_exists_locally(&self) -> bool {
-        self.location.exists()
     }
 
     pub fn is_legit_cocmd_package(&self) -> bool {

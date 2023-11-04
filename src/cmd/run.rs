@@ -2,7 +2,7 @@ use std::process;
 
 use anyhow::{Error, Result};
 use dialoguer::{theme::ColorfulTheme, Select};
-use tracing::error;
+use log::error;
 
 use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::cmd::parse_params;

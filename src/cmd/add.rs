@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Error, Result};
 use console::Style;
 use dialoguer::Confirm;
-use tracing::info;
+use log::info;
 
 use crate::core::package::Package;
 use crate::core::packages_manager::PackagesManager;

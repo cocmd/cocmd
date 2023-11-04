@@ -21,11 +21,8 @@ use std::io::{copy, Cursor};
 use std::path::Path;
 
 use anyhow::{bail, Context, Result};
+use log::info;
 use sha2::{Digest, Sha256};
-use tracing::info;
-pub fn download_and_extract_zip(url: &str, dest_dir: &Path) -> Result<()> {
-    download_and_extract_zip_verify_sha256(url, dest_dir, None)
-}
 
 pub fn download_and_extract_zip_verify_sha256(
     url: &str,
@@ -45,12 +42,6 @@ pub fn download_and_extract_zip_verify_sha256(
 pub fn read_string_from_url(url: &str) -> Result<String> {
     let buffer = download(url)?;
     let text = String::from_utf8(buffer)?;
-    Ok(text)
-}
-
-pub fn read_json_from_url(url: &str) -> Result<String> {
-    let response = reqwest::blocking::get(url)?;
-    let text = response.json()?;
     Ok(text)
 }
 

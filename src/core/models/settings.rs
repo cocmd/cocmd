@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs::{self, OpenOptions};
 use std::path::{Path, PathBuf};
 
-use tracing::error;
+use log::error;
 
 use crate::core::utils::io::from_yaml_file;
 use crate::core::utils::sys::get_os;
