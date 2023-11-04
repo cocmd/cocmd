@@ -5,19 +5,24 @@ automations:
       description: "onboarding for project https://github.com/JKHeadley/appy"
       env: osx
       steps:
-        - title: hello message
+        - title: Hello 👋👋👋
           runner: markdown
           content: |
-                                   __
-            _______  ______ _  ___/ /
-            / __/ _ \/ __/  ' \/ _  / 
-            \__/\___/\__/_/_/_/\_,_/  
-                                      
             ## Welcome to Cocmd Contributor onboarding 🎉🎉🎉
             
             This is a guide to getting started with cocmd development.
+            This will install all the tools you need to get started.
 
-        - title: ready?
+            it's going to:
+            - install git
+            - install rust
+            - install node
+            - clone all Cocmd repos
+            - build the website
+            - build cocmd cli
+            - open vscode with all the repos
+
+        - title: lets start
           runner: shell
           approval_message: Ready to start?
           content: echo lets start
