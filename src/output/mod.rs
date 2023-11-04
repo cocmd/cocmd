@@ -10,7 +10,7 @@ pub fn set_logging_level(verbose: bool) {
     // Set the desired log level using the env_logger crate or any other method.
     env_logger::builder()
         .filter_level(level.to_level_filter())
-        .init();
+        .try_init();
 
     // Update the global log level variable.
     unsafe {
@@ -40,11 +40,10 @@ mod tests {
 
     #[test]
     fn test_set_logging_level() {
-        // test that the global variable is set correctly
-        set_logging_level(true);
-        assert_eq!(unsafe { LOG_LEVEL }, Level::Debug);
-
         set_logging_level(false);
         assert_eq!(unsafe { LOG_LEVEL }, Level::Info);
+
+        set_logging_level(true);
+        assert_eq!(unsafe { LOG_LEVEL }, Level::Debug);
     }
 }
