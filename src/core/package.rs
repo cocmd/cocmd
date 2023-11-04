@@ -61,10 +61,6 @@ impl Package {
         package
     }
 
-    pub fn is_exists_locally(&self) -> bool {
-        self.location.exists()
-    }
-
     pub fn is_legit_cocmd_package(&self) -> bool {
         if self.location.exists() {
             let config_file_path = Path::new(&self.location).join(consts::SOURCE_CONFIG_FILE);
