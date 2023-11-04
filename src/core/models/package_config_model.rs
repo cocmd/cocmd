@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-use serde_derive::{Deserialize as De, Serialize as Se};
 use log::error;
+use serde_derive::{Deserialize as De, Serialize as Se};
 
 use super::script_model::{ScriptModel, StepModel};
 use crate::core::utils::io::{from_file, from_yaml_file, normalize_path};

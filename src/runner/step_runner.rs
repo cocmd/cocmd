@@ -5,8 +5,8 @@ use std::process::Command;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 
-use regex::Regex;
 use log::error;
+use regex::Regex;
 
 use super::shell::interactive_shell;
 use crate::core::models::script_model::StepParamModel;

@@ -23,8 +23,8 @@ use std::{
 };
 
 use anyhow::{anyhow, Context, Result};
-use serde::{Deserialize, Serialize};
 use log::info;
+use serde::{Deserialize, Serialize};
 
 use super::PackageProvider;
 use super::{

@@ -21,8 +21,8 @@ use std::io::{copy, Cursor};
 use std::path::Path;
 
 use anyhow::{bail, Context, Result};
-use sha2::{Digest, Sha256};
 use log::info;
+use sha2::{Digest, Sha256};
 pub fn download_and_extract_zip(url: &str, dest_dir: &Path) -> Result<()> {
     download_and_extract_zip_verify_sha256(url, dest_dir, None)
 }
