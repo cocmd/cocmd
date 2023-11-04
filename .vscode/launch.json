@@ -20,7 +20,8 @@
                 }
             },
             "args": [
-                "install"
+                "install",
+                "docker"
             ],
             "cwd": "${workspaceFolder}"
         },

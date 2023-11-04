@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
+use log::error;
 use serde_derive::{Deserialize as De, Serialize as Se};
-use tracing::error;
 
 use super::script_model::{ScriptModel, StepModel};
 use crate::core::utils::io::{from_file, from_yaml_file, normalize_path};
@@ -37,7 +37,7 @@ impl Automation {
                                     }
                                     Err(err) => {
                                         // Handle the error if needed
-                                        error!(err);
+                                        error!("{}", err);
                                         step.clone() // Return the original step on error
                                     }
                                 }
@@ -54,7 +54,7 @@ impl Automation {
                 }
                 Err(err) => {
                     // Handle the error if needed
-                    error!(err);
+                    error!("{}", err);
                 }
             }
         }
