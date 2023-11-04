@@ -1,24 +1,17 @@
+use log::{Level, LevelFilter};
 use termimad::MadSkin;
 
-use tracing::metadata::LevelFilter;
-use tracing::Level;
-use tracing_subscriber::prelude::*;
-
 // Global variable to store the log level.
-static mut LOG_LEVEL: Level = Level::INFO; // Initialize with a default level.
+static mut LOG_LEVEL: Level = Level::Info; // Initialize with a default level.
 
-pub fn set_tracing(verbose: bool) {
-    let level = if verbose { Level::DEBUG } else { Level::INFO };
+pub fn set_logging_level(verbose: bool) {
+    let level = if verbose { Level::Debug } else { Level::Info };
 
     // Set the desired log level using the env_logger crate or any other method.
-    std::env::set_var("RUST_LOG", level.to_string()); // Change "info" to your desired level.
+    env_logger::builder()
+        .filter_level(level.to_level_filter())
+        .try_init();
 
-    // Initialize the tracing subscriber with the configured level.
-    let subscriber = tracing_subscriber::FmtSubscriber::builder()
-        .with_max_level(Level::TRACE) // This sets the maximum level.
-        .finish();
-
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     // Update the global log level variable.
     unsafe {
         LOG_LEVEL = level; // Set it to your desired level.
@@ -34,7 +27,23 @@ pub fn print_md(markdown: &String) {
 pub fn print_md_debug(markdown: &String) {
     // get tracking log level and if it's DEBUG than print the markdown
 
-    if unsafe { LOG_LEVEL } == LevelFilter::DEBUG {
+    if unsafe { LOG_LEVEL } == LevelFilter::Debug {
         print_md(markdown);
+    }
+}
+
+// write a test for set_logging_level function. call it with different values and check if the global variable is set correctly and that env_logger level is correct
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_set_logging_level() {
+        set_logging_level(false);
+        assert_eq!(unsafe { LOG_LEVEL }, Level::Info);
+
+        set_logging_level(true);
+        assert_eq!(unsafe { LOG_LEVEL }, Level::Debug);
     }
 }

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -34,28 +35,6 @@ pub fn normalize_path(relative_path: &str, base_path: &PathBuf) -> String {
 
 pub fn exists(path: &str) -> bool {
     Path::new(path).exists()
-}
-
-/// Creates a directory and its parents if necessary.
-///
-/// # Arguments
-///
-/// - `dir`: The directory path to create.
-pub fn mkdir(dir: &str) {
-    if fs::create_dir_all(dir).is_err() {
-        eprintln!("Failed to create directory: {}", dir);
-    }
-}
-
-/// Creates an empty file.
-///
-/// # Arguments
-///
-/// - `file`: The file path to create.
-pub fn touch(file: &str) {
-    if fs::File::create(file).is_err() {
-        eprintln!("Failed to create file: {}", file);
-    }
 }
 
 /// Reads lines from a file into a `Vec<String>`.
@@ -112,15 +91,6 @@ pub fn get_tmp_file() -> Result<std::fs::File, std::io::Error> {
     let mut tmp_file = tmp_dir.clone();
     tmp_file.push("tempfile"); // You can specify the filename here
     fs::File::create(tmp_file)
-}
-
-/// Gets the path to the system's temporary directory.
-///
-/// # Returns
-///
-/// The path to the temporary directory as a `PathBuf`.
-pub fn get_tmp() -> PathBuf {
-    std::env::temp_dir()
 }
 
 // Function to serialize a value to YAML and write it to a file

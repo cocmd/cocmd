@@ -1,6 +1,5 @@
 #![allow(unused_must_use)]
 #![allow(clippy::missing_const_for_fn)]
-
 pub(crate) mod cmd;
 pub(crate) mod core;
 pub(crate) mod output;
@@ -19,20 +18,22 @@ use cmd::setup::run_setup;
 #[cfg(feature = "howto")]
 use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
+use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
-use tracing::info;
+
+use log::info;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
 use crate::core::packages_manager::PackagesManager;
 use crate::output::print_md;
-use crate::output::set_tracing;
+use crate::output::set_logging_level;
 
 /// Main CLI struct with meta-information
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.73",
+    version = "1.0.74",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -92,6 +93,11 @@ enum Commands {
         dont_ask: bool,
     },
 
+    /// Uninstall command with a package name argument - Uninstalls a specific package
+    Uninstall {
+        /// Name argument for 'uninstall' - Specifies the name of the package to uninstall
+        name: String,
+    },
     /// Remove command (no subcommands) - Removes something (add a description here)
     Remove,
 
@@ -132,9 +138,9 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
 
     if let Commands::Install { .. } = cli.command {
-        set_tracing(false);
+        set_logging_level(false);
     } else {
-        set_tracing(!cli.no_verbose);
+        set_logging_level(!cli.no_verbose);
     }
 
     let settings = Settings::new(None, None);
@@ -159,6 +165,9 @@ fn main() -> ExitCode {
         }
         Commands::Setup(args) => {
             res = run_setup(&mut packages_manager, args.shell);
+        }
+        Commands::Uninstall { name } => {
+            res = uninstall_package(&mut packages_manager, &name);
         }
         Commands::ProfileLoader => {
             res = run_profile_loader(&mut packages_manager);

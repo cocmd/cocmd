@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with cocmd.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+#![allow(dead_code)]
 use std::{path::Path, path::PathBuf, process::Command};
 
 use anyhow::{bail, Context, Result};

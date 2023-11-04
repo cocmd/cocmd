@@ -2,7 +2,7 @@ use std::path::Path;
 
 use anyhow::{bail, Result};
 use dialoguer::{theme::ColorfulTheme, Select};
-use tracing::{error, info};
+use log::{error, info};
 
 use crate::core::packages_manager::PackagesManager;
 // add to bashrc or zshrc the following line if not exists
