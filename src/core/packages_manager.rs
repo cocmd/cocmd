@@ -26,9 +26,22 @@ impl PackagesManager {
         }
     }
 
-    pub fn remove_package(&mut self, package: Package) {
-        self.packages.remove(package.uri.as_str());
-        self.save();
+    pub fn remove_package(&mut self, package_name: &str) -> Result<(), String> {
+        // Find the package URI by package name
+        let package_uri = self.packages.iter()
+            .find(|(_uri, pkg)| pkg.name() == package_name)
+            .map(|(uri, _pkg)| uri.clone());
+
+        if let Some(uri) = package_uri {
+            // Remove the package from the HashMap using the URI
+            self.packages.remove(&uri);
+                       // Update the packages.txt file
+            self.save().map_err(|e| {
+                format!("Failed to update packages file: {}", e)
+            })
+        } else {
+            Err(format!("Package '{}' not found.", package_name))
+        }
     }
 
     pub fn add_package(&mut self, package: Package) {
@@ -36,13 +49,20 @@ impl PackagesManager {
         self.save();
     }
 
-    pub fn save(&self) {
-        Self::save_packages(&self.packages_file, &self.packages);
-    }
+    pub fn save(&self) -> Result<(), String> {
+        // Convert the HashMap into a Vec of package URIs
+        let package_strings: Vec<String> = self.packages.values().map(|s| s.uri.to_string()).collect();
 
-    fn save_packages(packages_file: &str, packages: &HashMap<String, Package>) {
-        let package_strings: Vec<String> = packages.values().map(|s| s.uri.to_string()).collect();
-        let _ = file_write_lines(packages_file, &package_strings);
+        // Write the updated list of packages back to the packages.txt file
+        match file_write_lines(&self.packages_file, &package_strings) {
+            Ok(_) => {
+                Ok(())
+            },
+            Err(e) => {
+                tracing::error!("Failed to write to packages file: {}", e);
+                Err(format!("Failed to write to packages file: {}", e))
+            },
+        }
     }
 
     fn load_packages(packages_file: &str, settings: &Settings) -> HashMap<String, Package> {

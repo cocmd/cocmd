@@ -15,6 +15,7 @@ use cmd::add;
 use cmd::docs::run_docs;
 use cmd::profile_loader::run_profile_loader;
 use cmd::run::run_automation;
+use cmd::uninstall::uninstall_package;
 use cmd::setup::run_setup;
 #[cfg(feature = "howto")]
 use cmd::show::howto;
@@ -92,6 +93,11 @@ enum Commands {
         dont_ask: bool,
     },
 
+   /// Uninstall command with a package name argument - Uninstalls a specific package
+   Uninstall {
+    /// Name argument for 'uninstall' - Specifies the name of the package to uninstall
+    name: String,
+    },
     /// Remove command (no subcommands) - Removes something (add a description here)
     Remove,
 
@@ -160,6 +166,9 @@ fn main() -> ExitCode {
         Commands::Setup(args) => {
             res = run_setup(&mut packages_manager, args.shell);
         }
+        Commands::Uninstall { name } => {
+            res = uninstall_package(&mut packages_manager, &name);
+        },
         Commands::ProfileLoader => {
             res = run_profile_loader(&mut packages_manager);
         }
