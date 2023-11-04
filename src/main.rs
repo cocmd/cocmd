@@ -1,6 +1,5 @@
 #![allow(unused_must_use)]
 #![allow(clippy::missing_const_for_fn)]
-
 pub(crate) mod cmd;
 pub(crate) mod core;
 pub(crate) mod output;
@@ -21,7 +20,8 @@ use cmd::setup::run_setup;
 use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use dialoguer::{Confirm, MultiSelect};
-use tracing::info;
+
+use log::info;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;

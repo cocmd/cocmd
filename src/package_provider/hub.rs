@@ -24,7 +24,7 @@ use std::{
 
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
-use tracing::info;
+use log::info;
 
 use super::PackageProvider;
 use super::{

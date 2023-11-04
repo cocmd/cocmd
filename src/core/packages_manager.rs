@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use tracing::error;
+use log::error;
 
 use crate::core::models::package_config_model::Automation;
 use crate::core::package::Package;

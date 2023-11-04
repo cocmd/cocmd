@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use tracing::{error, warn};
+use log::{error, warn};
 
 use super::utils::io::exists;
 use crate::core::consts;
