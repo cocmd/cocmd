@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea to make Cocmd better
-title: ''
+title: 'feature: '
 labels: ''
 assignees: ''
 
@@ -9,7 +9,7 @@ assignees: ''
 
 **Description**
 
-**tests**
+**Tests**
 
 **Docs**
 

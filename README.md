@@ -10,7 +10,7 @@
 [![Crates.io](https://img.shields.io/crates/v/cocmd.svg)](https://crates.io/crates/cocmd)
 ![](https://img.shields.io/github/v/release/cocmd/cocmd)
 
-![Discord Channel](https://dcbadge.vercel.app/api/server/hKFKTaMKkq/)
+[![Discord Channel](https://dcbadge.vercel.app/api/server/hKFKTaMKkq/)](https://discord.gg/kPZBDKbk)
 
 ![alt text](media/cocmd1.png)
 

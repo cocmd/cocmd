@@ -6,12 +6,35 @@ use log::error;
 
 use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::cmd::parse_params;
+use crate::package_provider::get_provider;
 use crate::runner::run_script;
+
 pub fn run_automation(
     packages_manager: &mut PackagesManager,
     specific_name: Option<String>,
     params: Option<Vec<String>>,
+    from: Option<String>,
 ) -> Result<()> {
+    let mut limit_path = Option::<String>::None;
+
+    if let Some(from) = from {
+        let provider =
+            get_provider(&from.to_string(), &packages_manager.settings.runtime_dir).unwrap();
+        let localpath = provider.local_path();
+        if !provider.is_exists_locally() {
+            provider.download().unwrap();
+        }
+
+        limit_path = provider.local_path().to_str().map(|s| s.to_string());
+    }
+
+    // we need to reload packages manager for limited path if provided
+    let packages_manager: &mut PackagesManager = if limit_path.is_some() {
+        &mut PackagesManager::new(packages_manager.settings.clone(), limit_path)
+    } else {
+        packages_manager
+    };
+
     let available_automations = packages_manager.automations();
 
     let selected_name = match specific_name {
