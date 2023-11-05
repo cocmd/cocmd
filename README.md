@@ -43,6 +43,7 @@ Contribution guide can be found [here](https://cocmd.org/docs/contribute)
 - [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
 
 
+
 ## License
 Cocmd was created by [Moshe Roth](https://www.linkedin.com/in/mosherot/)
 and is licensed under the [GPL-3.0 license](/LICENSE).
