@@ -147,7 +147,7 @@ fn main() -> ExitCode {
     }
 
     let settings = Settings::new(None, None);
-    let mut packages_manager = PackagesManager::new(settings, None);
+    let mut packages_manager = PackagesManager::new(settings);
 
     let mut res: Result<(), Error> = Ok(());
 

@@ -4,10 +4,9 @@ use anyhow::{Error, Result};
 use dialoguer::{theme::ColorfulTheme, Select};
 use log::error;
 
-use crate::core::packages_manager::{self, PackagesManager};
+use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::cmd::parse_params;
-use crate::package_provider::get_provider;
-use crate::runner::run_script;
+use crate::runner::{run_script, shell::interactive_shell};
 
 pub fn run_automation(
     packages_manager: &mut PackagesManager,
@@ -15,30 +14,24 @@ pub fn run_automation(
     params: Option<Vec<String>>,
     from: Option<String>,
 ) -> Result<()> {
-    let mut packages_manager = packages_manager;
-    let mut limit_path = Option::<String>::None;
+    let packages_manager = packages_manager;
+    let _limit_path = Option::<String>::None;
 
-    if let Some(from) = from {
-        let provider =
-            get_provider(&from.to_string(), &packages_manager.settings.runtime_dir).unwrap();
-        if !provider.is_exists_locally() {
-            provider.download().unwrap();
+    if let Some(from) = &from {
+        if let Err(_err) = interactive_shell(
+            packages_manager,
+            format!("cocmd --no-verbose install {}", &from.as_str()),
+        ) {
+            return Err(Error::msg("Unable to install the package"));
         }
-
-        limit_path = provider.local_path().to_str().map(|s| s.to_string());
-    }
-
-    let mut new_packages_manager;
-
-    if limit_path.is_some() {
-        new_packages_manager = packages_manager::PackagesManager::new(
-            packages_manager.settings.clone(),
-            limit_path.clone(),
-        );
-        packages_manager = &mut new_packages_manager;
     }
 
     let available_automations = packages_manager.automations();
+
+    if available_automations.is_empty() {
+        error!("No automations found");
+        return Err(Error::msg("No automations found"));
+    }
 
     let selected_name = match specific_name {
         Some(name) => name,
@@ -51,7 +44,7 @@ pub fn run_automation(
                 .interact_opt()
                 .unwrap_or_else(|_e| {
                     error!("No script selected.");
-                    process::exit(1)
+                    process::exit(1);
                 });
 
             script_choices[selected_script.unwrap()].to_string()

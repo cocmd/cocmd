@@ -81,7 +81,7 @@ pub fn handle_step(
         }
         StepRunnerType::MARKDOWN => {
             // Print Markdown content
-            print_md(&content.to_string());
+            print_md(content);
         }
         StepRunnerType::PYTHON => {
             // Execute Python script
@@ -100,7 +100,7 @@ pub fn handle_step(
                 // print_md_debug(&"## ✅ Success".to_string());
                 return true;
             } else {
-                print_md_debug(&"## ❌ Failed (stderr):\n".to_string());
+                print_md_debug("## ❌ Failed (stderr):\n");
                 return false;
             }
         }

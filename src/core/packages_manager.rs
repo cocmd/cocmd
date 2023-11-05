@@ -16,9 +16,9 @@ pub struct PackagesManager {
 }
 
 impl PackagesManager {
-    pub fn new(settings: Settings, limited_path: Option<String>) -> Self {
+    pub fn new(settings: Settings) -> Self {
         let packages_file = settings.packages_file.clone();
-        let packages = Self::load_packages(&packages_file, &settings, limited_path);
+        let packages = Self::load_packages(&packages_file, &settings);
         Self {
             settings,
             packages_file,
@@ -65,11 +65,7 @@ impl PackagesManager {
         }
     }
 
-    fn load_packages(
-        packages_file: &str,
-        settings: &Settings,
-        limited_path: Option<String>,
-    ) -> HashMap<String, Package> {
+    fn load_packages(packages_file: &str, settings: &Settings) -> HashMap<String, Package> {
         match file_read_lines(packages_file) {
             Ok(lines) => {
                 let mut packages = HashMap::new();
@@ -80,19 +76,6 @@ impl PackagesManager {
                     if let Err(err) = provider {
                         error!("failed to get location for {} - {}", uri, err);
                         continue;
-                    }
-
-                    if let Some(limited_path) = &limited_path {
-                        if !provider
-                            .as_ref()
-                            .unwrap()
-                            .local_path()
-                            .to_str()
-                            .unwrap()
-                            .contains(limited_path)
-                        {
-                            continue;
-                        }
                     }
 
                     let package =

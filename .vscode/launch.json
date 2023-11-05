@@ -41,7 +41,9 @@
             },
             "args": [
                 "run",
-                "docker.start"
+                "cocmd.contrib-onboarding",
+                 "--from", 
+                 "https://github.com/cocmd/cocmd"
             ],
             "cwd": "${workspaceFolder}"
         },

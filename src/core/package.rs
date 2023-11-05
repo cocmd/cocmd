@@ -1,3 +1,4 @@
+#![allow(clippy::format_in_format_args)]
 use std::fmt;
 use std::fs;
 use std::path::Path;
@@ -22,7 +23,7 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn new(uri: String, location: &PathBuf, _settings: &Settings) -> Self {
+    pub fn new(uri: String, location: &Path, _settings: &Settings) -> Self {
         let mut package = Package {
             uri: uri.clone(),
             location: location.to_path_buf(),
@@ -158,7 +159,7 @@ impl Package {
             output += "| --- | --- | --- | --- |\n";
 
             for automation in &automations {
-                let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::ANY);
+                let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::Any);
                 output += &format!(
                     "| {}.{} | {} | {} | {} |\n",
                     self.name(),
@@ -275,7 +276,6 @@ impl Package {
 
 impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        println!("{:}", self.location.to_string_lossy());
         write!(f, "{}", self.location.to_string_lossy())
     }
 }

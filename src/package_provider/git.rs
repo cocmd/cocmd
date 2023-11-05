@@ -31,12 +31,12 @@ pub struct GitPackageProvider {
 }
 
 impl GitPackageProvider {
-    pub fn new(package: &String, git_parts: &GitParts, runtime_dir: &Path) -> Self {
+    pub fn new(package: &str, git_parts: &GitParts, runtime_dir: &Path) -> Self {
         // localpath is in runtime_dir with the name of the repo
         let binding = runtime_dir.join(format!("{}.{}", git_parts.author, git_parts.name));
         let local_path = binding.as_path();
         Self {
-            package: package.clone(),
+            package: package.to_string(),
             git_parts: (*git_parts).clone(),
             local_path: local_path.to_path_buf(),
         }
