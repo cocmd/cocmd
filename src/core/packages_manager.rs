@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-
+use std::fs;
 use log::error;
 
 use crate::core::models::package_config_model::Automation;
@@ -35,8 +35,14 @@ impl PackagesManager {
             .map(|(uri, _pkg)| uri.clone());
 
         if let Some(uri) = package_uri {
-            // Remove the package from the HashMap using the URI
             self.packages.remove(&uri);
+
+            let package_dir = self.settings.runtime_dir.join(package_name);
+
+            if let Err(e) = std::fs::remove_dir_all(&package_dir) {
+                return Err(format!("Failed to delete package directory: {}", e));
+            }
+
             // Update the packages.txt file
             self.save()
                 .map_err(|e| format!("Failed to update packages file: {}", e))
@@ -44,6 +50,8 @@ impl PackagesManager {
             Err(format!("Package '{}' not found.", package_name))
         }
     }
+
+
 
     pub fn add_package(&mut self, package: Package) {
         self.packages.insert(package.uri.clone(), package);
