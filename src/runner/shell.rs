@@ -11,10 +11,9 @@ use crate::output::print_md_debug;
 
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
-
     command: String,
 ) -> Result<bool, String> {
-    let paths_to_add = get_all_paths(packages_manager);
+    let paths_to_add = get_all_paths(&packages_manager);
 
     let cmd = "set -e\n".to_string() + command.as_str();
 
@@ -91,7 +90,7 @@ mod macos_tests {
     #[test]
     fn test_interactive_shell_macos() {
         let settings = Settings::new(None, None);
-        let mut packages_manager = PackagesManager::new(settings);
+        let mut packages_manager = PackagesManager::new(settings, None);
 
         // Call the interactive_shell function with test data for macOS
         let command = "echo Hello, macOS".to_string();

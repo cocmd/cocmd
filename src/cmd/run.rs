@@ -4,7 +4,7 @@ use anyhow::{Error, Result};
 use dialoguer::{theme::ColorfulTheme, Select};
 use log::error;
 
-use crate::core::packages_manager::PackagesManager;
+use crate::core::packages_manager::{self, PackagesManager};
 use crate::core::utils::cmd::parse_params;
 use crate::package_provider::get_provider;
 use crate::runner::run_script;
@@ -15,12 +15,12 @@ pub fn run_automation(
     params: Option<Vec<String>>,
     from: Option<String>,
 ) -> Result<()> {
+    let mut packages_manager = packages_manager;
     let mut limit_path = Option::<String>::None;
 
     if let Some(from) = from {
         let provider =
             get_provider(&from.to_string(), &packages_manager.settings.runtime_dir).unwrap();
-        let localpath = provider.local_path();
         if !provider.is_exists_locally() {
             provider.download().unwrap();
         }
@@ -28,12 +28,15 @@ pub fn run_automation(
         limit_path = provider.local_path().to_str().map(|s| s.to_string());
     }
 
-    // we need to reload packages manager for limited path if provided
-    let packages_manager: &mut PackagesManager = if limit_path.is_some() {
-        &mut PackagesManager::new(packages_manager.settings.clone(), limit_path)
-    } else {
-        packages_manager
-    };
+    let mut new_packages_manager;
+
+    if limit_path.is_some() {
+        new_packages_manager = packages_manager::PackagesManager::new(
+            packages_manager.settings.clone(),
+            limit_path.clone(),
+        );
+        packages_manager = &mut new_packages_manager;
+    }
 
     let available_automations = packages_manager.automations();
 
