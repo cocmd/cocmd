@@ -15,53 +15,32 @@
 ![alt text](media/cocmd1.png)
 
 
+# Features
+- write command line workflows
+- execute them from the terminal
+- community-ready packages (hub)
+- easy browsing and searching
+
+
 # Getting Started
 
 For installation and first step instructions, visit our [docs](https://cocmd.org/docs/intro)
 
-# Showcase
+## What is it good for?  
 
-## New-hire Onboarding
-
-Onboarding new hires is a very important process in any company. It's the first impression that the new hire gets from the company and it's the first impression that the company gets from the new hire. It's also a very important process for the new hire to get to know the company and the people in it.
-
-Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/onboarding)
-
-## Daily Routines
-
-Usually, every team has a set of routines and procedures that are executed on a regular basis.
-This can also be called "playbooks" or "runbooks". 
-
-CoCMD can help you automate these routines and make them available to your team.
-
-Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/routines)
+- New-hire Onboarding - [read more](https://cocmd.org/docs/showcase/onboarding)
+- Daily Routines - [read more](https://cocmd.org/docs/showcase/routines)
+- Codebase operations - [read more](https://cocmd.org/docs/showcase/cmdops)
 
 
-## Codebase CMDOps
-Any project can have CMDOps (Command Line Operations). Lets say for example, your project requires some installation steps, or you want to add some shortcuts for your team or community to use.
+## Contribute
 
-Read how to do it with CoCMD [Here](https://cocmd.org/docs/showcase/cmdops)
+Contribution guide can be found [here](https://cocmd.org/docs/contribute)
 
+- [Add an Idea 💡💡💡 for a new playbook](https://github.com/cocmd/hub/issues/new)
+- [Code with us - 🔥features / 🔥bugs](https://github.com/cocmd/cocmd/contribute)
+- [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
 
-
-## Shoutouts
-Thank you for the inspiration and the great work!
-- Espanso - https://espanso.org/
-- Spotify-UI! - https://github.com/Rigellute/spotify-tui
-
-Usefull Links:
-- https://github.com/Rigellute/spotify-tui/blob/master/.github/workflows/cd.yml
-- https://github.com/pvolok/mprocs#npm-linux-macos-windows
-
-
-## Get Involved
-
-We encourage you to reach out.
-
-- [Report an issue](https://github.com/cocmd/cocmd/issues/new)
-- Here's how to [contribute to cocmd](https://github.com/cocmd/cocmd/blob/master/CONTRIBUTING.md)
-- Looking to contribute? See our cli [good first issues](https://github.com/cocmd/cocmd/contribute) - Here's [how to contribute](https://github.com/cocmd/hub/blob/master/CONTRIBUTING.md)
-- Looking to contribute cocmd-packages? See our hub [good first issues](https://github.com/cocmd/hub/contribute).
 
 
 ## License
