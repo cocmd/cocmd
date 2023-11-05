@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-
 use log::info;
 
 use crate::core::packages_manager::PackagesManager;

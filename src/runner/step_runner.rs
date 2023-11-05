@@ -4,7 +4,6 @@ use std::process::Command;
 
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
-
 use log::error;
 use regex::Regex;
 

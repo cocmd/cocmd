@@ -20,7 +20,6 @@ use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
-
 use log::info;
 use tui_app::tui_runner;
 
