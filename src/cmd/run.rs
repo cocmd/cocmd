@@ -14,7 +14,6 @@ pub fn run_automation(
     params: Option<Vec<String>>,
     from: Option<String>,
 ) -> Result<()> {
-    let packages_manager = packages_manager;
     let _limit_path = Option::<String>::None;
 
     if let Some(from) = &from {
