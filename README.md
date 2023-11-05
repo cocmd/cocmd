@@ -35,7 +35,7 @@ For installation and first step instructions, visit our [docs](https://cocmd.org
 
 ## Contribute
 
-Contribution guide can be found [here](https://cocmd.org/docs/contribute)
+Contribution guide can be found [here](https://cocmd.org/docs/contributing)
 
 
 - [Add an Idea 💡💡💡 for a new playbook](https://github.com/cocmd/hub/issues/new)
