@@ -7,19 +7,21 @@ use log::info;
 
 use crate::core::package::Package;
 use crate::core::packages_manager::PackagesManager;
+use crate::core::utils::packages::extract_package_name_and_version;
 use crate::core::utils::repository::find_cocmd_files;
 use crate::package_provider::{get_provider, LOCAL_PROVIDER};
 pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
-    version: Option<String>,
     dont_ask: bool,
 ) -> Result<(), Error> {
     info!("Installing package {:?}", package);
 
     let settings = &packages_manager.settings;
 
-    let provider = get_provider(&package.to_string(), &settings.runtime_dir, version).unwrap();
+    let (package_uri, version) = extract_package_name_and_version(package);
+
+    let provider = get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
     let localpath = provider.local_path();
 
     if !provider.is_exists_locally() {
@@ -70,7 +72,7 @@ pub fn install_package(
                     let package_label = package.to_string();
                     package_label.clone()
                 },
-                Path::new(&loc),
+                &Path::new(&loc).to_path_buf(),
                 &packages_manager.settings,
             );
             let uri = package.uri.clone();

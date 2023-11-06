@@ -87,28 +87,28 @@ mod tests {
         let hub_url = "cocmd-hub";
         let local_url = "/tmp/test/no-existing";
 
-        let provider = get_provider(&git_url.to_string(), runtime_dir).unwrap();
+        let provider = get_provider(&git_url.to_string(), runtime_dir, None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
         assert_eq!(
             provider.local_path(),
             Path::new("/tmp/mzsrtgzt2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&git_url2.to_string(), runtime_dir).unwrap();
+        let provider = get_provider(&git_url2.to_string(), runtime_dir, None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
         assert_eq!(
             provider.local_path(),
             Path::new("/tmp/mzsrtgzr2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&hub_url.to_string(), runtime_dir).unwrap();
+        let provider = get_provider(&hub_url.to_string(), runtime_dir, None).unwrap();
         assert_eq!(provider.name(), COCMDHUB_PROVIDER);
         assert_eq!(
             provider.local_path(),
             Path::new("/tmp/cocmd-hub").to_path_buf()
         );
 
-        let provider = get_provider(&local_url.to_string(), runtime_dir).unwrap();
+        let provider = get_provider(&local_url.to_string(), runtime_dir, None).unwrap();
         assert_eq!(provider.name(), LOCAL_PROVIDER);
         assert_eq!(provider.local_path(), Path::new(local_url).to_path_buf());
     }

@@ -215,6 +215,7 @@ fn main() -> ExitCode {
                 let hub_provider = package_provider::hub::CocmdHubPackageProvider::new(
                     &"placeholder".to_string(),
                     &packages_manager.settings.runtime_dir,
+                    None,
                 );
                 let index = hub_provider
                     .get_index(false)
