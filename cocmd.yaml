@@ -104,7 +104,7 @@ automations:
               fi
             done
 
-            open cocmd-project
+            open .
 
         - title: add git hooks
           description: pre-commit and pre-push hooks for rust fmt and clippy
@@ -156,23 +156,26 @@ automations:
             rustup target add wasm32-unknown-unknown
             rustup target add aarch64-apple-darwin
             
-            cargo build
-            cargo test
             cargo install --path .
-
-            cocmd --help
+            echo "cocmd cli ready to run - cocmd --help"
 
         - title: install local hub 
           runner: shell
           content: |
-            cocmd install ./cocmd-project/hub/packages
+            echo "installing local hub packages"
+            cocmd install -y ./cocmd-project/hub/packages
+
+            echo
+            echo "hub packages installed"
+            echo "- this means that web you change local hub packages, you can test them locally"
+            echo "run 'cocmd show packages' to see them"
         
         - title: open IDEs
           runner: shell
           approval_message: To open the code with VSCode?
           content: |
             # check if vscode not installed
-            if ! code -v code &> /dev/null
+            if code -v &> /dev/null
             then
               code cocmd-project
             else
