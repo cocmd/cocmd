@@ -14,6 +14,12 @@ pub fn get_all_paths(packages_manager: &PackagesManager) -> Vec<String> {
         .collect()
 }
 
+pub fn get_package_name_from_uri(playbook_uri: &str) -> String {
+    // playbook uri is the package name + '.' + the playbook name
+    // so grab the package name
+    playbook_uri.split('.').next().unwrap().to_string()
+}
+
 pub fn extract_package_name_and_version(package: &str) -> (String, Option<String>) {
     let mut package_name = package.to_string();
     let mut package_version = None;

@@ -11,7 +11,6 @@ use crate::output::print_md_debug;
 
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
-
     command: String,
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(packages_manager);
@@ -41,7 +40,7 @@ pub fn interactive_shell(
     if status.success() {
         Ok(true)
     } else {
-        print_md_debug(&"## ❌ Failed (stderr):\n".to_string());
+        print_md_debug("## ❌ Failed (stderr):\n");
         Err("Shell command failed.".to_string())
     }
 }

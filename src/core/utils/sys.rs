@@ -18,7 +18,7 @@ pub enum OS {
     MacOS,
     Other,
     #[serde(alias = "any")]
-    ANY,
+    Any,
 }
 
 impl Display for OS {
@@ -28,7 +28,7 @@ impl Display for OS {
             OS::Linux => write!(f, "Linux"),
             OS::MacOS => write!(f, "MacOS"),
             OS::Other => write!(f, "Other"),
-            OS::ANY => write!(f, "Any"),
+            OS::Any => write!(f, "Any"),
         }
     }
 }
@@ -38,7 +38,7 @@ pub fn get_os() -> OS {
         "windows" => OS::Windows,
         "linux" => OS::Linux,
         "macos" => OS::MacOS,
-        "any" => OS::ANY,
+        "any" => OS::Any,
         _ => OS::Other,
     }
 }

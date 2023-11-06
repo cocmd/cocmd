@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Let us know about a bug in Cocmd
-title: ''
+title: 'bug: '
 labels: bug
 assignees: ''
 

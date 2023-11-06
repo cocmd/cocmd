@@ -1,3 +1,4 @@
+#![allow(clippy::upper_case_acronyms)]
 use serde_derive::{Deserialize, Serialize};
 
 use crate::core::utils::sys::OS;
