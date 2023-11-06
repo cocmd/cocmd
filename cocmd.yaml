@@ -1,10 +1,84 @@
 name: cocmd
 automations:
+  - name: web
+    content:
+      description: start the website
+      env: osx
+      steps:
+        - title: Cocmd website 👋👋👋
+          runner: markdown
+          content: |
+            Let's get started with the cocmd website.
+            It's a docusaurus site, so make sure you have node installed.
+            This will install all the tools you need to get started.
+
+            it's best to run the full onboarding first with:
+            `cocmd run cocmd.contrib-onboarding --from https://github.com/cocmd/cocmd`
+
+            Good to have you here 🎉🎉🎉
+            Cheers
+        - title: install node if needed
+          approval_message: Ready to start?
+          runner: shell
+          content: |
+            # if node not installed, run cocmd install node.setup
+            if ! node -v &> /dev/null
+            then
+              echo "node not installed"
+              cocmd --no-verbose install node.setup
+            fi
+
+            # if yarn not installed, run cocmd install yarn.setup
+            if ! yarn -v &> /dev/null
+            then
+              echo "yarn not installed"
+              cocmd --no-verbose install node.yarn.setup
+            fi
+        - title: install
+          runner: shell
+          
+          content: |
+            cd cocmd-project/website
+            yarn
+            
+        - title: start
+          runner: shell
+          content: |
+            cd cocmd-project/website
+            yarn start
+
   - name: contrib-onboarding
     content:
       description: "onboarding for project https://github.com/JKHeadley/appy"
       env: osx
       steps:
+        - title: Hello 👋👋👋
+          runner: markdown
+          content: |
+            ## Welcome to Cocmd Contributor onboarding 🎉🎉🎉
+            
+            This is a guide to getting started with cocmd development.
+            This will install all the tools you need to get started.
+
+            it's going to:
+            - install git
+            - install rust
+            - install node
+            - install vscode
+            - clone all Cocmd repos
+            - build the website
+            - build cocmd cli
+            - install local hub packages
+            - open vscode with all the repos
+
+        - title: lets start
+          runner: shell
+          approval_message: Ready to start?
+          content: echo lets start
+        - title: install vscode
+          runner: cocmd
+          approval_message: Cocmd is vscode-ready. install vscode?
+          content: vscode.setup
         - title: install git
           runner: cocmd
           content: git.setup
@@ -29,6 +103,8 @@ automations:
                 git clone $repo
               fi
             done
+
+            open .
 
         - title: add git hooks
           description: pre-commit and pre-push hooks for rust fmt and clippy
@@ -67,33 +143,62 @@ automations:
           runner: shell
           content: |
             cd cocmd-project/website
-            yarn install
-            
+            yarn
             echo "website ready to run - yarn start"
-        - title: add 
-          runner: shell
-          content: |
-            cd cocmd-project/website
             
         - title: build cli
           runner: shell
           content: |
             cd cocmd-project/cocmd
-            cargo build
-            cargo test
-            cargo run -- --version
 
+            rustup target add x86_64-unknown-linux-gnu
+            rustup target add x86_64-pc-windows-gnu
+            rustup target add wasm32-unknown-unknown
+            rustup target add aarch64-apple-darwin
+
+            rustup toolchain install nightly
+            
+            cargo install --path .
+            echo "cocmd cli ready to run - cocmd --help"
+
+        - title: install local hub 
+          runner: shell
+          content: |
+            echo "installing local hub packages"
+            cocmd install -y ./cocmd-project/hub/packages
+
+            echo
+            echo "hub packages installed"
+            echo "- this means that web you change local hub packages, you can test them locally"
+            echo "run 'cocmd show packages' to see them"
+        
         - title: open IDEs
           runner: shell
           approval_message: To open the code with VSCode?
           content: |
             # check if vscode not installed
-            if ! command -v code &> /dev/null
+            if code -v &> /dev/null
             then
-                echo "vscode could not be found. installing..."
-                cocmd --no-verbose run vscode.setup
+              code cocmd-project
+            else
+                echo "vscode could not be found. open cocmd-project in your IDE of choice"
             fi
-            
-            code cocmd-project
+
+        - title: final message
+          runner: markdown
+          content: |
+            ## All done!
+            You're all set up to contribute to cocmd. 
+            ### How can you help?
+              - [Add an Idea 💡💡💡 for a new playbook](https://github.com/cocmd/hub/issues/new)
+              - [Code with us - 🔥features / 🔥bugs](https://github.com/cocmd/cocmd/contribute)
+              - [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
+            Thank you for your help! 🙏🙏🙏
+
+            Join us on [Discord](https://discord.gg/PzaBZade)
+
+      
+
+        
             
             

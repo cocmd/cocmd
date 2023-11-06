@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Let us know about a bug in Cocmd
-title: ''
+title: 'bug: '
 labels: bug
 assignees: ''
 
@@ -11,6 +11,11 @@ assignees: ''
 A clear and concise description of what the bug is
 
 **To Reproduce**
+
+* Use https://asciinema.org if possible to record your terminal session
+* send us the link to the recording
+* don't forget to make it public recording
+
 Steps to reproduce the behavior:
 1.
 

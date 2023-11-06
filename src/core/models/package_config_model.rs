@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::Path;
 
 use log::error;
 use serde_derive::{Deserialize as De, Serialize as Se};
@@ -15,7 +15,7 @@ pub struct Automation {
 }
 
 impl Automation {
-    pub fn load_content(&self, location: &PathBuf) -> Automation {
+    pub fn load_content(&self, location: &Path) -> Automation {
         let mut automation_clone = self.clone();
         if let Some(file) = &self.file {
             let normalized_path = normalize_path(file, location);
@@ -64,7 +64,7 @@ impl Automation {
     pub fn supports_os(&self, os: &OS) -> bool {
         if let Some(content) = &self.content {
             if let Some(content_env) = &content.env {
-                return *content_env == *os || *content_env == OS::ANY;
+                return *content_env == *os || *content_env == OS::Any;
             }
         }
         true

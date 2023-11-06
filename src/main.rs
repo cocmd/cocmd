@@ -20,7 +20,6 @@ use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
-
 use log::info;
 use tui_app::tui_runner;
 
@@ -77,6 +76,10 @@ enum Commands {
         /// Optional argument for input parameters
         #[arg(long = "param", short = 'p')]
         params: Vec<String>,
+
+        /// Optional argument to specify the source of the playbook
+        #[arg(short, long)]
+        from: Option<String>,
     },
     #[cfg(feature = "howto")]
     Howto { query: String },
@@ -151,7 +154,7 @@ fn main() -> ExitCode {
     match cli.command {
         Commands::Browse => {
             while let Ok(Some(automation_name)) = tui_runner(packages_manager.clone()) {
-                res = run_automation(&mut packages_manager, Some(automation_name), None);
+                res = run_automation(&mut packages_manager, Some(automation_name), None, None);
                 if Confirm::new()
                     .with_prompt("Do you want to continue browsing?")
                     .interact()
@@ -189,8 +192,8 @@ fn main() -> ExitCode {
                 }
             }
         },
-        Commands::Run { name, params } => {
-            res = run_automation(&mut packages_manager, name, Some(params));
+        Commands::Run { name, params, from } => {
+            res = run_automation(&mut packages_manager, name, Some(params), from);
         }
         #[cfg(feature = "howto")]
         Commands::Howto { query } => {

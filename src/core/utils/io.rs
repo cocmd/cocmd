@@ -4,7 +4,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::io::{BufRead, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -19,8 +19,8 @@ use serde::Serialize;
 /// # Returns
 ///
 /// A normalized absolute path as a `String`.
-pub fn normalize_path(relative_path: &str, base_path: &PathBuf) -> String {
-    let mut abs_path = base_path.clone();
+pub fn normalize_path(relative_path: &str, base_path: &Path) -> String {
+    let mut abs_path = base_path.to_path_buf();
     for component in relative_path.split(std::path::is_separator) {
         match component {
             "." => continue,
@@ -128,6 +128,8 @@ pub fn from_file(file_path: &str) -> Result<String, Box<dyn Error>> {
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::*;
 
     #[test]
