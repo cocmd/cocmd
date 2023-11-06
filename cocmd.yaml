@@ -155,6 +155,8 @@ automations:
             rustup target add x86_64-pc-windows-gnu
             rustup target add wasm32-unknown-unknown
             rustup target add aarch64-apple-darwin
+
+            rustup toolchain install nightly
             
             cargo install --path .
             echo "cocmd cli ready to run - cocmd --help"
