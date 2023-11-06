@@ -69,7 +69,7 @@ pub fn install_package(
                     let package_label = package.to_string();
                     package_label.clone()
                 },
-                &Path::new(&loc).to_path_buf(),
+                Path::new(&loc),
                 &packages_manager.settings,
             );
             let uri = package.uri.clone();

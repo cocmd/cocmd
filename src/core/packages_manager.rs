@@ -77,6 +77,7 @@ impl PackagesManager {
                         error!("failed to get location for {} - {}", uri, err);
                         continue;
                     }
+
                     let package =
                         Package::new(uri.clone(), &provider.unwrap().local_path(), settings);
 

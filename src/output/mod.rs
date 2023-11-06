@@ -18,13 +18,13 @@ pub fn set_logging_level(verbose: bool) {
     }
 }
 
-pub fn print_md(markdown: &String) {
+pub fn print_md(markdown: &str) {
     // print with termimad to stdout
     let skin = MadSkin::default();
     skin.print_text(markdown);
 }
 
-pub fn print_md_debug(markdown: &String) {
+pub fn print_md_debug(markdown: &str) {
     // get tracking log level and if it's DEBUG than print the markdown
 
     if unsafe { LOG_LEVEL } == LevelFilter::Debug {
