@@ -9,6 +9,7 @@ use regex::Regex;
 
 use super::shell::interactive_shell;
 use crate::core::models::script_model::StepParamModel;
+use crate::core::utils::packages::get_package_name_from_uri;
 use crate::core::utils::sys::OS;
 use crate::core::{
     models::script_model::{StepModel, StepRunnerType},
@@ -48,7 +49,7 @@ pub fn handle_step(
             }
         }
         StepRunnerType::COCMD => {
-            let provider_name = content.split('.').next().unwrap();
+            let provider_name = get_package_name_from_uri(content);
 
             let available_automations = packages_manager.automations();
             if !available_automations.contains_key(content) {

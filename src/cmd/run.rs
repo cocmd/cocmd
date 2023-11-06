@@ -6,6 +6,7 @@ use log::error;
 
 use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::cmd::parse_params;
+use crate::core::utils::packages::get_package_name_from_uri;
 use crate::runner::{run_script, shell::interactive_shell};
 
 pub fn run_automation(
@@ -14,8 +15,6 @@ pub fn run_automation(
     params: Option<Vec<String>>,
     from: Option<String>,
 ) -> Result<()> {
-    let _limit_path = Option::<String>::None;
-
     if let Some(from) = &from {
         if let Err(_err) = interactive_shell(
             packages_manager,
@@ -62,5 +61,9 @@ pub fn run_automation(
 
     // return Err(Error("I don't know this script"));
     // return an error that the script is not found
+    error!(
+        "😲 Didn't find this package. \nplease run `cocmd install {}` and try again",
+        get_package_name_from_uri(&selected_name)
+    );
     Err(Error::msg("I don't know this script"))
 }
