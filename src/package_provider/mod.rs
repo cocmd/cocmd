@@ -44,7 +44,11 @@ pub trait PackageProvider {
     // TODO: fn check update available? (probably should be only available in the hub)
 }
 
-pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn PackageProvider>> {
+pub fn get_provider(
+    package: &String,
+    runtime_dir: &Path,
+    version: Option<String>,
+) -> Result<Box<dyn PackageProvider>> {
     // parse "package" if it's a local path create a LocalPackageProvider
     // if it's a git url create a GitPackageProvider
     // otherwise look for it in the hub and create a HubPackageProvider
@@ -64,6 +68,7 @@ pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn Pack
         return Ok(Box::new(hub::CocmdHubPackageProvider::new(
             package,
             runtime_dir,
+            version,
         )));
     }
 }

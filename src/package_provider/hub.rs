@@ -39,10 +39,9 @@ pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
 const PACKAGE_INDEX_CACHE_FILE: &str = "package_index_cache.json";
 const PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS: u64 = 60 * 60;
 
-const VERSION: &str = "0.0.0";
-
 pub struct CocmdHubPackageProvider {
     package: String,
+    version: Option<String>,
     local_path: PathBuf,
     runtime_dir: PathBuf,
 }
@@ -61,12 +60,12 @@ impl PackageProvider for CocmdHubPackageProvider {
         // .context("unable to get package index from cocmd hub")?;
 
         let package_info = index
-            .get_package(&self.package, Some(VERSION))
+            .get_package(&self.package, &self.version)
             .ok_or_else(|| {
                 anyhow!(
                     "unable to find package '{}@{}' in the cocmd hub",
                     &self.package,
-                    &VERSION
+                    &self.version.clone().unwrap_or_else(|| "latest".to_string())
                 )
             })?;
 
@@ -90,13 +89,14 @@ impl PackageProvider for CocmdHubPackageProvider {
 }
 
 impl CocmdHubPackageProvider {
-    pub fn new(package: &String, runtime_dir: &Path) -> Self {
+    pub fn new(package: &String, runtime_dir: &Path, version: Option<String>) -> Self {
         let binding = runtime_dir.join(package);
         let local_path = binding.as_path();
         Self {
             package: (*package.clone()).to_string(),
             local_path: local_path.to_path_buf(),
             runtime_dir: runtime_dir.to_path_buf(),
+            version,
         }
     }
 
@@ -178,7 +178,7 @@ pub struct PackageInfo {
 }
 
 impl PackageIndex {
-    fn get_package(&self, name: &str, version: Option<&str>) -> Option<PackageInfo> {
+    fn get_package(&self, name: &str, version: &Option<String>) -> Option<PackageInfo> {
         let mut matching_packages: Vec<PackageInfo> = self
             .packages
             .iter()
@@ -191,7 +191,7 @@ impl PackageIndex {
         if let Some(explicit_version) = version {
             matching_packages
                 .into_iter()
-                .find(|package| package.version == explicit_version)
+                .find(|package| package.version == *explicit_version)
         } else {
             matching_packages.into_iter().last()
         }

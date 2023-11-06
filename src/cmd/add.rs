@@ -12,13 +12,14 @@ use crate::package_provider::{get_provider, LOCAL_PROVIDER};
 pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
+    version: Option<String>,
     dont_ask: bool,
 ) -> Result<(), Error> {
     info!("Installing package {:?}", package);
 
     let settings = &packages_manager.settings;
 
-    let provider = get_provider(&package.to_string(), &settings.runtime_dir).unwrap();
+    let provider = get_provider(&package.to_string(), &settings.runtime_dir, version).unwrap();
     let localpath = provider.local_path();
 
     if !provider.is_exists_locally() {
