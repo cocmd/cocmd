@@ -42,7 +42,8 @@ Contribution guide can be found [here](https://cocmd.org/docs/contributing)
 - [Code with us - 🔥features / 🔥bugs](https://github.com/cocmd/cocmd/contribute)
 - [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
 
-
+<!-- readme: contributors -start -->
+<!-- readme: contributors -end -->
 
 ## License
 Cocmd was created by [Moshe Roth](https://www.linkedin.com/in/mosherot/)
