@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use log::error;
-
 use crate::core::models::package_config_model::Automation;
 use crate::core::package::Package;
 use crate::core::utils::io::{file_read_lines, file_write_lines};
@@ -27,6 +26,7 @@ impl PackagesManager {
     }
 
     pub fn remove_package(&mut self, package_name: &str) -> Result<(), String> {
+        // Find the package URI by package name
         let package_uri = self
             .packages
             .iter()
@@ -36,12 +36,18 @@ impl PackagesManager {
         if let Some(uri) = package_uri {
             self.packages.remove(&uri);
 
-            let provider =
-                get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
+            // Get the provider and the installation path
+            let provider = get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
             let package_dir = provider.get_installation_path();
 
-            if let Err(e) = std::fs::remove_dir_all(package_dir) {
-                return Err(format!("Failed to delete package directory: {}", e));
+            // Check if the directory exists before attempting to delete
+            if package_dir.exists() {
+                // Attempt to delete the directory
+                std::fs::remove_dir_all(&package_dir)
+                    .map_err(|e| format!("Failed to delete package directory: {}", e))?;
+            } else {
+                // Return an error message if the directory does not exist
+                return Err(format!("Package directory '{}' does not exist, nothing to remove.", package_dir.display()));
             }
 
             // Update the packages.txt file
@@ -51,6 +57,7 @@ impl PackagesManager {
             Err(format!("Package '{}' not found.", package_name))
         }
     }
+
 
     pub fn add_package(&mut self, package: Package) {
         self.packages.insert(package.uri.clone(), package);
@@ -115,7 +122,8 @@ impl PackagesManager {
             // look for packages .name() value and compare with uri. if yes, uri should be the package.uri
             let mut found = false;
             for package in self.packages.values() {
-                if package.name() == uri {
+                // Directly compare the name with the uri
+                if Some(package.name()) == Some(uri.as_str()) {
                     found = true;
                     id = package.uri.clone();
                     break;
@@ -126,7 +134,8 @@ impl PackagesManager {
             }
         }
 
-        let package = &self.packages[&id];
-        Some(package)
+        self.packages.get(&id)
     }
+
+
 }
