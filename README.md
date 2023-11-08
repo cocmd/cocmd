@@ -42,7 +42,7 @@ Contribution guide can be found [here](https://cocmd.org/docs/contributing)
 - [Code with us - 🔥features / 🔥bugs](https://github.com/cocmd/cocmd/contribute)
 - [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
 
-## Contributos of Cocmd CLI ❤️
+## Contributors of Cocmd CLI ❤️
 
 <!-- readme: contributors -start -->
 <table>
