@@ -1,7 +1,7 @@
 /*
  * This file is part of cocmd.
  *
- * Copyright (C) 2019-2021 Moshe Roth
+ * Copyright (C) 2023 Moshe Roth
  *
  * cocmd is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ use super::{
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
     "https://github.com/cocmd/hub/releases/latest/download/package_index.json";
-// "http://www.google.com";
 
 const PACKAGE_INDEX_CACHE_FILE: &str = "package_index_cache.json";
 const PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS: u64 = 60 * 60;

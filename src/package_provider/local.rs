@@ -1,7 +1,7 @@
 /*
  * This file is part of cocmd.
  *
- * Copyright (C) 2019-2021 Moshe Roth
+ * Copyright (C) 2023 Moshe Roth
  *
  * cocmd is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
