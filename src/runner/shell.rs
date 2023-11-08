@@ -11,12 +11,28 @@ use crate::output::print_md_debug;
 
 pub fn interactive_shell(
     packages_manager: &mut PackagesManager,
-
     command: String,
 ) -> Result<bool, String> {
     let paths_to_add = get_all_paths(packages_manager);
 
-    let cmd = "set -e\n".to_string() + command.as_str();
+    // find appropriate rc file to source based on env::var("SHELL")
+    let rc_file = match &packages_manager.settings.os {
+        OS::Windows => "".to_string(),
+        _ => {
+            let binding = env::var("SHELL").unwrap_or("/bin/sh".to_string());
+            match binding.as_str() {
+                "/bin/bash" => "~/.bashrc".to_string(),
+                "/bin/zsh" => "~/.zshrc".to_string(),
+                _ => "".to_string(),
+            }
+        }
+    };
+
+    // create cmd with command, in the beginning source rc file with set +e and -e wrapping
+    let cmd = format!(
+        "set +e\nsource {} > /dev/null \nset -e\n{}",
+        rc_file, command
+    );
 
     // Get the current PATH and add a directory to it
     let mut new_path = paths_to_add.join(":");
@@ -41,7 +57,7 @@ pub fn interactive_shell(
     if status.success() {
         Ok(true)
     } else {
-        print_md_debug(&"## ❌ Failed (stderr):\n".to_string());
+        print_md_debug("## ❌ Failed (stderr):\n");
         Err("Shell command failed.".to_string())
     }
 }

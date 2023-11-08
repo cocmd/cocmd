@@ -30,9 +30,9 @@ pub struct LocalPackageProvider {
 }
 
 impl LocalPackageProvider {
-    pub fn new(package: &String, path: &Path) -> Self {
+    pub fn new(package: &str, path: &Path) -> Self {
         Self {
-            package: package.clone(),
+            package: package.to_string(),
             local_path: path.to_path_buf(),
         }
     }

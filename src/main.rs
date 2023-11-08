@@ -32,7 +32,7 @@ use crate::output::set_logging_level;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.74",
+    version = "1.0.77",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
@@ -76,6 +76,10 @@ enum Commands {
         /// Optional argument for input parameters
         #[arg(long = "param", short = 'p')]
         params: Vec<String>,
+
+        /// Optional argument to specify the source of the playbook
+        #[arg(short, long)]
+        from: Option<String>,
     },
     #[cfg(feature = "howto")]
     Howto { query: String },
@@ -150,7 +154,7 @@ fn main() -> ExitCode {
     match cli.command {
         Commands::Browse => {
             while let Ok(Some(automation_name)) = tui_runner(packages_manager.clone()) {
-                res = run_automation(&mut packages_manager, Some(automation_name), None);
+                res = run_automation(&mut packages_manager, Some(automation_name), None, None);
                 if Confirm::new()
                     .with_prompt("Do you want to continue browsing?")
                     .interact()
@@ -188,8 +192,8 @@ fn main() -> ExitCode {
                 }
             }
         },
-        Commands::Run { name, params } => {
-            res = run_automation(&mut packages_manager, name, Some(params));
+        Commands::Run { name, params, from } => {
+            res = run_automation(&mut packages_manager, name, Some(params), from);
         }
         #[cfg(feature = "howto")]
         Commands::Howto { query } => {

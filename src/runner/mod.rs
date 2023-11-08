@@ -5,7 +5,7 @@ use anyhow::{Error, Result};
 use crate::core::utils::sys::OS;
 use crate::core::{models::script_model::ScriptModel, packages_manager::PackagesManager};
 use crate::output::print_md_debug;
-mod shell;
+pub mod shell;
 mod step_runner;
 
 pub fn run_script(

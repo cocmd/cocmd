@@ -6,13 +6,30 @@ use log::error;
 
 use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::cmd::parse_params;
-use crate::runner::run_script;
+use crate::core::utils::packages::get_package_name_from_uri;
+use crate::runner::{run_script, shell::interactive_shell};
+
 pub fn run_automation(
     packages_manager: &mut PackagesManager,
     specific_name: Option<String>,
     params: Option<Vec<String>>,
+    from: Option<String>,
 ) -> Result<()> {
+    if let Some(from) = &from {
+        if let Err(_err) = interactive_shell(
+            packages_manager,
+            format!("cocmd --no-verbose install {}", &from.as_str()),
+        ) {
+            return Err(Error::msg("Unable to install the package"));
+        }
+    }
+
     let available_automations = packages_manager.automations();
+
+    if available_automations.is_empty() {
+        error!("No automations found");
+        return Err(Error::msg("No automations found"));
+    }
 
     let selected_name = match specific_name {
         Some(name) => name,
@@ -25,7 +42,7 @@ pub fn run_automation(
                 .interact_opt()
                 .unwrap_or_else(|_e| {
                     error!("No script selected.");
-                    process::exit(1)
+                    process::exit(1);
                 });
 
             script_choices[selected_script.unwrap()].to_string()
@@ -44,5 +61,9 @@ pub fn run_automation(
 
     // return Err(Error("I don't know this script"));
     // return an error that the script is not found
+    error!(
+        "😲 Didn't find this package. \nplease run `cocmd install {}` and try again",
+        get_package_name_from_uri(&selected_name)
+    );
     Err(Error::msg("I don't know this script"))
 }
