@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
 use log::error;
+
 use crate::core::models::package_config_model::Automation;
 use crate::core::package::Package;
 use crate::core::utils::io::{file_read_lines, file_write_lines};
 use crate::package_provider::get_provider;
-use crate::Settings;
 use crate::package_provider::LOCAL_PROVIDER;
+use crate::Settings;
 
 #[derive(Debug, Clone)]
 pub struct PackagesManager {
@@ -36,7 +37,8 @@ impl PackagesManager {
 
         if let Some(uri) = package_uri {
             // Get the provider
-            let provider = get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
+            let provider =
+                get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
 
             // Check if the provider is local
             if provider.name() == LOCAL_PROVIDER {
@@ -49,7 +51,10 @@ impl PackagesManager {
                     std::fs::remove_dir_all(&package_dir)
                         .map_err(|e| format!("Failed to delete package directory: {}", e))?;
                 } else {
-                    return Err(format!("Package directory '{}' does not exist, nothing to remove.", package_dir.display()));
+                    return Err(format!(
+                        "Package directory '{}' does not exist, nothing to remove.",
+                        package_dir.display()
+                    ));
                 }
             }
 
@@ -60,9 +65,6 @@ impl PackagesManager {
             Err(format!("Package '{}' not found.", package_name))
         }
     }
-
-
-
 
     pub fn add_package(&mut self, package: Package) {
         self.packages.insert(package.uri.clone(), package);
@@ -142,6 +144,4 @@ impl PackagesManager {
 
         self.packages.get(&id)
     }
-
-
 }

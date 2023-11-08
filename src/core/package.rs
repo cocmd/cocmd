@@ -86,7 +86,9 @@ impl Package {
     }
 
     pub fn name(&self) -> &str {
-              self.cocmd_config.as_ref().map_or("default_name", |config| config.name.as_str())
+        self.cocmd_config
+            .as_ref()
+            .map_or("default_name", |config| config.name.as_str())
     }
 
     pub fn paths(&self, absolute: bool) -> Vec<String> {
@@ -150,7 +152,6 @@ impl Package {
             output += "| --- | --- | --- | --- |\n";
 
             for automation in &automations {
-
                 let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::Any);
                 let package_name = self.name();
 
@@ -162,17 +163,14 @@ impl Package {
                     automation.get_detailed_description(),
                     format!(
                         "run `{}.{}` or `cocmd run {}.{}`",
-                        package_name,
-                        automation.name,
-                        package_name,
-                        automation.name
+                        package_name, automation.name, package_name, automation.name
                     )
                 );
             }
             output += "\n";
         }
 
-            if let Some(alias) = &self.aliases() {
+        if let Some(alias) = &self.aliases() {
             output += &format!(
                 "## aliases ({}):\n```\n{}\n```\n",
                 self.get_aliases_count(),

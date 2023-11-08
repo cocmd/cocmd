@@ -1,9 +1,11 @@
 use std::path::PathBuf;
+
 use anyhow::{anyhow, Result};
-use log::{info, error};
-use crate::package_provider::LOCAL_PROVIDER;
+use log::{error, info};
+
 use crate::core::packages_manager::PackagesManager;
 use crate::package_provider::get_provider;
+use crate::package_provider::LOCAL_PROVIDER;
 
 pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &str) -> Result<()> {
     // Retrieve the package
@@ -23,7 +25,8 @@ pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &
     if provider.name() == LOCAL_PROVIDER {
         info!("Detected a local package uninstall, removing path from package.txt file only.");
         // Proceed with the removal process
-        return packages_manager.remove_package(package_name)
+        return packages_manager
+            .remove_package(package_name)
             .map_err(|e| anyhow!(e));
     }
 
@@ -31,7 +34,10 @@ pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &
     let installation_path = provider.get_installation_path(); // Use provider to get the installation path
     let runtime_dir = PathBuf::from(&packages_manager.settings.runtime_dir);
     if !installation_path.starts_with(runtime_dir) {
-        error!("Package '{}' is not in the runtime directory and will not be uninstalled.", package_name);
+        error!(
+            "Package '{}' is not in the runtime directory and will not be uninstalled.",
+            package_name
+        );
         return Ok(());
     }
 
