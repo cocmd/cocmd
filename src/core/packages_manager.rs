@@ -34,21 +34,24 @@ impl PackagesManager {
             .map(|(uri, _pkg)| uri.clone());
 
         if let Some(uri) = package_uri {
-            self.packages.remove(&uri);
-
             // Get the provider and the installation path
             let provider = get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
-            let package_dir = provider.get_installation_path();
 
-            // Check if the directory exists before attempting to delete
-            if package_dir.exists() {
-                // Attempt to delete the directory
-                std::fs::remove_dir_all(&package_dir)
-                    .map_err(|e| format!("Failed to delete package directory: {}", e))?;
-            } else {
-                // Return an error message if the directory does not exist
-                return Err(format!("Package directory '{}' does not exist, nothing to remove.", package_dir.display()));
+            // If the provider is not local, delete the directory
+            if provider.name() != "local" {
+                let package_dir = provider.get_installation_path();
+                // Check if the directory exists before attempting to delete
+                if package_dir.exists() {
+                    // Attempt to delete the directory
+                    std::fs::remove_dir_all(&package_dir)
+                        .map_err(|e| format!("Failed to delete package directory: {}", e))?;
+                } else {
+                    // Return an error message if the directory does not exist
+                    return Err(format!("Package directory '{}' does not exist, nothing to remove.", package_dir.display()));
+                }
             }
+
+            self.packages.remove(&uri);
 
             // Update the packages.txt file
             self.save()
@@ -57,6 +60,7 @@ impl PackagesManager {
             Err(format!("Package '{}' not found.", package_name))
         }
     }
+
 
 
     pub fn add_package(&mut self, package: Package) {
