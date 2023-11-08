@@ -34,32 +34,32 @@ impl PackagesManager {
             .map(|(uri, _pkg)| uri.clone());
 
         if let Some(uri) = package_uri {
-            // Get the provider and the installation path
+            // Get the provider
             let provider = get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
 
-            // If the provider is not local, delete the directory
-            if provider.name() != "local" {
+            // Check if the provider is local
+            if provider.name() == "local" {
+                // If local, only remove from packages.txt
+                self.packages.remove(&uri);
+            } else {
+                // If not local, delete the directory
                 let package_dir = provider.get_installation_path();
-                // Check if the directory exists before attempting to delete
                 if package_dir.exists() {
-                    // Attempt to delete the directory
                     std::fs::remove_dir_all(&package_dir)
                         .map_err(|e| format!("Failed to delete package directory: {}", e))?;
                 } else {
-                    // Return an error message if the directory does not exist
                     return Err(format!("Package directory '{}' does not exist, nothing to remove.", package_dir.display()));
                 }
             }
 
-            self.packages.remove(&uri);
-
-            // Update the packages.txt file
+            // Update the packages.txt file regardless of provider type
             self.save()
                 .map_err(|e| format!("Failed to update packages file: {}", e))
         } else {
             Err(format!("Package '{}' not found.", package_name))
         }
     }
+
 
 
 

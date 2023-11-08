@@ -3,6 +3,7 @@ use anyhow::{anyhow, Result};
 use log::{info, error};
 
 use crate::core::packages_manager::PackagesManager;
+use crate::package_provider::get_provider; // Make sure to import get_provider
 
 pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &str) -> Result<()> {
     // Retrieve the package
@@ -14,10 +15,20 @@ pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &
         }
     };
 
-    // The provider should be determined by the actual installation path of the package, not just the name
-    let installation_path = package.location(); // Assuming 'location' gives the installation path
+    // Use get_provider to determine the provider of the package
+    let provider = get_provider(&package.uri, &packages_manager.settings.runtime_dir)
+        .map_err(|_| anyhow!("Failed to get provider for package '{}'", package_name))?;
+
+    // Check if the provider is local
+    if provider.name() == "local" {
+        info!("Detected a local package uninstall, removing path from package.txt file only.");
+        // Proceed with the removal process
+        return packages_manager.remove_package(package_name)
+            .map_err(|e| anyhow!(e));
+    }
 
     // Check if the installation path is within the runtime directory
+    let installation_path = provider.get_installation_path(); // Use provider to get the installation path
     let runtime_dir = PathBuf::from(&packages_manager.settings.runtime_dir);
     if !installation_path.starts_with(&runtime_dir) {
         error!("Package '{}' is not in the runtime directory and will not be uninstalled.", package_name);
