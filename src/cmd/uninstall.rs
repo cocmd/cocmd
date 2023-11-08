@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 use anyhow::{anyhow, Result};
 use log::{info, error};
-
+use crate::package_provider::LOCAL_PROVIDER;
 use crate::core::packages_manager::PackagesManager;
-use crate::package_provider::get_provider; // Make sure to import get_provider
+use crate::package_provider::get_provider;
 
 pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &str) -> Result<()> {
     // Retrieve the package
@@ -20,7 +20,7 @@ pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &
         .map_err(|_| anyhow!("Failed to get provider for package '{}'", package_name))?;
 
     // Check if the provider is local
-    if provider.name() == "local" {
+    if provider.name() == LOCAL_PROVIDER {
         info!("Detected a local package uninstall, removing path from package.txt file only.");
         // Proceed with the removal process
         return packages_manager.remove_package(package_name)

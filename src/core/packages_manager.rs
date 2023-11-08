@@ -6,6 +6,7 @@ use crate::core::package::Package;
 use crate::core::utils::io::{file_read_lines, file_write_lines};
 use crate::package_provider::get_provider;
 use crate::Settings;
+use crate::package_provider::LOCAL_PROVIDER;
 
 #[derive(Debug, Clone)]
 pub struct PackagesManager {
@@ -38,7 +39,7 @@ impl PackagesManager {
             let provider = get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
 
             // Check if the provider is local
-            if provider.name() == "local" {
+            if provider.name() == LOCAL_PROVIDER {
                 // If local, only remove from packages.txt
                 self.packages.remove(&uri);
             } else {
