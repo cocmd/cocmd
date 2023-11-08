@@ -136,7 +136,7 @@ impl Package {
 
         let mut output = String::new();
 
-        let name = self.name();
+        let _name = self.name();
 
         let automations = self.automations(settings, Some(env_specific));
         if !automations.is_empty() {

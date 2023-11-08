@@ -30,7 +30,7 @@ pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &
     // Check if the installation path is within the runtime directory
     let installation_path = provider.get_installation_path(); // Use provider to get the installation path
     let runtime_dir = PathBuf::from(&packages_manager.settings.runtime_dir);
-    if !installation_path.starts_with(&runtime_dir) {
+    if !installation_path.starts_with(runtime_dir) {
         error!("Package '{}' is not in the runtime directory and will not be uninstalled.", package_name);
         return Ok(());
     }
