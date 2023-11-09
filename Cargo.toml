@@ -1,6 +1,6 @@
 [package]
 name = "cocmd"
-version = "1.0.77"
+version = "1.0.78"
 edition = "2021"
 authors = ["Moshe Roth <mzsrtgzr2@gmail.com>"]
 license = "GPL-3.0"
