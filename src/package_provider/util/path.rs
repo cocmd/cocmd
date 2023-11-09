@@ -1,3 +1,4 @@
+#![allow(clippy::unnecessary_unwrap)]
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -73,7 +74,7 @@ pub fn resolve_hub_package_locally(
 
         let latest = dirs.pop().unwrap();
 
-        return Ok(latest);
+        Ok(latest)
     } else {
         let version = version.unwrap();
 
@@ -100,6 +101,6 @@ pub fn resolve_hub_package_locally(
 
         let latest = dirs.pop().unwrap();
 
-        return Ok(latest.to_path_buf());
+        Ok(latest.to_path_buf())
     }
 }

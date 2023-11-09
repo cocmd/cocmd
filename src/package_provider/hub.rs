@@ -97,7 +97,7 @@ impl CocmdHubPackageProvider {
         let binding = runtime_dir.join(package);
         let default_path = binding.as_path();
 
-        let res = resolve_hub_package_locally(&runtime_dir, &package.as_str(), version.as_deref());
+        let res = resolve_hub_package_locally(runtime_dir, package.as_str(), version.as_deref());
 
         Self {
             package: (*package.clone()).to_string(),
@@ -214,7 +214,7 @@ impl PackageIndex {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    
 
     use temp_testdir::TempDir;
 
@@ -225,7 +225,7 @@ mod tests {
         let runtime_dir = TempDir::default();
         let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         let index = provider.get_index(true).unwrap();
-        assert!(index.packages.len() > 0);
+        assert!(!index.packages.is_empty());
     }
 
     #[test]
