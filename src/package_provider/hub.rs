@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with cocmd.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+#[allow(unused_imports)]
 use std::{
     path::{Path, PathBuf},
     time::UNIX_EPOCH,
@@ -196,12 +196,16 @@ impl PackageIndex {
         matching_packages.sort_by(|a, b| natord::compare(&a.version, &b.version));
 
         if let Some(explicit_version) = version {
-            matching_packages
+            let exact_match = matching_packages
+                .clone()
                 .into_iter()
-                .find(|package| package.version == *explicit_version)
-        } else {
-            matching_packages.into_iter().last()
+                .find(|package| package.version == *explicit_version);
+            if exact_match.is_some() {
+                return exact_match.clone();
+            }
         }
+
+        matching_packages.into_iter().last()
     }
 }
 
@@ -212,11 +216,13 @@ impl PackageIndex {
 mod tests {
     use std::path::PathBuf;
 
+    use temp_testdir::TempDir;
+
     use super::*;
 
     #[test]
     fn test_get_index() {
-        let runtime_dir = PathBuf::from("/tmp/");
+        let runtime_dir = TempDir::default();
         let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         let index = provider.get_index(true).unwrap();
         assert!(index.packages.len() > 0);
@@ -224,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_get_package() {
-        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let runtime_dir = TempDir::default();
         let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         provider.download();
         let index = provider.get_index(true).unwrap();
@@ -234,49 +240,53 @@ mod tests {
 
     #[test]
     fn test_get_package_with_version() {
-        let runtime_dir = PathBuf::from("/tmp/cocmd");
-        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        // generate a temporary directory, with random name for every test execution
+        // it should be deleted in the end of the test automatically
+        let runtime_dir = TempDir::default();
+        let mut provider = CocmdHubPackageProvider::new(
+            &"aws-s3".to_string(),
+            &runtime_dir,
+            Some(String::from("0.0.1")),
+        );
         provider.download();
         let index = provider.get_index(true).unwrap();
         let package = index
-            .get_package("docker", &Some("20.10.8".to_string()))
+            .get_package("aws-s3", &Some("0.0.1".to_string()))
             .unwrap();
-        assert_eq!(package.name, "docker");
-        assert_eq!(package.version, "20.10.8");
+        assert_eq!(package.name, "aws-s3");
+        assert_eq!(package.version, "0.0.1");
+
+        let package = index
+            .get_package("aws-s3", &Some("0.0.0".to_string()))
+            .unwrap();
+        assert_eq!(package.name, "aws-s3");
+        assert_eq!(package.version, "0.0.1");
     }
 
     #[test]
     fn test_get_package_with_version_not_found() {
-        let runtime_dir = PathBuf::from("/tmp/cocmd");
-        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        let runtime_dir = TempDir::default();
+        let mut provider = CocmdHubPackageProvider::new(
+            &"docker".to_string(),
+            &runtime_dir,
+            Some(String::from("0.0.0")),
+        );
         provider.download();
         let index = provider.get_index(true).unwrap();
         let package = index
             .get_package("docker", &Some("20.10.9".to_string()))
             .unwrap();
         assert_eq!(package.name, "docker");
-        assert_eq!(package.version, "20.10.8");
+        assert_eq!(package.version, "0.0.0");
     }
 
     #[test]
     fn test_get_package_not_found() {
-        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let runtime_dir = TempDir::default();
         let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         provider.download();
         let index = provider.get_index(true).unwrap();
         let package = index.get_package("docker2", &None);
         assert!(package.is_none());
-    }
-
-    #[test]
-    fn test_get_package_not_found_with_version() {
-        let runtime_dir = PathBuf::from("/tmp/cocmd");
-        let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
-        let index = provider.get_index(true).unwrap();
-        let package = index
-            .get_package("docker2", &Some("20.10.8".to_string()))
-            .unwrap();
-        assert_eq!(package.name, "docker");
-        assert_eq!(package.version, "20.10.8");
     }
 }
