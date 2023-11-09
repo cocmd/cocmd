@@ -54,4 +54,8 @@ impl PackageProvider for LocalPackageProvider {
     fn package(&self) -> String {
         self.package.clone()
     }
+
+    fn get_installation_path(&self) -> PathBuf {
+        self.local_path.to_path_buf()
+    }
 }

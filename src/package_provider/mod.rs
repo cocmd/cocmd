@@ -36,6 +36,9 @@ pub trait PackageProvider {
     fn name(&self) -> String;
     fn package(&self) -> String;
     fn local_path(&self) -> PathBuf;
+    fn get_installation_path(&self) -> PathBuf {
+        self.local_path().clone()
+    }
     fn is_exists_locally(&self) -> bool {
         // check for existsance of the local path
         self.local_path().exists()

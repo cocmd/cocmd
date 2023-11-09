@@ -86,15 +86,9 @@ impl Package {
     }
 
     pub fn name(&self) -> &str {
-        match &self.cocmd_config {
-            Some(config) => &config.name,
-            None => {
-                panic!(
-                    "Unable to get name for {}",
-                    &self.location.to_str().unwrap()
-                );
-            }
-        }
+        self.cocmd_config
+            .as_ref()
+            .map_or("default_name", |config| config.name.as_str())
     }
 
     pub fn paths(&self, absolute: bool) -> Vec<String> {
@@ -144,8 +138,7 @@ impl Package {
 
         let mut output = String::new();
 
-        // output += &format!("## {}\n", self.name());
-        output += &format!("- location: {}\n", self.location().to_str().unwrap());
+        let _name = self.name();
 
         let automations = self.automations(settings, Some(env_specific));
         if !automations.is_empty() {
@@ -160,18 +153,17 @@ impl Package {
 
             for automation in &automations {
                 let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::Any);
+                let package_name = self.name();
+
                 output += &format!(
                     "| {}.{} | {} | {} | {} |\n",
-                    self.name(),
+                    package_name,
                     automation.name,
                     env,
                     automation.get_detailed_description(),
                     format!(
                         "run `{}.{}` or `cocmd run {}.{}`",
-                        self.name(),
-                        automation.name,
-                        self.name(),
-                        automation.name
+                        package_name, automation.name, package_name, automation.name
                     )
                 );
             }
