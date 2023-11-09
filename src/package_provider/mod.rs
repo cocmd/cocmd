@@ -40,12 +40,12 @@ pub trait PackageProvider {
         // check for existsance of the local path
         self.local_path().exists()
     }
-    fn download(&self) -> Result<PathBuf>;
+    fn download(&mut self) -> Result<PathBuf>;
     // TODO: fn check update available? (probably should be only available in the hub)
 }
 
 pub fn get_provider(
-    package: &String,
+    uri: &String,
     runtime_dir: &Path,
     version: Option<String>,
 ) -> Result<Box<dyn PackageProvider>> {
@@ -53,20 +53,17 @@ pub fn get_provider(
     // if it's a git url create a GitPackageProvider
     // otherwise look for it in the hub and create a HubPackageProvider
 
-    if let Some(local_path) = util::path::extract_local_path(package) {
-        Ok(Box::new(local::LocalPackageProvider::new(
-            package,
-            &local_path,
-        )))
-    } else if let Some(github_parts) = util::git::extract_git_url_parts(package) {
+    if let Some(local_path) = util::path::extract_local_path(uri) {
+        Ok(Box::new(local::LocalPackageProvider::new(uri, &local_path)))
+    } else if let Some(github_parts) = util::git::extract_git_url_parts(uri) {
         return Ok(Box::new(git::GitPackageProvider::new(
-            package,
+            uri,
             &github_parts,
             runtime_dir,
         )));
     } else {
         return Ok(Box::new(hub::CocmdHubPackageProvider::new(
-            package,
+            uri,
             runtime_dir,
             version,
         )));

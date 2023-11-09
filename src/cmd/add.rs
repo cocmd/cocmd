@@ -21,7 +21,8 @@ pub fn install_package(
 
     let (package_uri, version) = extract_package_name_and_version(package);
 
-    let provider = get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
+    let mut provider =
+        get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
     let localpath = provider.local_path();
 
     if !provider.is_exists_locally() {

@@ -26,6 +26,7 @@ use anyhow::{anyhow, Context, Result};
 use log::info;
 use serde::{Deserialize, Serialize};
 
+use super::util::path::resolve_hub_package_locally;
 use super::PackageProvider;
 use super::{
     util::download::download_and_extract_zip_verify_sha256, util::download::read_string_from_url,
@@ -54,7 +55,7 @@ impl PackageProvider for CocmdHubPackageProvider {
         self.local_path.to_path_buf()
     }
 
-    fn download(&self) -> Result<PathBuf> {
+    fn download(&mut self) -> Result<PathBuf> {
         let index = self.get_index(true)?;
         // .context("unable to get package index from cocmd hub")?;
 
@@ -71,7 +72,9 @@ impl PackageProvider for CocmdHubPackageProvider {
         let archive_sha256 = read_string_from_url(&package_info.archive_sha256_url)
             .context("unable to read archive sha256 signature")?;
 
-        let local_path = self.local_path.clone(); // Clone the PathBuf
+        let local_path = self
+            .runtime_dir
+            .join(format!("{}-{}", package_info.name, package_info.version));
 
         download_and_extract_zip_verify_sha256(
             &package_info.archive_url,
@@ -79,7 +82,9 @@ impl PackageProvider for CocmdHubPackageProvider {
             Some(&archive_sha256),
         )?;
 
-        Ok(local_path)
+        self.local_path = local_path;
+
+        Ok(self.local_path.clone())
     }
 
     fn package(&self) -> String {
@@ -90,10 +95,13 @@ impl PackageProvider for CocmdHubPackageProvider {
 impl CocmdHubPackageProvider {
     pub fn new(package: &String, runtime_dir: &Path, version: Option<String>) -> Self {
         let binding = runtime_dir.join(package);
-        let local_path = binding.as_path();
+        let default_path = binding.as_path();
+
+        let res = resolve_hub_package_locally(&runtime_dir, &package.as_str(), version.as_deref());
+
         Self {
             package: (*package.clone()).to_string(),
-            local_path: local_path.to_path_buf(),
+            local_path: res.unwrap_or_else(|_| default_path.to_path_buf()),
             runtime_dir: runtime_dir.to_path_buf(),
             version,
         }
@@ -194,5 +202,81 @@ impl PackageIndex {
         } else {
             matching_packages.into_iter().last()
         }
+    }
+}
+
+// write a test for hub provider
+// download package called "docker" from the hub
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::*;
+
+    #[test]
+    fn test_get_index() {
+        let runtime_dir = PathBuf::from("/tmp/");
+        let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        let index = provider.get_index(true).unwrap();
+        assert!(index.packages.len() > 0);
+    }
+
+    #[test]
+    fn test_get_package() {
+        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        provider.download();
+        let index = provider.get_index(true).unwrap();
+        let package = index.get_package("docker", &None).unwrap();
+        assert_eq!(package.name, "docker");
+    }
+
+    #[test]
+    fn test_get_package_with_version() {
+        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        provider.download();
+        let index = provider.get_index(true).unwrap();
+        let package = index
+            .get_package("docker", &Some("20.10.8".to_string()))
+            .unwrap();
+        assert_eq!(package.name, "docker");
+        assert_eq!(package.version, "20.10.8");
+    }
+
+    #[test]
+    fn test_get_package_with_version_not_found() {
+        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        provider.download();
+        let index = provider.get_index(true).unwrap();
+        let package = index
+            .get_package("docker", &Some("20.10.9".to_string()))
+            .unwrap();
+        assert_eq!(package.name, "docker");
+        assert_eq!(package.version, "20.10.8");
+    }
+
+    #[test]
+    fn test_get_package_not_found() {
+        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        provider.download();
+        let index = provider.get_index(true).unwrap();
+        let package = index.get_package("docker2", &None);
+        assert!(package.is_none());
+    }
+
+    #[test]
+    fn test_get_package_not_found_with_version() {
+        let runtime_dir = PathBuf::from("/tmp/cocmd");
+        let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        let index = provider.get_index(true).unwrap();
+        let package = index
+            .get_package("docker2", &Some("20.10.8".to_string()))
+            .unwrap();
+        assert_eq!(package.name, "docker");
+        assert_eq!(package.version, "20.10.8");
     }
 }
