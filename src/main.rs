@@ -261,6 +261,52 @@ mod tests {
 
     #[test]
     fn test_install_specific_package() {
-        let runtime_dir = TempDir::default();
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker@0.0.0", true);
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_show_package() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker", true);
+        assert!(res.is_ok());
+
+        let res = show_package(&mut packages_manager, "docker".to_string());
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_show_package_for_old_hub_installation() {
+        // before
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker", true);
+        assert!(res.is_ok());
+
+        let res = show_package(&mut packages_manager, "docker".to_string());
+        assert!(res.is_ok());
+
+        // change the folder {tmp_home_dir}/runtime/docker-0.0.0
+        // to {tmp_home_dir}/runtime/docker
+        let docker_folder = tmp_home_dir.join("runtime").join("docker-0.0.0");
+        let docker_folder_new = tmp_home_dir.join("runtime").join("docker");
+        std::fs::rename(&docker_folder, &docker_folder_new);
+
+        let res = show_package(&mut packages_manager, "docker".to_string());
+        assert!(res.is_err());
+    }
+
+    #[test]
+    fn test_show_packages() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker", true);
+        assert!(res.is_ok());
+
+        let res = show_packages(&mut packages_manager);
+        assert!(res.is_ok());
     }
 }

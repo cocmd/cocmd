@@ -74,39 +74,48 @@ pub fn get_provider(
 // and that the correct provider is returned for each case
 #[cfg(test)]
 mod tests {
+    use temp_testdir::TempDir;
+
     use super::*;
 
     #[test]
     fn test_get_provider() {
-        let runtime_dir = Path::new("/tmp");
+        let tmp_home_dir = TempDir::default();
+        let runtime_dir = tmp_home_dir.join("runtime");
         let git_url = "git@github.com:mzsrtgzt2/cocmd.git";
         let git_url2 = "https://github.com/mzsrtgzr2/cocmd";
         let hub_url = "cocmd-hub";
-        let local_url = "/tmp/test/no-existing";
+        let local_url = runtime_dir
+            .join("no-existing")
+            .to_string_lossy()
+            .to_string();
 
-        let provider = get_provider(&git_url.to_string(), runtime_dir, None).unwrap();
+        let provider =
+            get_provider(&git_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
         assert_eq!(
             provider.local_path(),
-            Path::new("/tmp/mzsrtgzt2.cocmd").to_path_buf()
+            runtime_dir.join("mzsrtgzt2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&git_url2.to_string(), runtime_dir, None).unwrap();
+        let provider =
+            get_provider(&git_url2.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
         assert_eq!(
             provider.local_path(),
-            Path::new("/tmp/mzsrtgzr2.cocmd").to_path_buf()
+            runtime_dir.join("mzsrtgzr2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&hub_url.to_string(), runtime_dir, None).unwrap();
+        let provider =
+            get_provider(&hub_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), COCMDHUB_PROVIDER);
         assert_eq!(
             provider.local_path(),
-            Path::new("/tmp/cocmd-hub").to_path_buf()
+            runtime_dir.join("cocmd-hub-???").to_path_buf()
         );
 
-        let provider = get_provider(&local_url.to_string(), runtime_dir, None).unwrap();
+        let provider = get_provider(&local_url, &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), LOCAL_PROVIDER);
-        assert_eq!(provider.local_path(), Path::new(local_url).to_path_buf());
+        assert_eq!(provider.local_path(), Path::new(&local_url).to_path_buf());
     }
 }

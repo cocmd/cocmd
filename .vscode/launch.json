@@ -219,19 +219,19 @@
             }
         },
         {
-            "name": "test cocmd-package",
+            "name": "test all",
             "type": "lldb",
             "request": "launch",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--lib",
-                    "--package=cocmd-package"
+                    "--bin=cocmd",
+                    "--package=cocmd",
                 ],
                 "filter": {
-                    "name": "cocmd-package",
-                    "kind": "lib"
+                    "name": "cocmd",
+                    "kind": "bin"
                 }
             },
             "args": [ ],

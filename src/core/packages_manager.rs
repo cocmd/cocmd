@@ -111,6 +111,9 @@ impl PackagesManager {
             // look for packages .name() value and compare with uri. if yes, uri should be the package.uri
             let mut found = false;
             for package in self.packages.values() {
+                if !package.is_legit_cocmd_package() {
+                    continue;
+                }
                 if package.name() == uri {
                     found = true;
                     id = package.uri.clone();

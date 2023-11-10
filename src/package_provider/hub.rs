@@ -94,7 +94,12 @@ impl PackageProvider for CocmdHubPackageProvider {
 
 impl CocmdHubPackageProvider {
     pub fn new(package: &String, runtime_dir: &Path, version: Option<String>) -> Self {
-        let binding = runtime_dir.join(package.to_owned() + "-???");
+        let binding = if let Some(version) = &version {
+            runtime_dir.join(package.to_owned() + version.as_str())
+        } else {
+            runtime_dir.join(package.to_owned() + "-???")
+        };
+
         let default_path = binding.as_path();
 
         let res = resolve_hub_package_locally(runtime_dir, package.as_str(), version.as_deref());
