@@ -7,6 +7,7 @@ use crate::core::models::package_config_model::Automation;
 use crate::core::package::Package;
 use crate::core::utils::io::{file_read_lines, file_write_lines};
 use crate::package_provider::get_provider;
+use crate::package_provider::LOCAL_PROVIDER;
 use crate::Settings;
 
 #[derive(Debug, Clone)]
@@ -36,9 +37,29 @@ impl PackagesManager {
             .map(|(uri, _pkg)| uri.clone());
 
         if let Some(uri) = package_uri {
-            // Remove the package from the HashMap using the URI
-            self.packages.remove(&uri);
-            // Update the packages.txt file
+            // Get the provider
+            let provider =
+                get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
+
+            // Check if the provider is local
+            if provider.name() == LOCAL_PROVIDER {
+                // If local, only remove from packages.txt
+                self.packages.remove(&uri);
+            } else {
+                // If not local, delete the directory
+                let package_dir = provider.get_installation_path();
+                if package_dir.exists() {
+                    std::fs::remove_dir_all(&package_dir)
+                        .map_err(|e| format!("Failed to delete package directory: {}", e))?;
+                } else {
+                    return Err(format!(
+                        "Package directory '{}' does not exist, nothing to remove.",
+                        package_dir.display()
+                    ));
+                }
+            }
+
+            // Update the packages.txt file regardless of provider type
             self.save()
                 .map_err(|e| format!("Failed to update packages file: {}", e))
         } else {
@@ -114,6 +135,7 @@ impl PackagesManager {
                 if !package.is_legit_cocmd_package() {
                     continue;
                 }
+                // Directly compare the name with the uri
                 if package.name() == uri {
                     found = true;
                     id = package.uri.clone();
@@ -125,7 +147,6 @@ impl PackagesManager {
             }
         }
 
-        let package = &self.packages[&id];
-        Some(package)
+        self.packages.get(&id)
     }
 }

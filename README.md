@@ -41,9 +41,9 @@ Contribution guide can be found [here](https://cocmd.org/docs/contributing)
 
 - [Add an Idea 💡💡💡 for a new playbook](https://github.com/cocmd/hub/issues/new)
 - [Code with us - 🔥features / 🔥bugs](https://github.com/cocmd/cocmd/contribute)
-- [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new)
+- [Report a bug 🐞🧨🐞](https://github.com/cocmd/cocmd/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=bug%3A+)
 
-## Contributos of Cocmd CLI ❤️
+## Contributors of Cocmd CLI ❤️
 
 <!-- readme: contributors -start -->
 <table>
@@ -52,35 +52,35 @@ Contribution guide can be found [here](https://cocmd.org/docs/contributing)
         <a href="https://github.com/tevmji">
             <img src="https://avatars.githubusercontent.com/u/37437346?v=4" width="100;" alt="tevmji"/>
             <br />
-            <sub><b>Null</b></sub>
+            <sub><b>tevmji</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/mzsrtgzr2">
             <img src="https://avatars.githubusercontent.com/u/3530526?v=4" width="100;" alt="mzsrtgzr2"/>
             <br />
-            <sub><b>Moshe Roth</b></sub>
+            <sub><b>mzsrtgzr2</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/eyallampel1">
             <img src="https://avatars.githubusercontent.com/u/17165252?v=4" width="100;" alt="eyallampel1"/>
             <br />
-            <sub><b>Null</b></sub>
+            <sub><b>eyallampel1</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/yonahd">
             <img src="https://avatars.githubusercontent.com/u/47282577?v=4" width="100;" alt="yonahd"/>
             <br />
-            <sub><b>Yonah Dissen</b></sub>
+            <sub><b>yonahd</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/HillaShx">
             <img src="https://avatars.githubusercontent.com/u/44138955?v=4" width="100;" alt="HillaShx"/>
             <br />
-            <sub><b>Hilla Shahrabani</b></sub>
+            <sub><b>HillaShx</b></sub>
         </a>
     </td></tr>
 </table>

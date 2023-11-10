@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Error, Result};
 use console::Style;
 use dialoguer::Confirm;
-use log::info;
+use log::{error, info};
 
 use crate::core::package::Package;
 use crate::core::packages_manager::PackagesManager;
@@ -31,6 +31,14 @@ pub fn install_package(
                 info!("Downloaded package to {:?}", downloaded_path);
             }
             Err(e) => {
+                if e.to_string().contains("unable to find package") {
+                    error!(
+                        "Error: The requested package '{}' could not be found in the cocmd hub.",
+                        package
+                    );
+                } else {
+                    error!("Error downloading package '{}': {}", package, e);
+                }
                 return Err(e);
             }
         }
