@@ -251,3 +251,16 @@ fn main() -> ExitCode {
         ExitCode::from(0)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use temp_testdir::TempDir;
+
+    use super::*;
+
+    #[test]
+    fn test_install_specific_package() {
+        let runtime_dir = TempDir::default();
+    }
+}

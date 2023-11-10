@@ -21,7 +21,7 @@
             },
             "args": [
                 "install",
-                "docker@0.0.1",
+                "docker@0.0.2",
             ],
             "cwd": "${workspaceFolder}"
         },

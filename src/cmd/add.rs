@@ -23,7 +23,6 @@ pub fn install_package(
 
     let mut provider =
         get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
-    let localpath = provider.local_path();
 
     if !provider.is_exists_locally() {
         info!("Package not found locally. Downloading...");
@@ -36,6 +35,8 @@ pub fn install_package(
             }
         }
     }
+
+    let localpath = provider.local_path();
 
     let locations = if provider.name() == LOCAL_PROVIDER {
         find_cocmd_files(&localpath, packages_manager.settings.scan_depth)
