@@ -96,6 +96,7 @@ impl Automation {
 #[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
 pub struct PackageConfigModel {
     pub name: String,
+    pub version: Option<String>,
     pub aliases: Option<String>,
     pub paths: Option<Vec<String>>,
     pub automations: Option<Vec<Automation>>,

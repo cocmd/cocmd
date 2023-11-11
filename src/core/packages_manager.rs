@@ -38,8 +38,8 @@ impl PackagesManager {
 
         if let Some(uri) = package_uri {
             // Get the provider
-            let provider =
-                get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
+            let provider = get_provider(&uri, &self.settings.runtime_dir, Some("tbd".to_string()))
+                .map_err(|e| e.to_string())?;
 
             // Check if the provider is local
             if provider.name() == LOCAL_PROVIDER {

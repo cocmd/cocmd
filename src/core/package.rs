@@ -88,7 +88,19 @@ impl Package {
     pub fn name(&self) -> &str {
         self.cocmd_config
             .as_ref()
-            .map_or("default_name", |config| config.name.as_str())
+            .map_or("???", |config| config.name.as_str())
+    }
+
+    pub fn version(&self) -> String {
+        self.cocmd_config
+            .as_ref()
+            .map_or(String::from("???"), |config| {
+                config
+                    .version
+                    .as_ref()
+                    .unwrap_or(&String::from("???"))
+                    .to_string()
+            })
     }
 
     pub fn paths(&self, absolute: bool) -> Vec<String> {
