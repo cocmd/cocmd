@@ -20,7 +20,9 @@ use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
+use itertools::Itertools;
 use log::info;
+use maplit::hashmap;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
@@ -219,7 +221,13 @@ fn main() -> ExitCode {
                 .expect("unable to get index from hub");
 
                 // create with dialoguer MultiSelect, what packages the user asks to install. use index.packages.iter() and use package.name as the text
-                let packages: Vec<String> = index.packages.iter().map(|p| p.name.clone()).collect();
+                let packages: Vec<String> = index
+                    .packages
+                    .iter()
+                    .map(|p| p.name.clone())
+                    .unique()
+                    .sorted()
+                    .collect();
 
                 let selections = MultiSelect::new()
                     .items(&packages)
@@ -252,9 +260,12 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod tests {
 
+    use std::fs;
+
     use temp_testdir::TempDir;
 
     use super::*;
+    use crate::core::{consts, utils::io::to_yaml_file};
 
     #[test]
     fn test_install_latest_package() {
@@ -386,5 +397,58 @@ mod tests {
         let package = packages_manager.get_package("aws-s3".to_string());
         assert!(package.is_some());
         assert_eq!("0.0.1", package.unwrap().version());
+    }
+
+    // write a test that simulate two packages intsalled with the same name,
+    // one of them will be local and the other will be from hub
+    // this test will generate the cocmd.yaml file with the same name as the
+    // package from the hub
+    // then, call uninstall package and make sure both doesn't apear as a package
+    // in cocmd
+    #[test]
+    fn test_uninstall_package_after_double_installation() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+
+        // generate a local path in {tmp_home_dir}/local_path
+        // generate a cocmd.yaml with "name: aws-s3" inside
+        // and call install_package with this path
+        let local_path = tmp_home_dir.join("local_path");
+        fs::create_dir_all(&local_path).unwrap();
+
+        // write name: aws-s3 to the file &local_path.join(&consts::SOURCE_CONFIG_FILE
+        // use io to_yaml_file
+
+        to_yaml_file(
+            &hashmap! {
+                "name" => "aws-s3",
+                "version" => "0.0.1",
+            },
+            &local_path.join(&consts::SOURCE_CONFIG_FILE),
+        )
+        .unwrap();
+
+        let res = add::install_package(
+            &mut packages_manager,
+            &local_path.to_string_lossy().to_string(),
+            true,
+        );
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!(&local_path, package.unwrap().location());
+
+        let res = add::install_package(&mut packages_manager, "aws-s3", true);
+        assert!(res.is_ok());
+
+        let res = uninstall_package(&mut packages_manager, "aws-s3");
+        assert!(res.is_ok());
+
+        let res = show_packages(&mut packages_manager);
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_none());
     }
 }

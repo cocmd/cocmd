@@ -36,7 +36,7 @@ impl Package {
 
             if config_file_path.exists() {
                 let config: Result<PackageConfigModel, String> =
-                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                    from_yaml_file(&config_file_path).map_err(|e| e.to_string());
                 match config {
                     Ok(config_res) => {
                         // Successfully loaded the configuration
@@ -69,7 +69,7 @@ impl Package {
 
             if config_file_path.exists() {
                 let config: Result<PackageConfigModel, String> =
-                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                    from_yaml_file(&config_file_path).map_err(|e| e.to_string());
                 config.is_ok()
             } else {
                 false

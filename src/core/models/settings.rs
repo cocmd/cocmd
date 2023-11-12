@@ -12,7 +12,6 @@ use crate::core::{consts, utils::sys::OS};
 pub struct Settings {
     pub home: String,
     pub terminal: String,
-    pub config_file: PathBuf,
     pub packages_file: PathBuf,
     pub runtime_dir: PathBuf,
     pub scan_depth: usize,
@@ -27,7 +26,6 @@ impl Settings {
         let home = home.unwrap_or(&consts::HOME);
         let terminal = terminal.unwrap_or(consts::DEFAULT_TERMINAL);
         let runtime_dir = Path::new(home).join(consts::RUNTIME_DIR);
-        let config_file = Path::new(&home).join(consts::CONFIG_FILE);
         let packages_file = Path::new(&home).join(consts::SOURCES_FILE);
         let params_file_path = Path::new(&home).join(consts::PARAMS_FILE);
 
@@ -51,7 +49,6 @@ impl Settings {
             home: home.to_string(),
             terminal: terminal.to_string(),
             runtime_dir,
-            config_file,
             packages_file,
             scan_depth: 2,
             os: get_os(), // packages_manager: PackagesManager::new(), // Initialize this
@@ -64,7 +61,7 @@ impl Settings {
     // from params, should return HashMap<String, String>
     pub fn read_params(params_file_path: &Path) -> HashMap<String, String> {
         let params: Result<HashMap<String, String>, String> =
-            from_yaml_file(params_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+            from_yaml_file(&params_file_path).map_err(|e| e.to_string());
         match params {
             Ok(params_res) => {
                 // Successfully loaded the configuration

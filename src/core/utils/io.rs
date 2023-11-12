@@ -94,7 +94,7 @@ pub fn get_tmp_file() -> Result<std::fs::File, std::io::Error> {
 }
 
 // Function to serialize a value to YAML and write it to a file
-pub fn to_yaml_file<T>(data: &T, file: &str) -> Result<(), Box<dyn Error>>
+pub fn to_yaml_file<T>(data: &T, file: &Path) -> Result<(), Box<dyn Error>>
 where
     T: Serialize,
 {
@@ -104,7 +104,7 @@ where
 }
 
 // Function to deserialize a value from a YAML file
-pub fn from_yaml_file<T>(file: &str) -> Result<T, Box<dyn Error>>
+pub fn from_yaml_file<T>(file: &Path) -> Result<T, Box<dyn Error>>
 where
     T: DeserializeOwned,
 {

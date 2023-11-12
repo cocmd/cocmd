@@ -59,7 +59,7 @@ pub fn resolve_hub_package_locally(
 
             if config_file_path.exists() {
                 let config: Result<PackageConfigModel, String> =
-                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                    from_yaml_file(&config_file_path).map_err(|e| e.to_string());
 
                 if let Ok(config) = config {
                     if let Some(config_version) = config.version {

@@ -65,8 +65,7 @@ impl PackageProvider for CocmdHubPackageProvider {
 
         // if version is specified, check if the version in cocmd.yaml matches
         if config_file_path.exists() {
-            let config: PackageConfigModel =
-                from_yaml_file(&config_file_path.to_string_lossy()).unwrap();
+            let config: PackageConfigModel = from_yaml_file(&config_file_path).unwrap();
             if config.version == Some(self.version.clone()) {
                 return true;
             }
