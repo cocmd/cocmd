@@ -21,7 +21,7 @@ use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
 use itertools::Itertools;
-use log::info;
+use log::trace;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
@@ -237,7 +237,7 @@ fn main() -> ExitCode {
                 // set packages into selected_names (Vec[String])
                 selected_names = selections.iter().map(|s| packages[*s].clone()).collect();
             }
-            info!("Ok, I will install: {}", selected_names.join(", "));
+            trace!("Ok, I will install: {}", selected_names.join(", "));
             for name in selected_names {
                 res = add::install_package(&mut packages_manager, &name, dont_ask);
             }
