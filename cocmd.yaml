@@ -156,6 +156,10 @@ automations:
             rustup target add wasm32-unknown-unknown
             rustup target add aarch64-apple-darwin
 
+            # for coverage with grcov
+            rustup component add llvm-tools-preview
+            cargo install grcov
+
             rustup toolchain install nightly
             
             cargo install --path .
