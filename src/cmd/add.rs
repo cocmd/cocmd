@@ -3,12 +3,14 @@ use std::path::Path;
 use anyhow::{Error, Result};
 use console::Style;
 use dialoguer::Confirm;
-use log::info;
+use log::{error, info};
 
 use crate::core::package::Package;
 use crate::core::packages_manager::PackagesManager;
+use crate::core::utils::packages::extract_package_name_and_version;
 use crate::core::utils::repository::find_cocmd_files;
-use crate::package_provider::{get_provider, LOCAL_PROVIDER};
+use crate::package_provider::get_provider;
+
 pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
@@ -18,8 +20,9 @@ pub fn install_package(
 
     let settings = &packages_manager.settings;
 
-    let provider = get_provider(&package.to_string(), &settings.runtime_dir).unwrap();
-    let localpath = provider.local_path();
+    let (package_uri, version) = extract_package_name_and_version(package);
+
+    let provider = get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
 
     if !provider.is_exists_locally() {
         info!("Package not found locally. Downloading...");
@@ -28,12 +31,22 @@ pub fn install_package(
                 info!("Downloaded package to {:?}", downloaded_path);
             }
             Err(e) => {
+                if e.to_string().contains("unable to find package") {
+                    error!(
+                        "Error: The requested package '{}' could not be found in the cocmd hub.",
+                        package
+                    );
+                } else {
+                    error!("Error downloading package '{}': {}", package, e);
+                }
                 return Err(e);
             }
         }
     }
 
-    let locations = if provider.name() == LOCAL_PROVIDER {
+    let localpath = provider.local_path();
+
+    let locations = if provider.is_provider_local() {
         find_cocmd_files(&localpath, packages_manager.settings.scan_depth)
     } else {
         vec![localpath.to_str().unwrap().to_string()]
@@ -47,14 +60,14 @@ pub fn install_package(
         return Ok(());
     }
 
-    if provider.name() == LOCAL_PROVIDER {
+    if provider.is_provider_local() {
         info!(
             "found {} cocmd packages in this path:\n  - {}",
             locations.len(),
             lst_locs
         );
     }
-    if provider.name() != LOCAL_PROVIDER
+    if !provider.is_provider_local()
         || dont_ask
         || Confirm::new()
             .with_prompt("Do you want to continue?")
@@ -63,15 +76,15 @@ pub fn install_package(
     {
         for loc in locations {
             let package: Package = Package::new(
-                if provider.name() == LOCAL_PROVIDER {
+                if provider.is_provider_local() {
                     loc.clone()
                 } else {
-                    let package_label = package.to_string();
-                    package_label.clone()
+                    package_uri.clone().to_string()
                 },
                 Path::new(&loc),
                 &packages_manager.settings,
             );
+
             let uri = package.uri.clone();
             packages_manager.add_package(package.clone());
             info!("Package '{}' was installed:", uri);

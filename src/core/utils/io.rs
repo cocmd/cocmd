@@ -46,7 +46,7 @@ pub fn exists(path: &str) -> bool {
 /// # Returns
 ///
 /// A vector of strings containing the lines from the file.
-pub fn file_read_lines(file: &str) -> Result<Vec<String>, std::io::Error> {
+pub fn file_read_lines(file: &Path) -> Result<Vec<String>, std::io::Error> {
     let mut lines = Vec::new();
     let file = fs::File::open(file)?;
     let reader = std::io::BufReader::new(file);
@@ -62,7 +62,7 @@ pub fn file_read_lines(file: &str) -> Result<Vec<String>, std::io::Error> {
 ///
 /// - `file`: The file path to write to.
 /// - `lines`: A vector of strings to write to the file.
-pub fn file_write_lines(file: &str, lines: &[String]) -> Result<(), std::io::Error> {
+pub fn file_write_lines(file: &Path, lines: &[String]) -> Result<(), std::io::Error> {
     let mut file = fs::File::create(file)?;
     for line in lines {
         file.write_all(line.as_bytes())?;
@@ -77,7 +77,7 @@ pub fn file_write_lines(file: &str, lines: &[String]) -> Result<(), std::io::Err
 ///
 /// - `file`: The file path to write to.
 /// - `content`: The content to write to the file.
-pub fn file_write(file: &str, content: &str) -> Result<(), std::io::Error> {
+pub fn file_write(file: &Path, content: &str) -> Result<(), std::io::Error> {
     fs::write(file, content)
 }
 
@@ -94,7 +94,7 @@ pub fn get_tmp_file() -> Result<std::fs::File, std::io::Error> {
 }
 
 // Function to serialize a value to YAML and write it to a file
-pub fn to_yaml_file<T>(data: &T, file: &str) -> Result<(), Box<dyn Error>>
+pub fn to_yaml_file<T>(data: &T, file: &Path) -> Result<(), Box<dyn Error>>
 where
     T: Serialize,
 {
@@ -104,7 +104,7 @@ where
 }
 
 // Function to deserialize a value from a YAML file
-pub fn from_yaml_file<T>(file: &str) -> Result<T, Box<dyn Error>>
+pub fn from_yaml_file<T>(file: &Path) -> Result<T, Box<dyn Error>>
 where
     T: DeserializeOwned,
 {
