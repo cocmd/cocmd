@@ -33,7 +33,7 @@ use crate::output::set_logging_level;
 #[derive(Parser)]
 #[command(
     author = "Moshe Roth",
-    version = "1.0.78",
+    version = "1.0.79",
     about = "
     Cocmd is a CLI utility to collaborate on anything in the CMD in the community and internal teams. 
     Use it to sync Aliases, Scripts, and Workflows."
