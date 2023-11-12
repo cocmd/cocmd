@@ -10,6 +10,7 @@ use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::packages::extract_package_name_and_version;
 use crate::core::utils::repository::find_cocmd_files;
 use crate::package_provider::get_provider;
+
 pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
@@ -83,6 +84,7 @@ pub fn install_package(
                 Path::new(&loc),
                 &packages_manager.settings,
             );
+
             let uri = package.uri.clone();
             packages_manager.add_package(package.clone());
             info!("Package '{}' was installed:", uri);

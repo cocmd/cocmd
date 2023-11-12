@@ -28,6 +28,10 @@ impl PackagesManager {
         }
     }
 
+    pub fn reload(&mut self) {
+        self.packages = Self::load_packages(&self.packages_file, &self.settings)
+    }
+
     pub fn remove_package(&mut self, package_name: &str) -> Result<(), String> {
         // Find the package URI by package name
         let package_uri = self
@@ -71,14 +75,17 @@ impl PackagesManager {
         self.save();
     }
 
-    pub fn save(&self) -> Result<(), String> {
+    pub fn save(&mut self) -> Result<(), String> {
         // Convert the HashMap into a Vec of package URIs
         let package_strings: Vec<String> =
             self.packages.values().map(|s| s.uri.to_string()).collect();
 
         // Write the updated list of packages back to the packages.txt file
         match file_write_lines(&self.packages_file, &package_strings) {
-            Ok(_) => Ok(()),
+            Ok(_) => {
+                self.reload();
+                Ok(())
+            }
             Err(e) => {
                 log::error!("Failed to write to packages file: {}", e);
                 Err(format!("Failed to write to packages file: {}", e))
