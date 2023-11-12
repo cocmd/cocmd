@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 use log::error;
 
@@ -12,7 +13,7 @@ use crate::Settings;
 #[derive(Debug, Clone)]
 pub struct PackagesManager {
     pub settings: Settings,
-    pub packages_file: String,
+    pub packages_file: PathBuf,
     pub packages: HashMap<String, Package>,
 }
 
@@ -86,7 +87,7 @@ impl PackagesManager {
         }
     }
 
-    fn load_packages(packages_file: &str, settings: &Settings) -> HashMap<String, Package> {
+    fn load_packages(packages_file: &Path, settings: &Settings) -> HashMap<String, Package> {
         match file_read_lines(packages_file) {
             Ok(lines) => {
                 let mut packages = HashMap::new();
@@ -108,7 +109,7 @@ impl PackagesManager {
                 packages
             }
             Err(err) => {
-                error!("failed reading {} - {}", packages_file, err);
+                error!("failed reading {:?} - {}", packages_file, err);
                 HashMap::new()
             }
         }

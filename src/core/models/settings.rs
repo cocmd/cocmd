@@ -12,8 +12,8 @@ use crate::core::{consts, utils::sys::OS};
 pub struct Settings {
     pub home: String,
     pub terminal: String,
-    pub config_file: String,
-    pub packages_file: String,
+    pub config_file: PathBuf,
+    pub packages_file: PathBuf,
     pub runtime_dir: PathBuf,
     pub scan_depth: usize,
     pub os: OS,
@@ -27,12 +27,19 @@ impl Settings {
         let home = home.unwrap_or(&consts::HOME);
         let terminal = terminal.unwrap_or(consts::DEFAULT_TERMINAL);
         let runtime_dir = Path::new(home).join(consts::RUNTIME_DIR);
-        let config_file = format!("{}/{}", home, consts::CONFIG_FILE);
-        let packages_file = format!("{}/{}", home, consts::SOURCES_FILE);
+        let config_file = Path::new(&home).join(consts::CONFIG_FILE);
+        let packages_file = Path::new(&home).join(consts::SOURCES_FILE);
+        let params_file_path = Path::new(&home).join(consts::PARAMS_FILE);
 
         // Create directories and files
         fs::create_dir_all(home).unwrap();
         fs::create_dir_all(&runtime_dir).unwrap();
+        OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&packages_file)
+            .unwrap();
+
         OpenOptions::new()
             .create(true)
             .append(true)
@@ -49,14 +56,13 @@ impl Settings {
             scan_depth: 2,
             os: get_os(), // packages_manager: PackagesManager::new(), // Initialize this
             // credentials: CredsConfigModel::new(), // Initialize this
-            params: Settings::read_params(home.to_string()),
+            params: Settings::read_params(params_file_path.as_path()),
         }
     }
 
     // create function 'read_params' that read from home/consts::PARAMS_FILE path yaml file and return a map of params
     // from params, should return HashMap<String, String>
-    pub fn read_params(home: String) -> HashMap<String, String> {
-        let params_file_path = Path::new(&home).join(consts::PARAMS_FILE);
+    pub fn read_params(params_file_path: &Path) -> HashMap<String, String> {
         let params: Result<HashMap<String, String>, String> =
             from_yaml_file(params_file_path.to_str().unwrap()).map_err(|e| e.to_string());
         match params {

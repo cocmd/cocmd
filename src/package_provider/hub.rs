@@ -185,8 +185,15 @@ impl CocmdHubPackageProvider {
             cached_at: current_unix,
             index,
         };
-        let serialized = serde_json::to_string(&cached_index)?;
-        std::fs::write(target_file, serialized)?;
+        let serialized_res = serde_json::to_string(&cached_index);
+        if let Err(err) = serialized_res {
+            return Err(anyhow!("unable to serialize package index: {}", err));
+        }
+        let serialized = serialized_res.unwrap();
+        let write_res = std::fs::write(target_file, serialized);
+        if let Err(err) = write_res {
+            return Err(anyhow!("unable to write package index cache: {}", err));
+        }
         Ok(())
     }
 }

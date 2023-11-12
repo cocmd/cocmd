@@ -97,6 +97,12 @@ mod tests {
     fn test_get_provider() {
         let tmp_home_dir = TempDir::default();
         let runtime_dir = tmp_home_dir.join("runtime");
+
+        // create runtime_dir if not exists
+        if !runtime_dir.exists() {
+            std::fs::create_dir_all(&runtime_dir).unwrap();
+        }
+
         let git_url = "git@github.com:mzsrtgzt2/cocmd.git";
         let git_url2 = "https://github.com/mzsrtgzr2/cocmd";
         let hub_url = "cocmd-hub";
