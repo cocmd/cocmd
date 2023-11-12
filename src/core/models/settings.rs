@@ -61,7 +61,7 @@ impl Settings {
     // from params, should return HashMap<String, String>
     pub fn read_params(params_file_path: &Path) -> HashMap<String, String> {
         let params: Result<HashMap<String, String>, String> =
-            from_yaml_file(&params_file_path).map_err(|e| e.to_string());
+            from_yaml_file(params_file_path).map_err(|e| e.to_string());
         match params {
             Ok(params_res) => {
                 // Successfully loaded the configuration

@@ -22,7 +22,6 @@ use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
 use itertools::Itertools;
 use log::info;
-use maplit::hashmap;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
@@ -262,6 +261,7 @@ mod tests {
 
     use std::fs;
 
+    use maplit::hashmap;
     use temp_testdir::TempDir;
 
     use super::*;
@@ -424,13 +424,13 @@ mod tests {
                 "name" => "aws-s3",
                 "version" => "0.0.1",
             },
-            &local_path.join(&consts::SOURCE_CONFIG_FILE),
+            &local_path.join(consts::SOURCE_CONFIG_FILE),
         )
         .unwrap();
 
         let res = add::install_package(
             &mut packages_manager,
-            &local_path.to_string_lossy().to_string(),
+            local_path.to_string_lossy().as_ref(),
             true,
         );
         assert!(res.is_ok());
