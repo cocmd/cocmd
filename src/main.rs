@@ -212,14 +212,11 @@ fn main() -> ExitCode {
             if let Some(names) = names {
                 selected_names = names.clone();
             } else {
-                let hub_provider = package_provider::hub::CocmdHubPackageProvider::new(
-                    &"placeholder".to_string(),
+                let index = package_provider::hub::CocmdHubPackageProvider::get_index(
                     &packages_manager.settings.runtime_dir,
-                    None,
-                );
-                let index = hub_provider
-                    .get_index(false)
-                    .expect("unable to get index from hub");
+                    false,
+                )
+                .expect("unable to get index from hub");
 
                 // create with dialoguer MultiSelect, what packages the user asks to install. use index.packages.iter() and use package.name as the text
                 let packages: Vec<String> = index.packages.iter().map(|p| p.name.clone()).collect();
