@@ -112,7 +112,7 @@ impl PackageProvider for CocmdHubPackageProvider {
 
 impl CocmdHubPackageProvider {
     pub fn new(package: &String, runtime_dir: &Path, version: Option<String>) -> Self {
-        let binding = runtime_dir.join(package.to_owned());
+        let binding = runtime_dir.join(package);
 
         let default_path = binding.as_path();
 
@@ -223,7 +223,7 @@ pub struct PackageInfo {
 }
 
 impl PackageIndex {
-    fn get_package(&self, name: &str, version: &Option<String>) -> Option<PackageInfo> {
+    pub fn get_package(&self, name: &str, version: &Option<String>) -> Option<PackageInfo> {
         let mut matching_packages: Vec<PackageInfo> = self
             .packages
             .iter()
@@ -260,7 +260,6 @@ mod tests {
     #[test]
     fn test_get_index() {
         let runtime_dir = TempDir::default();
-        let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         let index =
             CocmdHubPackageProvider::get_index(runtime_dir.to_path_buf().as_path(), true).unwrap();
         assert!(!index.packages.is_empty());

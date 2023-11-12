@@ -38,14 +38,13 @@ impl PackagesManager {
 
         if let Some(uri) = package_uri {
             // Get the provider
-            let provider = get_provider(&uri, &self.settings.runtime_dir, Some("tbd".to_string()))
-                .map_err(|e| e.to_string())?;
+            let provider =
+                get_provider(&uri, &self.settings.runtime_dir, None).map_err(|e| e.to_string())?;
+
+            self.packages.remove(&uri);
 
             // Check if the provider is local
-            if provider.is_provider_local() {
-                // If local, only remove from packages.txt
-                self.packages.remove(&uri);
-            } else {
+            if !provider.is_provider_local() {
                 // If not local, delete the directory
                 let package_dir = provider.get_installation_path();
                 if package_dir.exists() {

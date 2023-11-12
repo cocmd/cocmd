@@ -114,7 +114,7 @@ mod tests {
         let provider =
             get_provider(&git_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
-        assert_eq!(true, provider.is_provider_git());
+        assert!(provider.is_provider_git());
         assert_eq!(
             provider.local_path(),
             runtime_dir.join("mzsrtgzt2.cocmd").to_path_buf()
@@ -123,7 +123,7 @@ mod tests {
         let provider =
             get_provider(&git_url2.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
-        assert_eq!(true, provider.is_provider_git());
+        assert!(provider.is_provider_git());
         assert_eq!(
             provider.local_path(),
             runtime_dir.join("mzsrtgzr2.cocmd").to_path_buf()
@@ -132,7 +132,7 @@ mod tests {
         let provider =
             get_provider(&hub_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), COCMDHUB_PROVIDER);
-        assert_eq!(true, provider.is_provider_hub());
+        assert!(provider.is_provider_hub());
         assert_eq!(
             provider.local_path(),
             runtime_dir.join("cocmd-hub").to_path_buf()
@@ -140,7 +140,7 @@ mod tests {
 
         let provider = get_provider(&local_url, &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), LOCAL_PROVIDER);
-        assert_eq!(true, provider.is_provider_local());
+        assert!(provider.is_provider_local());
         assert_eq!(provider.local_path(), Path::new(&local_url).to_path_buf());
     }
 }

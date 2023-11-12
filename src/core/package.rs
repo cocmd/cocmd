@@ -1,4 +1,5 @@
 #![allow(clippy::format_in_format_args)]
+#![allow(dead_code)]
 use std::fmt;
 use std::fs;
 use std::path::Path;

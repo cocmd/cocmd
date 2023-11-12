@@ -17,12 +17,8 @@ pub fn uninstall_package(packages_manager: &mut PackagesManager, package_name: &
     };
 
     // Use get_provider to determine the provider of the package
-    let provider = get_provider(
-        &package.uri,
-        &packages_manager.settings.runtime_dir,
-        Some("tbd".to_string()),
-    )
-    .map_err(|_| anyhow!("Failed to get provider for package '{}'", package_name))?;
+    let provider = get_provider(&package.uri, &packages_manager.settings.runtime_dir, None)
+        .map_err(|_| anyhow!("Failed to get provider for package '{}'", package_name))?;
 
     // Check if the provider is local
     if provider.is_provider_local() {

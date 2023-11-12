@@ -257,11 +257,41 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_install_latest_package() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "aws-s3", true);
+        assert!(res.is_ok());
+
+        // get the latest version from index and make sure this is the one we download
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+
+        let index = package_provider::hub::CocmdHubPackageProvider::get_index(
+            &packages_manager.settings.runtime_dir,
+            false,
+        )
+        .expect("unable to get index from hub");
+
+        let latest_version = index
+            .get_package("aws-s3", &None::<String>)
+            .unwrap()
+            .version
+            .clone();
+
+        assert_eq!(latest_version, package.unwrap().version());
+    }
+
+    #[test]
     fn test_install_specific_package() {
         let tmp_home_dir = TempDir::default();
         let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
-        let res = add::install_package(&mut packages_manager, "docker@0.0.0", true);
+        let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);
         assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.0", package.unwrap().version());
     }
 
     #[test]
@@ -282,7 +312,7 @@ mod tests {
         let res = add::install_package(&mut packages_manager, "docker@0.0.0", true);
         assert!(res.is_ok());
 
-        let res = show_package(&mut packages_manager, "docker@0.0.0".to_string());
+        let res = show_package(&mut packages_manager, "docker".to_string());
         assert!(res.is_ok());
     }
 
@@ -308,27 +338,37 @@ mod tests {
         let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
         let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);
         assert!(res.is_ok());
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.0", package.unwrap().version());
 
         let res = add::install_package(&mut packages_manager, "aws-s3@0.0.1", true);
         assert!(res.is_ok());
 
         // use packages_manager.get_package("aws-s3".to_string()) to make sure.
-        // check we only get 0.0.1 by the uri
-        let package = packages_manager.get_package("aws-s3".to_string());
+        let binding = packages_manager.clone();
+        let package = binding.get_package("aws-s3".to_string());
         assert!(package.is_some());
-        assert!(package.unwrap().uri.contains("0.0.1"));
+        assert_eq!("0.0.1", package.unwrap().version());
 
-        let res = uninstall_package(&mut packages_manager, "aws-s3@0.0.0");
+        let package_path = package.unwrap().location();
+
+        let res = uninstall_package(&mut packages_manager, "aws-s3");
         assert!(res.is_ok());
 
         let res = show_packages(&mut packages_manager);
         assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_none());
+
+        // make sure package_path doesn't exist
+        assert!(!package_path.exists());
     }
 
     // write a test for checking that when a latest version is installed
-    // the old one is ignored and not shown in show_packages
     #[test]
-    fn test_show_packages_after_install_latest_version() {
+    fn test_install_latest_version_after_old() {
         let tmp_home_dir = TempDir::default();
         let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
         let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);

@@ -78,8 +78,7 @@ pub fn install_package(
                 if provider.is_provider_local() {
                     loc.clone()
                 } else {
-                    let package_label = package.to_string();
-                    package_label.clone()
+                    package_uri.clone().to_string()
                 },
                 Path::new(&loc),
                 &packages_manager.settings,

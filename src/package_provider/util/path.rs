@@ -64,7 +64,7 @@ pub fn resolve_hub_package_locally(
                 if let Ok(config) = config {
                     if let Some(config_version) = config.version {
                         if config_version == version {
-                            return Ok(path);
+                            Ok(path)
                         } else {
                             bail!(
                                 "unable to find package '{}' version '{}' in '{}'",
@@ -99,7 +99,7 @@ pub fn resolve_hub_package_locally(
             }
         } else {
             // return ok for any version, we don't care
-            return Ok(path);
+            Ok(path)
         }
     } else {
         bail!(
