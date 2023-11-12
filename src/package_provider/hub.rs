@@ -23,7 +23,7 @@ use std::{
 };
 
 use anyhow::{anyhow, Context, Result};
-use log::info;
+use log::{info, trace};
 use serde::{Deserialize, Serialize};
 
 use super::util::path::resolve_hub_package_locally;
@@ -146,7 +146,7 @@ impl CocmdHubPackageProvider {
                 let current_unix = current_time.as_secs();
                 if old_index.cached_at >= (current_unix - PACKAGE_INDEX_CACHE_INVALIDATION_SECONDS)
                 {
-                    info!("using cached package index");
+                    trace!("using cached package index");
                     return Ok(old_index.index);
                 }
             }
