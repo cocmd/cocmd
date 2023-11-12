@@ -20,7 +20,8 @@ use cmd::show::howto;
 use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
-use log::info;
+use itertools::Itertools;
+use log::trace;
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
@@ -212,16 +213,20 @@ fn main() -> ExitCode {
             if let Some(names) = names {
                 selected_names = names.clone();
             } else {
-                let hub_provider = package_provider::hub::CocmdHubPackageProvider::new(
-                    &"placeholder".to_string(),
+                let index = package_provider::hub::CocmdHubPackageProvider::get_index(
                     &packages_manager.settings.runtime_dir,
-                );
-                let index = hub_provider
-                    .get_index(false)
-                    .expect("unable to get index from hub");
+                    false,
+                )
+                .expect("unable to get index from hub");
 
                 // create with dialoguer MultiSelect, what packages the user asks to install. use index.packages.iter() and use package.name as the text
-                let packages: Vec<String> = index.packages.iter().map(|p| p.name.clone()).collect();
+                let packages: Vec<String> = index
+                    .packages
+                    .iter()
+                    .map(|p| p.name.clone())
+                    .unique()
+                    .sorted()
+                    .collect();
 
                 let selections = MultiSelect::new()
                     .items(&packages)
@@ -232,7 +237,7 @@ fn main() -> ExitCode {
                 // set packages into selected_names (Vec[String])
                 selected_names = selections.iter().map(|s| packages[*s].clone()).collect();
             }
-            info!("Ok, I will install: {}", selected_names.join(", "));
+            trace!("Ok, I will install: {}", selected_names.join(", "));
             for name in selected_names {
                 res = add::install_package(&mut packages_manager, &name, dont_ask);
             }
@@ -248,5 +253,202 @@ fn main() -> ExitCode {
         ExitCode::from(1)
     } else {
         ExitCode::from(0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use std::fs;
+
+    use maplit::hashmap;
+    use temp_testdir::TempDir;
+
+    use super::*;
+    use crate::core::{consts, utils::io::to_yaml_file};
+
+    #[test]
+    fn test_install_latest_package() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "aws-s3", true);
+        assert!(res.is_ok());
+
+        // get the latest version from index and make sure this is the one we download
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+
+        let index = package_provider::hub::CocmdHubPackageProvider::get_index(
+            &packages_manager.settings.runtime_dir,
+            false,
+        )
+        .expect("unable to get index from hub");
+
+        let latest_version = index
+            .get_package("aws-s3", &None::<String>)
+            .unwrap()
+            .version
+            .clone();
+
+        assert_eq!(latest_version, package.unwrap().version());
+    }
+
+    #[test]
+    fn test_install_specific_package() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.0", package.unwrap().version());
+    }
+
+    #[test]
+    fn test_show_package() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker", true);
+        assert!(res.is_ok());
+
+        let res = show_package(&mut packages_manager, "docker".to_string());
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_show_package_w_version() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker@0.0.0", true);
+        assert!(res.is_ok());
+
+        let res = show_package(&mut packages_manager, "docker".to_string());
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_show_packages() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "docker", true);
+        assert!(res.is_ok());
+
+        let res = show_packages(&mut packages_manager);
+        assert!(res.is_ok());
+    }
+
+    // write a test where we install aws-s3@0.0.0 and aws-s3@0.0.1
+    // and we show packages and make sure both are shown
+    // then we uninstall aws-s3@0.0.0
+    // and we show packages and make sure only aws-s3@0.0.1
+    // is shown
+    #[test]
+    fn test_show_packages_after_uninstall() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);
+        assert!(res.is_ok());
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.0", package.unwrap().version());
+
+        let res = add::install_package(&mut packages_manager, "aws-s3@0.0.1", true);
+        assert!(res.is_ok());
+
+        // use packages_manager.get_package("aws-s3".to_string()) to make sure.
+        let binding = packages_manager.clone();
+        let package = binding.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.1", package.unwrap().version());
+
+        let package_path = package.unwrap().location();
+
+        let res = uninstall_package(&mut packages_manager, "aws-s3");
+        assert!(res.is_ok());
+
+        let res = show_packages(&mut packages_manager);
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_none());
+
+        // make sure package_path doesn't exist
+        assert!(!package_path.exists());
+    }
+
+    // write a test for checking that when a latest version is installed
+    #[test]
+    fn test_install_latest_version_after_old() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+        let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.0", package.unwrap().version());
+
+        let res = add::install_package(&mut packages_manager, "aws-s3", true);
+        assert!(res.is_ok());
+
+        // use packages_manager.get_package("aws-s3".to_string()) to make sure.
+        // check we only get 0.0.1 by the uri
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.1", package.unwrap().version());
+    }
+
+    // write a test that simulate two packages intsalled with the same name,
+    // one of them will be local and the other will be from hub
+    // this test will generate the cocmd.yaml file with the same name as the
+    // package from the hub
+    // then, call uninstall package and make sure both doesn't apear as a package
+    // in cocmd
+    #[test]
+    fn test_uninstall_package_after_double_installation() {
+        let tmp_home_dir = TempDir::default();
+        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
+
+        // generate a local path in {tmp_home_dir}/local_path
+        // generate a cocmd.yaml with "name: aws-s3" inside
+        // and call install_package with this path
+        let local_path = tmp_home_dir.join("local_path");
+        fs::create_dir_all(&local_path).unwrap();
+
+        // write name: aws-s3 to the file &local_path.join(&consts::SOURCE_CONFIG_FILE
+        // use io to_yaml_file
+
+        to_yaml_file(
+            &hashmap! {
+                "name" => "aws-s3",
+                "version" => "0.0.1",
+            },
+            &local_path.join(consts::SOURCE_CONFIG_FILE),
+        )
+        .unwrap();
+
+        let res = add::install_package(
+            &mut packages_manager,
+            local_path.to_string_lossy().as_ref(),
+            true,
+        );
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!(&local_path, package.unwrap().location());
+
+        let res = add::install_package(&mut packages_manager, "aws-s3", true);
+        assert!(res.is_ok());
+
+        let res = uninstall_package(&mut packages_manager, "aws-s3");
+        assert!(res.is_ok());
+
+        let res = show_packages(&mut packages_manager);
+        assert!(res.is_ok());
+
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_none());
     }
 }

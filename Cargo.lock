@@ -282,9 +282,11 @@ dependencies = [
  "fs_extra",
  "glob",
  "hex",
+ "itertools",
  "lazy_static",
  "levenshtein",
  "log",
+ "maplit",
  "natord",
  "openssl",
  "ratatui",
@@ -296,6 +298,7 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "sha2",
+ "temp_testdir",
  "tempdir",
  "termimad",
  "thiserror",
@@ -1076,6 +1079,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
 
 [[package]]
+name = "maplit"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
+
+[[package]]
 name = "memchr"
 version = "2.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1777,6 +1786,12 @@ dependencies = [
  "core-foundation-sys",
  "libc",
 ]
+
+[[package]]
+name = "temp_testdir"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "921f1e9c427802414907a48b21a6504ff6b3a15a1a3cf37e699590949ad9befc"
 
 [[package]]
 name = "tempdir"

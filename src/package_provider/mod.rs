@@ -1,7 +1,7 @@
 /*
  * This file is part of cocmd.
  *
- * Copyright (C) 2019-2021 Moshe Roth
+ * Copyright (C) 2023 Moshe Roth
  *
  * cocmd is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,28 +45,42 @@ pub trait PackageProvider {
     }
     fn download(&self) -> Result<PathBuf>;
     // TODO: fn check update available? (probably should be only available in the hub)
+
+    fn is_provider_local(&self) -> bool {
+        self.name() == LOCAL_PROVIDER
+    }
+
+    fn is_provider_git(&self) -> bool {
+        self.name() == GIT_PROVIDER
+    }
+
+    fn is_provider_hub(&self) -> bool {
+        self.name() == COCMDHUB_PROVIDER
+    }
 }
 
-pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn PackageProvider>> {
+pub fn get_provider(
+    uri: &String,
+    runtime_dir: &Path,
+    version: Option<String>,
+) -> Result<Box<dyn PackageProvider>> {
     // parse "package" if it's a local path create a LocalPackageProvider
     // if it's a git url create a GitPackageProvider
     // otherwise look for it in the hub and create a HubPackageProvider
 
-    if let Some(local_path) = util::path::extract_local_path(package) {
-        Ok(Box::new(local::LocalPackageProvider::new(
-            package,
-            &local_path,
-        )))
-    } else if let Some(github_parts) = util::git::extract_git_url_parts(package) {
+    if let Some(local_path) = util::path::extract_local_path(uri) {
+        Ok(Box::new(local::LocalPackageProvider::new(uri, &local_path)))
+    } else if let Some(github_parts) = util::git::extract_git_url_parts(uri) {
         return Ok(Box::new(git::GitPackageProvider::new(
-            package,
+            uri,
             &github_parts,
             runtime_dir,
         )));
     } else {
         return Ok(Box::new(hub::CocmdHubPackageProvider::new(
-            package,
+            uri,
             runtime_dir,
+            version,
         )));
     }
 }
@@ -75,39 +89,58 @@ pub fn get_provider(package: &String, runtime_dir: &Path) -> Result<Box<dyn Pack
 // and that the correct provider is returned for each case
 #[cfg(test)]
 mod tests {
+    use temp_testdir::TempDir;
+
     use super::*;
 
     #[test]
     fn test_get_provider() {
-        let runtime_dir = Path::new("/tmp");
+        let tmp_home_dir = TempDir::default();
+        let runtime_dir = tmp_home_dir.join("runtime");
+
+        // create runtime_dir if not exists
+        if !runtime_dir.exists() {
+            std::fs::create_dir_all(&runtime_dir).unwrap();
+        }
+
         let git_url = "git@github.com:mzsrtgzt2/cocmd.git";
         let git_url2 = "https://github.com/mzsrtgzr2/cocmd";
         let hub_url = "cocmd-hub";
-        let local_url = "/tmp/test/no-existing";
+        let local_url = runtime_dir
+            .join("no-existing")
+            .to_string_lossy()
+            .to_string();
 
-        let provider = get_provider(&git_url.to_string(), runtime_dir).unwrap();
+        let provider =
+            get_provider(&git_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
+        assert!(provider.is_provider_git());
         assert_eq!(
             provider.local_path(),
-            Path::new("/tmp/mzsrtgzt2.cocmd").to_path_buf()
+            runtime_dir.join("mzsrtgzt2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&git_url2.to_string(), runtime_dir).unwrap();
+        let provider =
+            get_provider(&git_url2.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
+        assert!(provider.is_provider_git());
         assert_eq!(
             provider.local_path(),
-            Path::new("/tmp/mzsrtgzr2.cocmd").to_path_buf()
+            runtime_dir.join("mzsrtgzr2.cocmd").to_path_buf()
         );
 
-        let provider = get_provider(&hub_url.to_string(), runtime_dir).unwrap();
+        let provider =
+            get_provider(&hub_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), COCMDHUB_PROVIDER);
+        assert!(provider.is_provider_hub());
         assert_eq!(
             provider.local_path(),
-            Path::new("/tmp/cocmd-hub").to_path_buf()
+            runtime_dir.join("cocmd-hub").to_path_buf()
         );
 
-        let provider = get_provider(&local_url.to_string(), runtime_dir).unwrap();
+        let provider = get_provider(&local_url, &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), LOCAL_PROVIDER);
-        assert_eq!(provider.local_path(), Path::new(local_url).to_path_buf());
+        assert!(provider.is_provider_local());
+        assert_eq!(provider.local_path(), Path::new(&local_url).to_path_buf());
     }
 }

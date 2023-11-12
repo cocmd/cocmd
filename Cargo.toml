@@ -41,6 +41,11 @@ termimad = "0.24.0"
 crossterm = "0.27.0"
 env_logger = "0.10.0"
 log = "0.4.20"
+itertools = "0.11.0"
+maplit = "1.0.2"
+
+[dev-dependencies]
+temp_testdir = "0.2.3"
 
 [features]
 default = ["cli"]

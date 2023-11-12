@@ -1,18 +1,19 @@
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 use log::error;
 
+use super::utils::packages::extract_package_name_and_version;
 use crate::core::models::package_config_model::Automation;
 use crate::core::package::Package;
 use crate::core::utils::io::{file_read_lines, file_write_lines};
 use crate::package_provider::get_provider;
-use crate::package_provider::LOCAL_PROVIDER;
 use crate::Settings;
 
 #[derive(Debug, Clone)]
 pub struct PackagesManager {
     pub settings: Settings,
-    pub packages_file: String,
+    pub packages_file: PathBuf,
     pub packages: HashMap<String, Package>,
 }
 
@@ -27,6 +28,10 @@ impl PackagesManager {
         }
     }
 
+    pub fn reload(&mut self) {
+        self.packages = Self::load_packages(&self.packages_file, &self.settings)
+    }
+
     pub fn remove_package(&mut self, package_name: &str) -> Result<(), String> {
         // Find the package URI by package name
         let package_uri = self
@@ -38,13 +43,12 @@ impl PackagesManager {
         if let Some(uri) = package_uri {
             // Get the provider
             let provider =
-                get_provider(&uri, &self.settings.runtime_dir).map_err(|e| e.to_string())?;
+                get_provider(&uri, &self.settings.runtime_dir, None).map_err(|e| e.to_string())?;
+
+            self.packages.remove(&uri);
 
             // Check if the provider is local
-            if provider.name() == LOCAL_PROVIDER {
-                // If local, only remove from packages.txt
-                self.packages.remove(&uri);
-            } else {
+            if !provider.is_provider_local() {
                 // If not local, delete the directory
                 let package_dir = provider.get_installation_path();
                 if package_dir.exists() {
@@ -71,14 +75,17 @@ impl PackagesManager {
         self.save();
     }
 
-    pub fn save(&self) -> Result<(), String> {
+    pub fn save(&mut self) -> Result<(), String> {
         // Convert the HashMap into a Vec of package URIs
         let package_strings: Vec<String> =
             self.packages.values().map(|s| s.uri.to_string()).collect();
 
         // Write the updated list of packages back to the packages.txt file
         match file_write_lines(&self.packages_file, &package_strings) {
-            Ok(_) => Ok(()),
+            Ok(_) => {
+                self.reload();
+                Ok(())
+            }
             Err(e) => {
                 log::error!("Failed to write to packages file: {}", e);
                 Err(format!("Failed to write to packages file: {}", e))
@@ -86,14 +93,15 @@ impl PackagesManager {
         }
     }
 
-    fn load_packages(packages_file: &str, settings: &Settings) -> HashMap<String, Package> {
+    fn load_packages(packages_file: &Path, settings: &Settings) -> HashMap<String, Package> {
         match file_read_lines(packages_file) {
             Ok(lines) => {
                 let mut packages = HashMap::new();
                 for line in lines {
                     let uri = line.trim().to_string();
 
-                    let provider = get_provider(&uri, &settings.runtime_dir);
+                    let (package_uri, version) = extract_package_name_and_version(&uri);
+                    let provider = get_provider(&package_uri, &settings.runtime_dir, version);
                     if let Err(err) = provider {
                         error!("failed to get location for {} - {}", uri, err);
                         continue;
@@ -107,7 +115,7 @@ impl PackagesManager {
                 packages
             }
             Err(err) => {
-                error!("failed reading {} - {}", packages_file, err);
+                error!("failed reading {:?} - {}", packages_file, err);
                 HashMap::new()
             }
         }
@@ -130,8 +138,11 @@ impl PackagesManager {
             // look for packages .name() value and compare with uri. if yes, uri should be the package.uri
             let mut found = false;
             for package in self.packages.values() {
+                if !package.is_legit_cocmd_package() {
+                    continue;
+                }
                 // Directly compare the name with the uri
-                if Some(package.name()) == Some(uri.as_str()) {
+                if package.name() == uri {
                     found = true;
                     id = package.uri.clone();
                     break;

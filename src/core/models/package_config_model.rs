@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use log::error;
 use serde_derive::{Deserialize as De, Serialize as Se};
@@ -20,7 +20,7 @@ impl Automation {
         if let Some(file) = &self.file {
             let normalized_path = normalize_path(file, location);
 
-            match from_yaml_file::<ScriptModel>(&normalized_path) {
+            match from_yaml_file::<ScriptModel>(&PathBuf::from(normalized_path)) {
                 Ok(script_model) => {
                     let updated_steps: Vec<StepModel> = script_model
                         .steps
@@ -96,6 +96,7 @@ impl Automation {
 #[derive(Debug, Se, De, PartialEq, Eq, Hash, Clone)]
 pub struct PackageConfigModel {
     pub name: String,
+    pub version: Option<String>,
     pub aliases: Option<String>,
     pub paths: Option<Vec<String>>,
     pub automations: Option<Vec<Automation>>,

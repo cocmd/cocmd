@@ -1,4 +1,5 @@
 #![allow(clippy::format_in_format_args)]
+#![allow(dead_code)]
 use std::fmt;
 use std::fs;
 use std::path::Path;
@@ -35,7 +36,7 @@ impl Package {
 
             if config_file_path.exists() {
                 let config: Result<PackageConfigModel, String> =
-                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                    from_yaml_file(&config_file_path).map_err(|e| e.to_string());
                 match config {
                     Ok(config_res) => {
                         // Successfully loaded the configuration
@@ -68,7 +69,7 @@ impl Package {
 
             if config_file_path.exists() {
                 let config: Result<PackageConfigModel, String> =
-                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+                    from_yaml_file(&config_file_path).map_err(|e| e.to_string());
                 config.is_ok()
             } else {
                 false
@@ -88,7 +89,19 @@ impl Package {
     pub fn name(&self) -> &str {
         self.cocmd_config
             .as_ref()
-            .map_or("default_name", |config| config.name.as_str())
+            .map_or("???", |config| config.name.as_str())
+    }
+
+    pub fn version(&self) -> String {
+        self.cocmd_config
+            .as_ref()
+            .map_or(String::from("0.0.0"), |config| {
+                config
+                    .version
+                    .as_ref()
+                    .unwrap_or(&String::from("0.0.0"))
+                    .to_string()
+            })
     }
 
     pub fn paths(&self, absolute: bool) -> Vec<String> {
