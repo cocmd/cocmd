@@ -290,27 +290,6 @@ mod tests {
     }
 
     #[test]
-    fn test_show_package_for_old_hub_installation() {
-        // before
-        let tmp_home_dir = TempDir::default();
-        let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
-        let res = add::install_package(&mut packages_manager, "docker", true);
-        assert!(res.is_ok());
-
-        let res = show_package(&mut packages_manager, "docker".to_string());
-        assert!(res.is_ok());
-
-        // change the folder {tmp_home_dir}/runtime/docker-0.0.0
-        // to {tmp_home_dir}/runtime/docker
-        let docker_folder = tmp_home_dir.join("runtime").join("docker-0.0.0");
-        let docker_folder_new = tmp_home_dir.join("runtime").join("docker");
-        std::fs::rename(&docker_folder, &docker_folder_new);
-
-        let res = show_package(&mut packages_manager, "docker".to_string());
-        assert!(res.is_err());
-    }
-
-    #[test]
     fn test_show_packages() {
         let tmp_home_dir = TempDir::default();
         let mut packages_manager = PackagesManager::new(Settings::new(tmp_home_dir.to_str(), None));
@@ -358,6 +337,10 @@ mod tests {
         let res = add::install_package(&mut packages_manager, "aws-s3@0.0.0", true);
         assert!(res.is_ok());
 
+        let package = packages_manager.get_package("aws-s3".to_string());
+        assert!(package.is_some());
+        assert_eq!("0.0.0", package.unwrap().version());
+
         let res = add::install_package(&mut packages_manager, "aws-s3", true);
         assert!(res.is_ok());
 
@@ -365,9 +348,6 @@ mod tests {
         // check we only get 0.0.1 by the uri
         let package = packages_manager.get_package("aws-s3".to_string());
         assert!(package.is_some());
-        assert!(package.unwrap().uri.contains("0.0.1"));
-
-        let res = show_packages(&mut packages_manager);
-        assert!(res.is_ok());
+        assert_eq!("0.0.1", package.unwrap().version());
     }
 }

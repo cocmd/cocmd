@@ -24,6 +24,7 @@ use std::{
 
 use anyhow::{anyhow, Context, Result};
 use log::info;
+use openssl::version;
 use serde::{Deserialize, Serialize};
 
 use super::util::path::resolve_hub_package_locally;
@@ -31,6 +32,9 @@ use super::PackageProvider;
 use super::{
     util::download::download_and_extract_zip_verify_sha256, util::download::read_string_from_url,
     COCMDHUB_PROVIDER,
+};
+use crate::core::{
+    consts, models::package_config_model::PackageConfigModel, utils::io::from_yaml_file,
 };
 
 pub const COCMD_HUB_PACKAGE_INDEX_URL: &str =
@@ -55,8 +59,28 @@ impl PackageProvider for CocmdHubPackageProvider {
         self.local_path.to_path_buf()
     }
 
-    fn download(&mut self) -> Result<PathBuf> {
-        let index = self.get_index(true)?;
+    fn is_exists_locally(&self) -> bool {
+        // check for existsance of the local path
+        if self.version.is_none() {
+            self.local_path().exists()
+        } else {
+            // read cocmd.yaml (consts::SOURCE_CONFIG_FILE) file look for version field
+            let config_file_path = self.local_path().join(consts::SOURCE_CONFIG_FILE);
+
+            // if version is specified, check if the version in cocmd.yaml matches
+            if config_file_path.exists() {
+                let config: PackageConfigModel =
+                    from_yaml_file(&config_file_path.to_string_lossy()).unwrap();
+                if config.version == self.version {
+                    return true;
+                }
+            }
+            false
+        }
+    }
+
+    fn download(&self) -> Result<PathBuf> {
+        let index = self.get_index(false)?;
         // .context("unable to get package index from cocmd hub")?;
 
         let package_info = index
@@ -72,17 +96,16 @@ impl PackageProvider for CocmdHubPackageProvider {
         let archive_sha256 = read_string_from_url(&package_info.archive_sha256_url)
             .context("unable to read archive sha256 signature")?;
 
-        let local_path = self
-            .runtime_dir
-            .join(format!("{}-{}", package_info.name, package_info.version));
+        // remove self.local_path if exists
+        if self.local_path.exists() {
+            std::fs::remove_dir_all(&self.local_path)?;
+        }
 
         download_and_extract_zip_verify_sha256(
             &package_info.archive_url,
-            &local_path,
+            &self.local_path,
             Some(&archive_sha256),
         )?;
-
-        self.local_path = local_path;
 
         Ok(self.local_path.clone())
     }
@@ -94,13 +117,16 @@ impl PackageProvider for CocmdHubPackageProvider {
 
 impl CocmdHubPackageProvider {
     pub fn new(package: &String, runtime_dir: &Path, version: Option<String>) -> Self {
-        let binding = if let Some(version) = &version {
-            runtime_dir.join(package.to_owned() + version.as_str())
-        } else {
-            runtime_dir.join(package.to_owned() + "-???")
-        };
+        let binding = runtime_dir.join(package.to_owned());
 
         let default_path = binding.as_path();
+
+        // if version not provided use the latest version you find in index
+        // if version is provided, use it
+        let mut version = version.clone();
+        if version.is_none() {
+            let index = Self::get_index(false).unwrap();
+        }
 
         let res = resolve_hub_package_locally(runtime_dir, package.as_str(), version.as_deref());
 
@@ -235,7 +261,7 @@ mod tests {
     #[test]
     fn test_get_package() {
         let runtime_dir = TempDir::default();
-        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         provider.download();
         let index = provider.get_index(true).unwrap();
         let package = index.get_package("docker", &None).unwrap();
@@ -247,30 +273,24 @@ mod tests {
         // generate a temporary directory, with random name for every test execution
         // it should be deleted in the end of the test automatically
         let runtime_dir = TempDir::default();
-        let mut provider = CocmdHubPackageProvider::new(
+        let provider = CocmdHubPackageProvider::new(
             &"aws-s3".to_string(),
             &runtime_dir,
-            Some(String::from("0.0.1")),
+            Some(String::from("0.0.0")),
         );
         provider.download();
         let index = provider.get_index(true).unwrap();
         let package = index
-            .get_package("aws-s3", &Some("0.0.1".to_string()))
-            .unwrap();
-        assert_eq!(package.name, "aws-s3");
-        assert_eq!(package.version, "0.0.1");
-
-        let package = index
             .get_package("aws-s3", &Some("0.0.0".to_string()))
             .unwrap();
         assert_eq!(package.name, "aws-s3");
-        assert_eq!(package.version, "0.0.1");
+        assert_eq!(package.version, "0.0.0");
     }
 
     #[test]
     fn test_get_package_with_version_not_found() {
         let runtime_dir = TempDir::default();
-        let mut provider = CocmdHubPackageProvider::new(
+        let provider = CocmdHubPackageProvider::new(
             &"docker".to_string(),
             &runtime_dir,
             Some(String::from("0.0.0")),
@@ -287,7 +307,7 @@ mod tests {
     #[test]
     fn test_get_package_not_found() {
         let runtime_dir = TempDir::default();
-        let mut provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
+        let provider = CocmdHubPackageProvider::new(&"docker".to_string(), &runtime_dir, None);
         provider.download();
         let index = provider.get_index(true).unwrap();
         let package = index.get_package("docker2", &None);

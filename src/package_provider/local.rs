@@ -47,7 +47,7 @@ impl PackageProvider for LocalPackageProvider {
         self.local_path.to_path_buf()
     }
 
-    fn download(&mut self) -> Result<PathBuf> {
+    fn download(&self) -> Result<PathBuf> {
         Ok(self.local_path.to_path_buf())
     }
 

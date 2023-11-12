@@ -43,8 +43,20 @@ pub trait PackageProvider {
         // check for existsance of the local path
         self.local_path().exists()
     }
-    fn download(&mut self) -> Result<PathBuf>;
+    fn download(&self) -> Result<PathBuf>;
     // TODO: fn check update available? (probably should be only available in the hub)
+
+    fn is_provider_local(&self) -> bool {
+        self.name() == LOCAL_PROVIDER
+    }
+
+    fn is_provider_git(&self) -> bool {
+        self.name() == GIT_PROVIDER
+    }
+
+    fn is_provider_hub(&self) -> bool {
+        self.name() == COCMDHUB_PROVIDER
+    }
 }
 
 pub fn get_provider(
@@ -96,6 +108,7 @@ mod tests {
         let provider =
             get_provider(&git_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
+        assert_eq!(true, provider.is_provider_git());
         assert_eq!(
             provider.local_path(),
             runtime_dir.join("mzsrtgzt2.cocmd").to_path_buf()
@@ -104,6 +117,7 @@ mod tests {
         let provider =
             get_provider(&git_url2.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), GIT_PROVIDER);
+        assert_eq!(true, provider.is_provider_git());
         assert_eq!(
             provider.local_path(),
             runtime_dir.join("mzsrtgzr2.cocmd").to_path_buf()
@@ -112,13 +126,15 @@ mod tests {
         let provider =
             get_provider(&hub_url.to_string(), &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), COCMDHUB_PROVIDER);
+        assert_eq!(true, provider.is_provider_hub());
         assert_eq!(
             provider.local_path(),
-            runtime_dir.join("cocmd-hub-???").to_path_buf()
+            runtime_dir.join("cocmd-hub").to_path_buf()
         );
 
         let provider = get_provider(&local_url, &runtime_dir.to_path_buf(), None).unwrap();
         assert_eq!(provider.name(), LOCAL_PROVIDER);
+        assert_eq!(true, provider.is_provider_local());
         assert_eq!(provider.local_path(), Path::new(&local_url).to_path_buf());
     }
 }

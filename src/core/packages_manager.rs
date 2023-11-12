@@ -7,7 +7,6 @@ use crate::core::models::package_config_model::Automation;
 use crate::core::package::Package;
 use crate::core::utils::io::{file_read_lines, file_write_lines};
 use crate::package_provider::get_provider;
-use crate::package_provider::LOCAL_PROVIDER;
 use crate::Settings;
 
 #[derive(Debug, Clone)]
@@ -42,7 +41,7 @@ impl PackagesManager {
                 .map_err(|e| e.to_string())?;
 
             // Check if the provider is local
-            if provider.name() == LOCAL_PROVIDER {
+            if provider.is_provider_local() {
                 // If local, only remove from packages.txt
                 self.packages.remove(&uri);
             } else {

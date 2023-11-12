@@ -94,11 +94,11 @@ impl Package {
     pub fn version(&self) -> String {
         self.cocmd_config
             .as_ref()
-            .map_or(String::from("???"), |config| {
+            .map_or(String::from("0.0.0"), |config| {
                 config
                     .version
                     .as_ref()
-                    .unwrap_or(&String::from("???"))
+                    .unwrap_or(&String::from("0.0.0"))
                     .to_string()
             })
     }

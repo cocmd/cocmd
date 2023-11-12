@@ -2,7 +2,11 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
+
+use crate::core::consts;
+use crate::core::models::package_config_model::PackageConfigModel;
+use crate::core::utils::io::from_yaml_file;
 
 pub fn extract_local_path(package: &String) -> Option<PathBuf> {
     // find out if package is a local path, even if it doesn't exist
@@ -41,66 +45,67 @@ pub fn resolve_hub_package_locally(
     name: &str,
     version: Option<&str>,
 ) -> Result<PathBuf> {
-    // write this function that will look for the package in the runtime_dir
-    // just list the directories that match name-<version>. and match
-    // the version if it's provided. if not, pick up the latest one
-    // and return the path to the directory
+    // write this function that will look for the package in the base_dir
+    // looks for {base_dir}/{name}
+    // look in cocmd.yaml if exists, in optional field 'version'
+    // if version is not specified, just return the path if cocmd.yaml exists
 
-    let mut dirs = std::fs::read_dir(base_dir)
-        .context("unable to read runtime directory")?
-        .filter_map(|entry| {
-            if let Ok(entry) = entry {
-                if let Ok(metadata) = entry.metadata() {
-                    if metadata.is_dir() {
-                        if let Some(file_name) = entry.file_name().to_str() {
-                            if file_name == name || file_name.starts_with(&format!("{}-", name)) {
-                                return Some(entry.path());
-                            }
+    let path = base_dir.join(name);
+
+    if path.exists() {
+        if let Some(version) = version {
+            // read cocmd.yaml (consts::SOURCE_CONFIG_FILE) file look for version field
+            let config_file_path = path.join(consts::SOURCE_CONFIG_FILE);
+
+            if config_file_path.exists() {
+                let config: Result<PackageConfigModel, String> =
+                    from_yaml_file(config_file_path.to_str().unwrap()).map_err(|e| e.to_string());
+
+                if let Ok(config) = config {
+                    if let Some(config_version) = config.version {
+                        if config_version == version {
+                            return Ok(path);
+                        } else {
+                            bail!(
+                                "unable to find package '{}' version '{}' in '{}'",
+                                name,
+                                version,
+                                base_dir.display()
+                            );
                         }
+                    } else {
+                        bail!(
+                            "unable to find package '{}' version '{}' in '{}'",
+                            name,
+                            version,
+                            base_dir.display()
+                        );
                     }
+                } else {
+                    bail!(
+                        "unable to find package '{}' version '{}' in '{}'",
+                        name,
+                        version,
+                        base_dir.display()
+                    );
                 }
+            } else {
+                bail!(
+                    "unable to find package '{}' version '{}' in '{}'",
+                    name,
+                    version,
+                    base_dir.display()
+                );
             }
-
-            None
-        })
-        .collect::<Vec<PathBuf>>();
-
-    if dirs.is_empty() {
-        bail!("unable to find package '{}' in the runtime directory", name);
-    }
-
-    if version.is_none() {
-        dirs.sort();
-
-        let latest = dirs.pop().unwrap();
-
-        Ok(latest)
-    } else {
-        let version = version.unwrap();
-
-        let mut dirs = dirs
-            .iter()
-            .filter(|path| {
-                if let Some(path) = path.to_str() {
-                    if path.ends_with(version) {
-                        return true;
-                    }
-                }
-
-                false
-            })
-            .collect::<Vec<&PathBuf>>();
-
-        if dirs.is_empty() {
-            bail!(
-                "unable to find package '{}' version '{}' in the runtime directory",
-                name,
-                version
-            );
+        } else {
+            // return ok for any version, we don't care
+            return Ok(path);
         }
-
-        let latest = dirs.pop().unwrap();
-
-        Ok(latest.to_path_buf())
+    } else {
+        bail!(
+            "unable to find package '{}' in '{}'",
+            name,
+            base_dir.display()
+        );
     }
 }

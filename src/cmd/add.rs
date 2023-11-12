@@ -9,7 +9,7 @@ use crate::core::package::Package;
 use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::packages::extract_package_name_and_version;
 use crate::core::utils::repository::find_cocmd_files;
-use crate::package_provider::{get_provider, LOCAL_PROVIDER};
+use crate::package_provider::get_provider;
 pub fn install_package(
     packages_manager: &mut PackagesManager,
     package: &str,
@@ -21,8 +21,7 @@ pub fn install_package(
 
     let (package_uri, version) = extract_package_name_and_version(package);
 
-    let mut provider =
-        get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
+    let provider = get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
 
     if !provider.is_exists_locally() {
         info!("Package not found locally. Downloading...");
@@ -46,7 +45,7 @@ pub fn install_package(
 
     let localpath = provider.local_path();
 
-    let locations = if provider.name() == LOCAL_PROVIDER {
+    let locations = if provider.is_provider_local() {
         find_cocmd_files(&localpath, packages_manager.settings.scan_depth)
     } else {
         vec![localpath.to_str().unwrap().to_string()]
@@ -60,14 +59,14 @@ pub fn install_package(
         return Ok(());
     }
 
-    if provider.name() == LOCAL_PROVIDER {
+    if provider.is_provider_local() {
         info!(
             "found {} cocmd packages in this path:\n  - {}",
             locations.len(),
             lst_locs
         );
     }
-    if provider.name() != LOCAL_PROVIDER
+    if !provider.is_provider_local()
         || dont_ask
         || Confirm::new()
             .with_prompt("Do you want to continue?")
@@ -76,7 +75,7 @@ pub fn install_package(
     {
         for loc in locations {
             let package: Package = Package::new(
-                if provider.name() == LOCAL_PROVIDER {
+                if provider.is_provider_local() {
                     loc.clone()
                 } else {
                     let package_label = package.to_string();
