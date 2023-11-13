@@ -7,6 +7,7 @@ use crate::core::{models::script_model::ScriptModel, packages_manager::PackagesM
 use crate::output::print_md_debug;
 pub mod shell;
 mod step_runner;
+mod utils;
 
 pub fn run_script(
     automation_name: &String,

@@ -16,6 +16,7 @@ use crate::core::{
     packages_manager::PackagesManager,
 };
 use crate::output::{print_md, print_md_debug};
+use crate::runner::utils::check_installed;
 
 pub fn handle_step(
     step: &StepModel,
@@ -85,6 +86,12 @@ pub fn handle_step(
             print_md(content);
         }
         StepRunnerType::PYTHON => {
+            // make sure that "python" is installed and reachable from the command line
+            if !check_installed("python") {
+                print_md_debug("## ❌ Python not installed\n");
+                return false;
+            }
+
             // Execute Python script
             let output = Command::new("python")
                 .arg("-c")
@@ -101,7 +108,7 @@ pub fn handle_step(
                 // print_md_debug(&"## ✅ Success".to_string());
                 return true;
             } else {
-                print_md_debug("## ❌ Failed (stderr):\n");
+                print_md_debug("## ❌ Failed\n");
                 return false;
             }
         }
