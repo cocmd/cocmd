@@ -24,6 +24,8 @@ pub fn run_automation(
         }
     }
 
+    packages_manager.reload();
+
     let available_automations = packages_manager.automations();
 
     if available_automations.is_empty() {

@@ -73,6 +73,7 @@ pub fn handle_step(
                 ) {
                     return false;
                 }
+                packages_manager.reload();
             }
             if let Err(_err) = interactive_shell(
                 packages_manager,
