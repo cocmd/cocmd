@@ -1,0 +1,28 @@
+FROM ./llama-2-7b-function-calling.Q3_K_M.gguf
+
+TEMPLATE """
+<FUNCTIONS>
+    {
+        "function": "search_bing",
+        "description": "Search the web for content on Bing.",
+        "arguments": [
+            {
+                "name": "query",
+                "type": "string",
+                "description": "The search query string"
+            }
+        ]
+    }
+</FUNCTIONS>
+[INST] 
+    <<SYS>>
+    {{ .System }}
+    <</SYS>>
+        
+    {{ .Prompt }} 
+[/INST]
+"""
+
+SYSTEM """
+You are helpful assistant that answers the user questions after looking it up via bing search.
+"""

@@ -12,6 +12,7 @@ use anyhow::Error;
 use clap::{Parser, Subcommand};
 use cmd::add;
 use cmd::docs::run_docs;
+use cmd::onboarding::run_onboarding;
 use cmd::profile_loader::run_profile_loader;
 use cmd::run::run_automation;
 use cmd::setup::run_setup;
@@ -83,7 +84,9 @@ enum Commands {
         from: Option<String>,
     },
     #[cfg(feature = "howto")]
-    Howto { query: String },
+    Howto {
+        query: String,
+    },
 
     /// Show command with subcommands
     Show(ShowArgs),
@@ -107,6 +110,8 @@ enum Commands {
 
     /// Setup command with a shell argument - Set up the CLI tool, specify shell
     Setup(SetupArgs),
+
+    Onboarding,
 }
 
 /// Arguments for the 'show' subcommand with meta-information
@@ -138,7 +143,8 @@ struct SetupArgs {
     shell: Option<String>,
 }
 
-fn main() -> ExitCode {
+#[tokio::main]
+async fn main() -> ExitCode {
     let cli = Cli::parse();
 
     if let Commands::Install { .. } = cli.command {
@@ -244,6 +250,9 @@ fn main() -> ExitCode {
         }
         Commands::Remove => {
             println!("'cocmd remove' was used");
+        }
+        Commands::Onboarding => {
+            run_onboarding(&mut packages_manager).await;
         }
     }
 
