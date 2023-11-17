@@ -11,16 +11,16 @@ pub async fn run_onboarding(_packages_manager: &mut PackagesManager) -> Result<(
     let ollama = Ollama::default();
 
     loop {
-        let model = "choose-a-model-name".to_string();
-        let prompt = "Show me a new fact about python programming".to_string();
+        let model = "cocmd5".to_string();
+        let prompt = ".".to_string();
         let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
 
         let answer = res.unwrap().response;
+        println!("{}", answer);
         // if its not containing the word "function" try again
-        if !answer.contains("function") {
+        if !answer.contains("Initial Answer:") {
             continue;
         } else {
-            println!("{}", answer);
             break;
         }
     }

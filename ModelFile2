@@ -1,0 +1,197 @@
+FROM ./llama-2-7b-function-calling.Q3_K_M.gguf
+
+TEMPLATE """
+<FUNCTIONS>
+    {
+        "function": "run_playbook",
+        "description": "Execute a package.playbook to setup the project",
+        "arguments": [
+            {
+                "name": "package",
+                "type": "string",
+                "description": "The name of the package"
+            },
+            {
+                "name": "playbook",
+                "type": "string",
+                "description": "The name of the playbook"
+            }
+        ]
+    }
+</FUNCTIONS>
+[INST] 
+    <<SYS>>
+    {{ .System }}
+    <</SYS>>
+        
+    {{ .Prompt }} 
+[/INST]
+"""
+
+SYSTEM """
+You are helping me to execute the right playbook from what i need to achieve. Here is a full list
+of packages (a package contains several playbooks):
+package node:
+│    playbook     │ env │                              description                               │                   how to run?                    │
+├────────────────┼─────┼────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────┤
+│node.setup.yarn │Any  │setup yarn                                                              │run node.setup.yarn or cocmd run node.setup.yarn  │
+│node.setup.pnpm │MacOS│setup pnpm - https://pnpm.io/installation                               │run node.setup.pnpm or cocmd run node.setup.pnpm  │
+│node.remove.pnpm│MacOS│remove pnpm                                                             │run node.remove.pnpm or cocmd run node.remove.pnpm│
+│node.setup      │MacOS│setup node on macos: install Node.js. Install yarn. Install VSCode      │run node.setup or cocmd run node.setup            │
+│                │     │plugins.                                                                │                                                  │
+│node.clean-cache│Any  │Clean node cache and build artifacts                                    │run node.clean-cache or cocmd run node.clean-cache│
+
+package docker:
+│    command     │ env │                           description                           │                   how to run?                    │
+├────────────────┼─────┼─────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────┤
+│docker.setup    │MacOS│setup docker for desktop: Install docker. Install docker-compose.│run docker.setup or cocmd run docker.setup        │
+│docker.cleanup  │Any  │Cleanup Docker environment                                       │run docker.cleanup or cocmd run docker.cleanup    │
+│docker.monitor  │Any  │Monitor Docker resources                                         │run docker.monitor or cocmd run docker.monitor    │
+│docker.build-run│MacOS│Build and run a Docker image                                     │run docker.build-run or cocmd run docker.build-run│
+│docker.start    │MacOS│Start docker                                                     │run docker.start or cocmd run docker.start        │
+
+
+package python:
+│        command        │ env │                    description                    │                          how to run?                           │
+├───────────────────────┼─────┼───────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────┤
+│python.clean           │MacOS│Clean python cache and build artifacts: Clean      │run python.clean or cocmd run python.clean                      │
+│                       │     │__pycache__, pyc, pyo files. Clean build and dist  │                                                                │
+│                       │     │folders.                                           │                                                                │
+│python.setup           │MacOS│Setup python: install Python. Python VSCode        │run python.setup or cocmd run python.setup                      │
+│                       │     │plugins. Install miniconda.                        │                                                                │
+│python.setup.miniconda │MacOS│Setup miniconda: install miniconda. update shell   │run python.setup.miniconda or cocmd run python.setup.miniconda  │
+│                       │     │path.                                              │                                                                │
+│python.setup-poetry    │MacOS│Setup Poetry for Python development                │run python.setup-poetry or cocmd run python.setup-poetry        │
+│python.conda-env-create│Any  │Create a conda environment                         │run python.conda-env-create or cocmd run python.conda-env-create│
+
+
+i will give you a package tree and tell me what playbooks to run in order to 
+setup the project with playbooks above:
+
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── check_ports.sh
+├── container-storage
+│   ├── 1.jpg
+│   ├── 2.jpg
+│   ├── 3.jpg
+│   ├── 4.jpg
+│   └── 5.jpg
+├── docker-compose.test-github.yml
+├── docker-compose.yml
+├── docker-grafana
+│   ├── Dockerfile
+│   ├── configuration.env
+│   ├── datasources
+│   │   └── influx.json
+│   └── entrypoint.sh
+├── docker-influxdb
+│   ├── Dockerfile
+│   ├── configuration.env
+│   └── entrypoint.sh
+├── docker-mosquitto
+│   └── Dockerfile
+├── docker-python
+│   ├── Dockerfile
+│   └── base
+│       └── Dockerfile
+├── docker-python-pypy
+│   └── Dockerfile
+├── docker-redis
+│   ├── Dockerfile
+│   └── redis.conf
+├── import.sh
+├── krakend.json
+├── kubernetes
+│   ├── fulltext-search-deplyment.yaml
+│   ├── fulltext-serarch-service.yaml
+│   ├── mongodb-deplyment.yaml
+│   ├── mongodb-service.yaml
+│   ├── random-demo-deplyment.yaml
+│   └── random-demo-service.yaml
+├── python
+│   ├── __init__.py
+│   ├── baesian
+│   │   ├── __init__.py
+│   │   └── baesian.py
+│   ├── bookcollection
+│   │   ├── __init__.py
+│   │   ├── bookcollection.py
+│   │   └── requirements.txt
+│   ├── common
+│   │   ├── __init__.py
+│   │   └── utils.py
+│   ├── diagrams_generator.py
+│   ├── fastapidemo
+│   │   ├── __init__.py
+│   │   ├── requirements.txt
+│   │   └── users-fastapi.py
+│   ├── fulltextsearch
+│   │   ├── __init__.py
+│   │   └── fulltext_search.py
+│   ├── geolocation
+│   │   ├── __init__.py
+│   │   ├── geolocation_search.py
+│   │   └── requirements-geolocation.txt
+│   ├── graphql
+│   │   ├── requirements.txt
+│   │   ├── schema.graphql
+│   │   └── users.py
+│   ├── mqtt
+│   │   ├── __init__.py
+│   │   ├── mqtt.py
+│   │   └── requirements-mqtt.txt
+│   ├── photo
+│   │   ├── __init__.py
+│   │   ├── photo_process.py
+│   │   └── requirements-photo.txt
+│   ├── python_app.log
+│   ├── random
+│   │   ├── __init__.py
+│   │   └── random_demo.py
+│   ├── requirements-dev.txt
+│   ├── requirements.txt
+│   ├── tictactoe
+│   │   ├── __init__.py
+│   │   ├── template
+│   │   │   └── tictactoe.html
+│   │   └── tictactoe.py
+│   └── users
+│       ├── __init__.py
+│       ├── caching.py
+│       └── users.py
+├── resources
+│   ├── autogenerated.png
+│   ├── diagram.jpg
+│   ├── diagram.odp
+│   └── grafana.png
+├── secrets
+│   ├── mqtt_pass.txt
+│   ├── mqtt_user.txt
+│   └── redis_pass.txt
+├── stresstest-locusts
+│   ├── baesian.py
+│   ├── fulltext_search.py
+│   ├── geolocation_search.py
+│   ├── random_demo.py
+│   └── users.py
+├── test.txt
+├── tests
+│   ├── conftest.py
+│   ├── requirements.txt
+│   ├── resources
+│   │   └── test.jpg
+│   ├── test_0_users.py
+│   ├── test_baesian.py
+│   ├── test_bookcollection.py
+│   ├── test_fulltext_search.py
+│   ├── test_geolocation_search.py
+│   ├── test_mqtt.py
+│   ├── test_photo.py
+│   ├── test_random_demo.py
+│   └── utils.py
+└── wait_until_up.sh
+
+give me the function call to trigger the playbook like in the functions spec
+"""
