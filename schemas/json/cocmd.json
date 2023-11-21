@@ -1,0 +1,92 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "title": "CoCmd Onboarding and Playbooks as code",
+    "description": "Automate projects dependency installation",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "project name"
+        },
+        "automations": {
+            "type": "array",
+            "description": "installation phases",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "phase name"
+                    },
+                    "content": {
+                        "type": "object",
+                        "description": "content",
+                        "properties": {
+                            "description": {
+                                "type": "string",
+                                "description": "description desc"
+                            },
+                            "env": {
+                                "type": "string",
+                                "description": "operation system flow supports",
+                                "oneOf": [
+                                    {
+                                        "const": "osx",
+                                        "description": "apple operation system"
+                                    },
+                                    {
+                                        "const": "windows",
+                                        "description": "microsoft windows operations system"
+                                    },
+                                    {
+                                        "const": "linux",
+                                        "description": "linux operation system"
+                                    }
+                                ]
+                            },
+                            "steps": {
+                                "type": "array",
+                                "description": "installation flow steps",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "title": {
+                                            "type": "string",
+                                            "description": "step title"
+                                        },
+                                        "runner": {
+                                            "type": "string",
+                                            "description": "select the command executor",
+                                            "oneOf": [
+                                                {
+                                                    "const": "shell",
+                                                    "description": "use shell"
+                                                },
+                                                {
+                                                    "const": "markdown",
+                                                    "description": "use markdown"
+                                                },
+                                                {
+                                                    "const": "cocmd",
+                                                    "description": "use shell"
+                                                }
+                                            ]
+                                        },
+                                        "approval_message": {
+                                            "type": "string",
+                                            "description": "message to display on approval"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "description": "command to run on the context of the runner"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
