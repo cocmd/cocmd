@@ -54,3 +54,4 @@ Temporary Items
 *.snap
 *.profraw
 *.gguf
+.env

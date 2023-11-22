@@ -22,7 +22,7 @@ use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
 use itertools::Itertools;
-use log::trace;
+use log::{error, trace};
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;
@@ -252,13 +252,13 @@ async fn main() -> ExitCode {
             println!("'cocmd remove' was used");
         }
         Commands::Onboarding => {
-            run_onboarding(&mut packages_manager).await;
+            res = run_onboarding(&mut packages_manager).await;
         }
     }
 
     // if res returned an error, print it to stderr
     if let Err(_e) = res {
-        // error!("{}", e);
+        // error!("{}", _e);
         ExitCode::from(1)
     } else {
         ExitCode::from(0)
