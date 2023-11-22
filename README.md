@@ -77,6 +77,13 @@ Contribution guide can be found [here](https://cocmd.org/docs/contributing)
         </a>
     </td>
     <td align="center">
+        <a href="https://github.com/arelg">
+            <img src="https://avatars.githubusercontent.com/u/34028785?v=4" width="100;" alt="arelg"/>
+            <br />
+            <sub><b>arelg</b></sub>
+        </a>
+    </td>
+    <td align="center">
         <a href="https://github.com/HillaShx">
             <img src="https://avatars.githubusercontent.com/u/44138955?v=4" width="100;" alt="HillaShx"/>
             <br />
