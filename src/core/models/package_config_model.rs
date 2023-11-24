@@ -64,9 +64,8 @@ impl Automation {
 
     pub fn supports_os(&self, os: &OS) -> bool {
         if let Some(content) = &self.content {
-            if let Some(content_env) = &content.env {
-                return *content_env == *os || *content_env == OS::Any;
-            }
+            let envs = content.get_env();
+            return envs.is_empty() || envs.contains(&OS::Any) || envs.contains(os);
         }
         true
     }

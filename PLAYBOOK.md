@@ -1,118 +1,16 @@
-# maakaf.onboarding
-onboarding for Maakaf contributors
-
-
-## Welcome to Maakaf Contributor onboarding 🎉🎉🎉
-
-This is a guide to getting started with Maakaf-temp development.
-This will install all the tools you need to get started.
-
-it's going to:
-- install git
-- install node
-- install vscode
-- clone all repo
-- build 
-- open the repos
-
-
-
-
-## (Optional) install vscode
-```
-vscode.setup
-```
-
-
+# git.setup
+Install and configure git on this machine
 
 ## install git
-```
-git.setup
-```
-
-
-
-## install github cli
-```
-git.setup.github
-```
-
-
-
-## install node
-```
-node.setup
-```
-
-
-
-## install pnpm
-```
-node.setup.pnpm
-```
-
-
-
-## git clones
 <details><summary>script to run</summary>
 
 ```shell
-# using github-cli (gh) fork Maakaf/maakaf-temp to my personal account
-gh auth login
-
-# Fork the repository
-gh repo fork Maakaf/maakaf-temp
-
-# clone the forked repo
-username=$(gh api user --jq '.login')
-set +e
-gh repo clone $username/maakaf-temp
-
-# add upstream
-cd maakaf-temp
-git remote add upstream git@github.com:Maakaf/maakaf-temp.git
-
-open .
-
-```
-
-</details>
-
-
-
-## run website
-<details><summary>script to run</summary>
-
-```shell
-cd maakaf-temp
-echo installing dependencies
-pnpm i
-echo "website ready to run - pnpm dev"
-
-```
-
-</details>
-
-
-
-## (Optional) add special vscode extensions
-<details><summary>script to run</summary>
-
-```shell
-# check if vscode not installed
-if code -v &> /dev/null
-then
-  # install astro extention
-  code --install-extension astro-build.astro-vscode
-  # install tailwind intellisense
-  code --install-extension bradlc.vscode-tailwindcss
-  # install prettier
-  code --install-extension esbenp.prettier-vscode
-  # install css intellisense
-  code --install-extension zignd.html-css-class-completion
-else
-    echo "vscode could not be found. skipping..."
+# check if git is installed first, if yes print message and leave
+if git --version > /dev/null; then
+  echo "Git is already installed, skipping..."
+  exit 0
 fi
+brew install git
 
 ```
 
@@ -120,29 +18,17 @@ fi
 
 
 
-<details><summary>script to run</summary>
+## Configue git
+This step requires some additional parameters, make sure to add them to the command below
+
+* `username`
+* `email`
 
 ```shell
-# check if vscode not installed
-if code -v &> /dev/null
-then
-  code maakaf-temp
-else
-    echo "vscode could not be found. open maakaf-temp in your IDE of choice"
-fi
+git config --global user.name "{{username}}"
+git config --global user.email "{{email}}"
 
 ```
-
-</details>
-
-
-
-
-## All done!
-You're all set up to contribute to Maakaf. 
-
-Join us on discord - https://discord.gg/PzaBZade
-
 
 
 

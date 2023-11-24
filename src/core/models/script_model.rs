@@ -4,6 +4,7 @@ use std::path::Path;
 
 use log::error;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::{serde_as, OneOrMany};
 use termimad::print_text;
 
 use super::settings::Settings;
@@ -74,30 +75,24 @@ impl StepModel {
         self.title.clone().unwrap_or_else(|| "".to_string())
     }
 }
-
+#[serde_as]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub struct ScriptModel {
     pub steps: Vec<StepModel>,
-    pub env: Option<EnvType>,
+    #[serde_as(deserialize_as = "OneOrMany<_>")]
+    #[serde(default = "default_env")]
+    pub env: Vec<OS>,
     pub description: Option<String>,
     pub params: Option<Vec<StepParamModel>>,
 }
 
-// Define the custom enum EnvType to encapsulate the flexibility of OS or Vec<OS>
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
-pub enum EnvType {
-    Single(OS),
-    Multiple(Vec<OS>),
+fn default_env() -> Vec<OS> {
+    vec![OS::Any]
 }
 
 impl ScriptModel {
     pub fn get_env(&self) -> Vec<OS> {
-        // return a vector of the values, even if it's single
-        match &self.env {
-            Some(EnvType::Single(os)) => vec![os.clone()],
-            Some(EnvType::Multiple(os_vec)) => os_vec.clone(),
-            None => Vec::new(),
-        }
+        self.env.clone()
     }
 
     pub fn supports_os(&self, target_os: &OS) -> bool {

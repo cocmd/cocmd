@@ -1,13 +1,12 @@
 #![allow(clippy::format_in_format_args)]
 #![allow(dead_code)]
+use std::collections::{HashMap, HashSet};
 use std::fmt;
-use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use log::{error, warn};
+use log::error;
 
-use super::utils::io::exists;
 use super::utils::io::file_write;
 use crate::core::consts;
 use crate::core::models::package_config_model::Automation;
@@ -143,6 +142,47 @@ impl Package {
         result
     }
 
+    pub fn get_automations_envs_map(&self) -> HashMap<String, HashMap<OS, Automation>> {
+        let mut env_automations: HashMap<String, Vec<Automation>> = HashMap::new();
+
+        if let Some(package_config) = &self.cocmd_config {
+            if let Some(automations) = &package_config.automations {
+                for automation in automations.iter() {
+                    let automation_loaded = automation.load_content(&self.location);
+                    let automation_name = automation_loaded.name.clone();
+
+                    if let Some(automation_vec) = env_automations.get_mut(&automation_name) {
+                        automation_vec.push(automation_loaded.clone());
+                    } else {
+                        let mut new_automation_vec = Vec::new();
+                        new_automation_vec.push(automation_loaded.clone());
+                        env_automations.insert(automation_name.clone(), new_automation_vec);
+                    }
+                }
+            }
+        }
+
+        let mut result: HashMap<String, HashMap<OS, Automation>> = HashMap::new();
+        for (automation_name, automation_map) in &env_automations {
+            for os in vec![OS::Linux, OS::MacOS, OS::Windows] {
+                if let Some(automation) = automation_map
+                    .iter()
+                    .find(|a| a.content.as_ref().unwrap().supports_os(&os))
+                {
+                    if let Some(mut supported_automations) = result.get_mut(automation_name) {
+                        supported_automations.insert(os.clone(), automation.clone());
+                    } else {
+                        let mut new_supported_automations = HashMap::new();
+                        new_supported_automations.insert(os.clone(), automation.clone());
+                        result.insert(automation_name.clone(), new_supported_automations);
+                    }
+                }
+            }
+        }
+
+        result
+    }
+
     pub fn get_playbook(&self, playbook_name: String) -> Option<Automation> {
         if let Some(package_config) = &self.cocmd_config {
             if let Some(automations) = &package_config.automations {
@@ -168,7 +208,7 @@ impl Package {
         output_file: Option<String>,
     ) {
         // i want to print this content as md(with skin) or raw text(just println):
-
+        let package_name = self.name();
         let mut output = String::new();
 
         let _name = self.name();
@@ -178,30 +218,33 @@ impl Package {
             self.location.to_string_lossy().to_string()
         );
 
-        let automations = self.automations(settings, Some(env_specific));
-        if !automations.is_empty() {
+        let automations_envs_map = self.get_automations_envs_map();
+
+        if !automations_envs_map.is_empty() {
             output += &format!(
                 "\nThis package contains {} playbooks:\n\n",
                 self.get_automations_count(settings)
             );
 
-            for automation in &automations {
-                let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::Any);
-                let package_name = self.name();
-
+            for (automation_name, envs_map) in &automations_envs_map {
                 // write more human readable for this playbook
                 // title with the name of the playbook
                 // the env, description and how to run it (with cocmd or with cocmd run)
 
-                if env == &OS::Any {
-                    output += &format!("### {}.{}\n", package_name, automation.name);
-                } else {
-                    output += &format!("### {}.{} ({})\n", package_name, automation.name, env);
-                }
-                output += &format!("{}\n", automation.get_detailed_description());
+                let supported_envs: Vec<String> =
+                    envs_map.keys().cloned().map(|o| o.to_string()).collect();
+
+                output += &format!(
+                    "### {}.{} ({})\n",
+                    package_name,
+                    automation_name,
+                    supported_envs.join(", ")
+                );
+
+                // output += &format!("{}\n", automation.get_detailed_description());
                 output += &format!(
                     "\nrun it with: `cocmd run {}.{}`\n\n",
-                    package_name, automation.name
+                    package_name, automation_name
                 );
             }
             output += "\n\n";
