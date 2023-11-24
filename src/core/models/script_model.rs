@@ -19,6 +19,8 @@ use crate::{
 pub enum StepRunnerType {
     #[serde(alias = "shell", alias = "SHELL")]
     SHELL,
+    #[serde(alias = "welcome", alias = "WELCOME")]
+    WELCOME,
     #[serde(alias = "markdown", alias = "MARKDOWN")]
     MARKDOWN,
     #[serde(alias = "python", alias = "PYTHON", alias = "py", alias = "PY")]
@@ -40,7 +42,7 @@ pub struct StepModel {
     pub runner: StepRunnerType,
     pub content: Option<String>,
     pub file: Option<String>,
-    pub title: String,
+    pub title: Option<String>,
     pub params: Option<Vec<StepParamModel>>,
     pub approval_message: Option<String>,
 }
@@ -66,6 +68,10 @@ impl StepModel {
         } else {
             params
         }
+    }
+
+    pub fn get_title(&self) -> String {
+        self.title.clone().unwrap_or_else(|| "".to_string())
     }
 }
 
@@ -103,14 +109,14 @@ impl ScriptModel {
             doc.push_str("\n");
         }
         for step in &self.steps {
-            let is_optional = step.approval_message.is_some();
-            if is_optional {
-                doc.push_str(&format!(
-                    "<details><summary>(Optional) {}</summary>\n\n",
-                    step.title
-                ));
-            } else {
-                doc.push_str(&format!("<details><summary>{}</summary>\n\n", step.title));
+            let title = step.get_title();
+            if !title.is_empty() {
+                let is_optional = step.approval_message.is_some();
+                if is_optional {
+                    doc.push_str(&format!("## (Optional) {}\n", step.get_title()));
+                } else {
+                    doc.push_str(&format!("## {}\n", step.get_title()));
+                }
             }
 
             if let Some(step_params) = &step.params {
@@ -121,20 +127,39 @@ impl ScriptModel {
                 doc.push_str("\n");
             }
 
+            let wrap_script_text = |script_text: &str, script_type: &str| -> String {
+                // if the script text is more than 3 lines, put in in <details> collapsable section
+                // otherwise, just print it as is
+                let script_text = script_text.to_string();
+                let lines = script_text.lines();
+                let mut wrapped_script_text = String::new();
+                if lines.clone().count() > 3 {
+                    wrapped_script_text
+                        .push_str(&format!("<details><summary>script to run</summary>\n\n"));
+                    wrapped_script_text
+                        .push_str(&format!("```{}\n{}\n```\n\n", script_type, script_text));
+                    wrapped_script_text.push_str(&format!("</details>\n\n"));
+                } else {
+                    wrapped_script_text
+                        .push_str(&format!("```{}\n{}\n```\n\n", script_type, script_text));
+                }
+                wrapped_script_text
+            };
+
             match step.runner {
                 StepRunnerType::SHELL => {
                     doc.push_str(&format!(
-                        "```shell\n{}\n```\n\n",
-                        step.content.as_ref().unwrap()
+                        "{}",
+                        wrap_script_text(step.content.as_ref().unwrap(), &"shell")
                     ));
                 }
-                StepRunnerType::MARKDOWN => {
+                StepRunnerType::MARKDOWN | StepRunnerType::WELCOME => {
                     doc.push_str(&format!("\n{}\n\n", step.content.as_ref().unwrap()));
                 }
                 StepRunnerType::PYTHON => {
                     doc.push_str(&format!(
-                        "```python\n{}\n```\n\n",
-                        step.content.as_ref().unwrap()
+                        "{}",
+                        wrap_script_text(step.content.as_ref().unwrap(), &"python")
                     ));
                 }
                 StepRunnerType::LINK => {
@@ -145,7 +170,7 @@ impl ScriptModel {
                 }
             }
 
-            doc.push_str(&format!("</details>\n\n"));
+            doc.push_str(&format!("\n\n"));
         }
 
         if let Some(output_file) = output_file {

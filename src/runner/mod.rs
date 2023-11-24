@@ -27,14 +27,18 @@ pub fn run_script(
             params.clone(),
         );
         // check if step runner is executable shell/cmd/python add it
-        step_statuses.push((step.title.clone(), success));
+        step_statuses.push((step, success));
     }
 
     print_md_debug(&format!(
         "\n\n\n## 🚀🚀🚀 {} completed 🚀🚀🚀",
         automation_name
     ));
-    for (title, success) in &step_statuses {
+    for (step, success) in &step_statuses {
+        let title = step.get_title();
+        if title.is_empty() {
+            continue;
+        }
         let status_str = if *success { "✅" } else { "❌" };
         print_md_debug(&format!("{} {}", status_str, title));
     }
