@@ -4,6 +4,7 @@ use log::error;
 use serde_derive::{Deserialize as De, Serialize as Se};
 
 use super::script_model::{ScriptModel, StepModel};
+use super::settings::Settings;
 use crate::core::utils::io::{from_file, from_yaml_file, normalize_path};
 use crate::core::utils::sys::OS;
 
@@ -71,7 +72,7 @@ impl Automation {
     }
 
     pub fn get_detailed_description(&self) -> String {
-        let mut description = self
+        let description = self
             .content
             .as_ref()
             .unwrap()
@@ -79,17 +80,25 @@ impl Automation {
             .as_ref()
             .unwrap_or(&"".to_string())
             .to_string();
-        let steps = &self.content.as_ref().unwrap().steps;
-
-        if steps.len() > 1 {
-            description += ": ";
-
-            for step in steps {
-                description += &format!("{}. ", step.title);
-            }
-        }
 
         description
+    }
+
+    pub fn print_doc(
+        &self,
+        settings: &Settings,
+        print_as_markdown: bool,
+        env_specific: bool,
+        output_file: Option<String>,
+        title: String,
+    ) {
+        self.content.as_ref().unwrap().print_doc(
+            settings,
+            print_as_markdown,
+            env_specific,
+            output_file,
+            title,
+        )
     }
 }
 

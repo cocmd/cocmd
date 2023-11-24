@@ -148,7 +148,7 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "docs",
+            "name": "docs - package",
             "type": "lldb",
             "request": "launch",
             "cargo": {
@@ -164,7 +164,30 @@
             "args": [
                 "docs",
                 "git",
-                // "--raw-markdown",
+                // "--raw",
+                
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "docs - package.playbook",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cocmd"
+                ],
+                "filter": {
+                    "name": "cocmd",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "docs",
+                "maakaf.onboarding",
+                // "--raw",
+                "-o", "PLAYBOOK.md"
                 
             ],
             "cwd": "${workspaceFolder}"

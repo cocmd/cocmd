@@ -69,16 +69,15 @@ pub fn handle_step(
                 // if yes, download the package
                 if let Err(_err) = interactive_shell(
                     packages_manager,
-                    format!("cocmd --no-verbose install {}", &provider_name),
+                    format!("cocmd --silent install {}", &provider_name),
                 ) {
                     return false;
                 }
                 packages_manager.reload();
             }
-            if let Err(_err) = interactive_shell(
-                packages_manager,
-                format!("cocmd --no-verbose run {}", &content),
-            ) {
+            if let Err(_err) =
+                interactive_shell(packages_manager, format!("cocmd --silent run {}", &content))
+            {
                 return false;
             }
         }

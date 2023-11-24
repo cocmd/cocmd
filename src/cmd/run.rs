@@ -18,7 +18,7 @@ pub fn run_automation(
     if let Some(from) = &from {
         if let Err(_err) = interactive_shell(
             packages_manager,
-            format!("cocmd --no-verbose install {}", &from.as_str()),
+            format!("cocmd --silent install {}", &from.as_str()),
         ) {
             return Err(Error::msg("Unable to install the package"));
         }

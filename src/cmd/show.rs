@@ -50,7 +50,7 @@ pub fn show_package(packages_manager: &mut PackagesManager, uri: String) -> Resu
         bail!("Package {} is not a legit cocmd package", uri);
     }
 
-    package.print_doc(&packages_manager.settings, true, true);
+    package.print_doc(&packages_manager.settings, true, true, None);
 
     Ok(())
 }
