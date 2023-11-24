@@ -78,12 +78,34 @@ impl StepModel {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub struct ScriptModel {
     pub steps: Vec<StepModel>,
-    pub env: Option<OS>,
+    pub env: Option<EnvType>,
     pub description: Option<String>,
     pub params: Option<Vec<StepParamModel>>,
 }
 
+// Define the custom enum EnvType to encapsulate the flexibility of OS or Vec<OS>
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
+pub enum EnvType {
+    Single(OS),
+    Multiple(Vec<OS>),
+}
+
 impl ScriptModel {
+    pub fn get_env(&self) -> Vec<OS> {
+        // return a vector of the values, even if it's single
+        match &self.env {
+            Some(EnvType::Single(os)) => vec![os.clone()],
+            Some(EnvType::Multiple(os_vec)) => os_vec.clone(),
+            None => Vec::new(),
+        }
+    }
+
+    pub fn supports_os(&self, target_os: &OS) -> bool {
+        // get an OS and returns true iff it supports this OS based on get_env result
+        let env_os = self.get_env();
+        env_os.contains(target_os)
+    }
+
     pub fn print_doc(
         &self,
         settings: &Settings,
