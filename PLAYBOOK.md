@@ -1,4 +1,6 @@
 # git.setup
+
+This script is only available for the following OSes: [MacOS]
 Install and configure git on this machine
 
 ## install git

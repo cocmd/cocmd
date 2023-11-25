@@ -112,11 +112,18 @@ impl ScriptModel {
         let mut doc = String::new();
         doc.push_str(&format!("# {}\n", title));
 
+        if !env_specific {
+            doc.push_str(&format!(
+                "\nThis script is only available for the following OSes: {:?}\n",
+                self.env
+            ));
+        }
+
         if let Some(description) = &self.description {
             doc.push_str(&format!("{}\n\n", description));
         }
         if let Some(params) = &self.params {
-            doc.push_str("## Some parameters\n\n");
+            doc.push_str("## parameters\n\n");
             // add an explanation
             doc.push_str("Make sure to add the following parameters to the command below\n");
 
