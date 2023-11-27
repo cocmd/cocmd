@@ -1,6 +1,6 @@
 #![allow(clippy::format_in_format_args)]
 #![allow(dead_code)]
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt;
 use std::path::Path;
 use std::path::PathBuf;
@@ -154,8 +154,7 @@ impl Package {
                     if let Some(automation_vec) = env_automations.get_mut(&automation_name) {
                         automation_vec.push(automation_loaded.clone());
                     } else {
-                        let mut new_automation_vec = Vec::new();
-                        new_automation_vec.push(automation_loaded.clone());
+                        let new_automation_vec = vec![automation_loaded.clone()];
                         env_automations.insert(automation_name.clone(), new_automation_vec);
                     }
                 }
@@ -242,9 +241,9 @@ impl Package {
 
     pub fn print_doc(
         &self,
-        settings: &Settings,
+        _settings: &Settings,
         print_as_markdown: bool,
-        env_specific: bool,
+        _env_specific: bool,
         output_file: Option<String>,
     ) {
         // i want to print this content as md(with skin) or raw text(just println):
@@ -253,10 +252,7 @@ impl Package {
 
         let _name = self.name();
 
-        output += &format!(
-            "\nlocation: {}\n",
-            self.location.to_string_lossy().to_string()
-        );
+        output += &format!("\nlocation: {}\n", self.location.to_string_lossy());
 
         let automations_envs_map = self.get_automations_envs_map_flat();
 
@@ -289,7 +285,7 @@ impl Package {
             }
             output += "\n\n";
         } else {
-            output += &format!("\nThis package contains no playbooks\n\n");
+            output += "\nThis package contains no playbooks\n\n";
         }
 
         // if let Some(alias) = &self.aliases() {
@@ -355,13 +351,13 @@ impl Package {
 
         if let Some(output_file) = output_file {
             // write output to output_file, if exists overwrite it
-            file_write(Path::new(&output_file), &output, true).or_else(|e| {
+            file_write(Path::new(&output_file), &output, true).map_err(|e| {
                 error!(
                     "Unable to write to file {}: {}",
                     &output_file,
                     e.to_string()
                 );
-                Err(e)
+                e
             });
         } else {
             // write to stdout

@@ -40,7 +40,7 @@ pub fn run_docs(
                 error!("Can't get package {}", uri);
                 Err(Error::msg("can't get package"))
             },
-            |pkg| Ok(pkg),
+            Ok,
         )?;
 
     if !package.is_legit_cocmd_package() {
@@ -55,25 +55,25 @@ pub fn run_docs(
                     error!("Can't get playbook {}", playbook_name);
                     Err(Error::msg("can't get playbook"))
                 },
-                |pb| Ok(pb),
+                Ok,
             )?;
 
         if output_file.is_some() {
             let output_path = Path::new(output_file.as_ref().unwrap().as_str());
-            file_write(&output_path, &format!("# {}\n\n\n", uri), false);
+            file_write(output_path, &format!("# {}\n\n\n", uri), false);
 
             // write table of contents for each os
             for (oses, _) in playbook_envs_map.clone() {
                 let oses_str: Vec<String> = oses.iter().map(|o| o.to_string()).collect();
                 let oses_str = oses_str.join(", ");
                 file_write(
-                    &output_path,
+                    output_path,
                     &format!("- [{}](#{})\n", oses_str, oses_str),
                     false,
                 );
             }
 
-            file_write(&output_path, "\n\n", false);
+            file_write(output_path, "\n\n", false);
         }
 
         for (oses, playbook) in playbook_envs_map {
@@ -112,9 +112,9 @@ fn write_signature_if_needed(output_file: &Option<String>) -> Result<()> {
             &format!("*{}*", GEN_MESSAGE),
             false,
         )
-        .or_else(|e| {
+        .map_err(|e| {
             error!("Unable to write to file {}: {}", output_file, e.to_string());
-            Err(e)
+            e
         });
     }
     Ok(())

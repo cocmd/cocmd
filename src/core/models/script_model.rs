@@ -69,7 +69,7 @@ impl StepModel {
     }
 
     pub fn get_title(&self) -> String {
-        self.title.clone().unwrap_or_else(|| "".to_string())
+        self.title.clone().unwrap_or_default()
     }
 }
 #[serde_as]
@@ -90,12 +90,6 @@ fn default_env() -> Vec<OS> {
 impl ScriptModel {
     pub fn get_env(&self) -> Vec<OS> {
         self.env.clone()
-    }
-
-    pub fn supports_os(&self, target_os: &OS) -> bool {
-        // get an OS and returns true iff it supports this OS based on get_env result
-        let env_os = self.get_env();
-        env_os.contains(target_os)
     }
 
     pub fn print_doc(
@@ -127,7 +121,7 @@ impl ScriptModel {
             for param in params {
                 doc.push_str(&format!("* `{}`\n", param.name));
             }
-            doc.push_str("\n");
+            doc.push('\n');
         }
         for step in &self.steps {
             let title = step.get_title();
@@ -145,7 +139,7 @@ impl ScriptModel {
                 for param in step_params {
                     doc.push_str(&format!("* `{}`\n", param.name));
                 }
-                doc.push_str("\n");
+                doc.push('\n');
             }
 
             let wrap_script_text = |script_text: &str, script_type: &str| -> String {
@@ -155,11 +149,10 @@ impl ScriptModel {
                 let lines = script_text.lines();
                 let mut wrapped_script_text = String::new();
                 if lines.clone().count() > 3 {
-                    wrapped_script_text
-                        .push_str(&format!("<details><summary>script to run</summary>\n\n"));
+                    wrapped_script_text.push_str("<details><summary>script to run</summary>\n\n");
                     wrapped_script_text
                         .push_str(&format!("```{}\n{}\n```\n\n", script_type, script_text));
-                    wrapped_script_text.push_str(&format!("</details>\n\n"));
+                    wrapped_script_text.push_str("</details>\n\n");
                 } else {
                     wrapped_script_text
                         .push_str(&format!("```{}\n{}\n```\n\n", script_type, script_text));
@@ -169,19 +162,17 @@ impl ScriptModel {
 
             match step.runner {
                 StepRunnerType::SHELL => {
-                    doc.push_str(&format!(
-                        "{}",
-                        wrap_script_text(step.content.as_ref().unwrap(), &"shell")
-                    ));
+                    doc.push_str(
+                        &wrap_script_text(step.content.as_ref().unwrap(), "shell").to_string(),
+                    );
                 }
                 StepRunnerType::MARKDOWN | StepRunnerType::WELCOME => {
                     doc.push_str(&format!("\n{}\n\n", step.content.as_ref().unwrap()));
                 }
                 StepRunnerType::PYTHON => {
-                    doc.push_str(&format!(
-                        "{}",
-                        wrap_script_text(step.content.as_ref().unwrap(), &"python")
-                    ));
+                    doc.push_str(
+                        &wrap_script_text(step.content.as_ref().unwrap(), "python").to_string(),
+                    );
                 }
                 StepRunnerType::LINK => {
                     doc.push_str(&format!("\n{}\n\n\n", step.content.as_ref().unwrap()));
@@ -194,22 +185,20 @@ impl ScriptModel {
                 }
             }
 
-            doc.push_str(&format!("\n\n"));
+            doc.push_str("\n\n");
         }
 
-        doc.push_str(&format!("\n\n"));
+        doc.push_str("\n\n");
 
         if let Some(output_file) = output_file {
-            file_write(Path::new(&output_file), &doc, false).or_else(|e| {
+            file_write(Path::new(&output_file), &doc, false).map_err(|e| {
                 error!("Unable to write to file {}: {}", output_file, e.to_string());
-                Err(e)
+                e
             });
+        } else if print_as_markdown {
+            print_md(&doc);
         } else {
-            if print_as_markdown {
-                print_md(&doc);
-            } else {
-                print_text(&doc);
-            }
+            print_text(&doc);
         }
     }
 }

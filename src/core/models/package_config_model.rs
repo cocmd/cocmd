@@ -70,19 +70,6 @@ impl Automation {
         true
     }
 
-    pub fn get_detailed_description(&self) -> String {
-        let description = self
-            .content
-            .as_ref()
-            .unwrap()
-            .description
-            .as_ref()
-            .unwrap_or(&"".to_string())
-            .to_string();
-
-        description
-    }
-
     pub fn print_doc(
         &self,
         settings: &Settings,
