@@ -185,7 +185,7 @@
             },
             "args": [
                 "docs",
-                "reduced-to.onboarding",
+                "git.setup",
                 // "--raw",
                 // "-o", "PLAYBOOK.md"
                 
