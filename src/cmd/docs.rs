@@ -63,10 +63,12 @@ pub fn run_docs(
             file_write(&output_path, &format!("# {}\n\n\n", uri), false);
 
             // write table of contents for each os
-            for (os, _) in playbook_envs_map.clone() {
+            for (oses, _) in playbook_envs_map.clone() {
+                let oses_str: Vec<String> = oses.iter().map(|o| o.to_string()).collect();
+                let oses_str = oses_str.join(", ");
                 file_write(
                     &output_path,
-                    &format!("- [{}](#{})\n", format!("{}", os), format!("{}", os)),
+                    &format!("- [{}](#{})\n", oses_str, oses_str),
                     false,
                 );
             }
@@ -74,13 +76,15 @@ pub fn run_docs(
             file_write(&output_path, "\n\n", false);
         }
 
-        for (os, playbook) in playbook_envs_map {
+        for (oses, playbook) in playbook_envs_map {
+            let oses_str: Vec<String> = oses.iter().map(|o| o.to_string()).collect();
+            let oses_str = oses_str.join(", ");
             playbook.print_doc(
                 &packages_manager.settings,
                 !raw_markdown,
                 false,
                 output_file.clone(),
-                format!("{}", os),
+                oses_str,
             );
         }
 
@@ -103,7 +107,12 @@ pub fn run_docs(
 
 fn write_signature_if_needed(output_file: &Option<String>) -> Result<()> {
     if let Some(output_file) = output_file {
-        file_write(Path::new(&output_file), GEN_MESSAGE, false).or_else(|e| {
+        file_write(
+            Path::new(&output_file),
+            &format!("*{}*", GEN_MESSAGE),
+            false,
+        )
+        .or_else(|e| {
             error!("Unable to write to file {}: {}", output_file, e.to_string());
             Err(e)
         });

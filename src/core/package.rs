@@ -142,7 +142,7 @@ impl Package {
         result
     }
 
-    pub fn get_automations_envs_map(&self) -> HashMap<String, HashMap<OS, Automation>> {
+    pub fn get_automations_envs_map(&self) -> HashMap<String, HashMap<Vec<OS>, Automation>> {
         let mut env_automations: HashMap<String, Vec<Automation>> = HashMap::new();
 
         if let Some(package_config) = &self.cocmd_config {
@@ -162,24 +162,43 @@ impl Package {
             }
         }
 
-        let mut result: HashMap<String, HashMap<OS, Automation>> = HashMap::new();
-        for (automation_name, automation_map) in &env_automations {
-            for os in vec![OS::Linux, OS::MacOS, OS::Windows] {
-                if let Some(automation) = automation_map
-                    .iter()
-                    .find(|a| a.content.as_ref().unwrap().supports_os(&os))
-                {
-                    if let Some(mut supported_automations) = result.get_mut(automation_name) {
-                        supported_automations.insert(os.clone(), automation.clone());
-                    } else {
-                        let mut new_supported_automations = HashMap::new();
-                        new_supported_automations.insert(os.clone(), automation.clone());
-                        result.insert(automation_name.clone(), new_supported_automations);
-                    }
+        let mut result: HashMap<String, HashMap<Vec<OS>, Automation>> = HashMap::new();
+        // convert env_automations to result, make sure
+        // that for each automation OS not appear more than once
+        for (automation_name, automation_vec) in env_automations {
+            let mut os_automation: HashMap<Vec<OS>, Automation> = HashMap::new();
+
+            for automation in automation_vec {
+                let mut os_vec: Vec<OS> = vec![];
+                if let Some(content) = &automation.content {
+                    os_vec = content.get_env();
                 }
+                if os_vec.is_empty() {
+                    os_vec.push(OS::Any);
+                }
+                os_vec.sort();
+                os_vec.dedup();
+                os_automation.insert(os_vec, automation.clone());
             }
+            result.insert(automation_name, os_automation);
         }
 
+        result
+    }
+
+    pub fn get_automations_envs_map_flat(&self) -> HashMap<String, HashMap<OS, Automation>> {
+        // use get_automations_envs_map and flatten the OS vector
+        let mut result: HashMap<String, HashMap<OS, Automation>> = HashMap::new();
+        let automations_envs_map = self.get_automations_envs_map();
+        for (automation_name, envs_map) in automations_envs_map {
+            let mut os_automation: HashMap<OS, Automation> = HashMap::new();
+            for (os_vec, automation) in envs_map {
+                for os in os_vec {
+                    os_automation.insert(os, automation.clone());
+                }
+            }
+            result.insert(automation_name, os_automation);
+        }
         result
     }
 
@@ -196,12 +215,25 @@ impl Package {
         None
     }
 
-    pub fn get_playbook_envs_map(&self, playbook_name: String) -> Option<HashMap<OS, Automation>> {
-        let automations_envs_map = self.get_automations_envs_map();
-        if let Some(automation) = automations_envs_map.get(&playbook_name) {
-            return Some(automation.clone());
-        }
-        None
+    pub fn get_playbook_envs_map(
+        &self,
+        playbook_name: String,
+    ) -> Option<HashMap<Vec<OS>, Automation>> {
+        // get key value from self.get_automations_envs_map
+        // where key is playbook_name
+
+        let automations_envs_map = self.get_automations_envs_map().clone();
+        automations_envs_map.get(&playbook_name).cloned()
+    }
+
+    pub fn get_playbook_envs_map_flat(
+        &self,
+        playbook_name: String,
+    ) -> Option<HashMap<OS, Automation>> {
+        self.get_automations_envs_map_flat()
+            .clone()
+            .get(&playbook_name)
+            .cloned()
     }
 
     pub fn location(&self) -> &PathBuf {
@@ -226,12 +258,12 @@ impl Package {
             self.location.to_string_lossy().to_string()
         );
 
-        let automations_envs_map = self.get_automations_envs_map();
+        let automations_envs_map = self.get_automations_envs_map_flat();
 
         if !automations_envs_map.is_empty() {
             output += &format!(
                 "\nThis package contains {} playbooks:\n\n",
-                self.get_automations_count(settings)
+                &automations_envs_map.len()
             );
 
             for (automation_name, envs_map) in &automations_envs_map {

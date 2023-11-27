@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash, Clone, Copy, PartialOrd, Ord)]
 pub enum OS {
     #[serde(alias = "windows", alias = "Windows")]
     Windows,
