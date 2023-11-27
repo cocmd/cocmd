@@ -184,10 +184,13 @@ impl ScriptModel {
                     ));
                 }
                 StepRunnerType::LINK => {
-                    doc.push_str(&format!("```\n{}\n```\n\n", step.content.as_ref().unwrap()));
+                    doc.push_str(&format!("\n{}\n\n\n", step.content.as_ref().unwrap()));
                 }
                 StepRunnerType::COCMD => {
-                    doc.push_str(&format!("```\n{}\n```\n\n", step.content.as_ref().unwrap()));
+                    doc.push_str(&format!(
+                        "```shell\ncocmd run {}\n```\n\n",
+                        step.content.as_ref().unwrap()
+                    ));
                 }
             }
 
