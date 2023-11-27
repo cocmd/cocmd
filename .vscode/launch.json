@@ -185,7 +185,7 @@
             },
             "args": [
                 "docs",
-                "git.setup",
+                "git.setup.github",
                 // "--raw",
                 "-o", "PLAYBOOK.md"
                 

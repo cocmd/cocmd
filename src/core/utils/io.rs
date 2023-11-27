@@ -82,10 +82,16 @@ pub fn file_write(
     content: &str,
     overwrite: bool,
 ) -> Result<(), std::io::Error> {
-    if overwrite && output_file.exists() {
+    if overwrite {
         fs::remove_file(output_file).unwrap();
     }
-    fs::write(output_file, content)
+    // append content to outout_file
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(output_file)?;
+    file.write_all(content.as_bytes())?;
+    Ok(())
 }
 
 /// Gets a temporary file.

@@ -196,6 +196,14 @@ impl Package {
         None
     }
 
+    pub fn get_playbook_envs_map(&self, playbook_name: String) -> Option<HashMap<OS, Automation>> {
+        let automations_envs_map = self.get_automations_envs_map();
+        if let Some(automation) = automations_envs_map.get(&playbook_name) {
+            return Some(automation.clone());
+        }
+        None
+    }
+
     pub fn location(&self) -> &PathBuf {
         &self.location
     }

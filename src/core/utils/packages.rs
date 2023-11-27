@@ -33,7 +33,7 @@ pub fn get_playbook_name_from_uri(uri: &str) -> Option<String> {
         return None;
     }
 
-    Some(splits.last().unwrap().to_string())
+    Some(splits[1..].join("."))
 }
 
 pub fn extract_package_name_and_version(package: &str) -> (String, Option<String>) {
@@ -87,6 +87,10 @@ mod tests {
         let uri = "cocmd.playbook_name";
         let playbook_name = get_playbook_name_from_uri(uri);
         assert_eq!(playbook_name, Some("playbook_name".to_string()));
+
+        let uri = "cocmd.playbook.name";
+        let playbook_name = get_playbook_name_from_uri(uri);
+        assert_eq!(playbook_name, Some("playbook.name".to_string()));
 
         let uri = "cocmd";
         let playbook_name = get_playbook_name_from_uri(uri);

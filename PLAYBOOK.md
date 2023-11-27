@@ -1,18 +1,36 @@
-# git.setup
+# git.setup.github
 
-This script is only available for the following OSes: [MacOS]
-Install and configure git on this machine
 
-## install git
+- [Windows](#Windows)
+- [Linux](#Linux)
+- [MacOS](#MacOS)
+
+
+## Windows
+install github cli
+
+### install
+```shell
+winget install --id GitHub.cli	
+```
+
+
+
+
+
+## Linux
+install github cli
+
+### install
 <details><summary>script to run</summary>
 
 ```shell
-# check if git is installed first, if yes print message and leave
-if git --version > /dev/null; then
-  echo "Git is already installed, skipping..."
-  exit 0
-fi
-brew install git
+type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+&& sudo apt update \
+&& sudo apt install gh -y
 
 ```
 
@@ -20,17 +38,33 @@ brew install git
 
 
 
-## Configue git
-This step requires some additional parameters, make sure to add them to the command below
 
-* `username`
-* `email`
+
+## MacOS
+install github cli
+
+### install brew
+```
+osx.setup.brew
+```
+
+
+
+### install gh
+<details><summary>script to run</summary>
 
 ```shell
-git config --global user.name "{{username}}"
-git config --global user.email "{{email}}"
-
+# check if gh is installed first, if yes print message and leave
+if gh --version > /dev/null; then
+  echo "gh is already installed, skipping..."
+  exit 0
+fi
+brew install gh
 ```
+
+</details>
+
+
 
 
 

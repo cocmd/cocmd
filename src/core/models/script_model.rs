@@ -9,10 +9,7 @@ use termimad::print_text;
 
 use super::settings::Settings;
 use crate::{
-    core::{
-        consts::GEN_MESSAGE,
-        utils::{io::file_write, sys::OS},
-    },
+    core::utils::{io::file_write, sys::OS},
     output::print_md,
 };
 
@@ -110,20 +107,20 @@ impl ScriptModel {
         title: String,
     ) {
         let mut doc = String::new();
-        doc.push_str(&format!("# {}\n", title));
+        doc.push_str(&format!("## {}\n", title));
 
-        if !env_specific {
-            doc.push_str(&format!(
-                "\nThis script is only available for the following OSes: {:?}\n",
-                self.env
-            ));
-        }
+        // if !env_specific {
+        //     doc.push_str(&format!(
+        //         "\nThis script is only available for the following OSes: {:?}\n",
+        //         self.env
+        //     ));
+        // }
 
         if let Some(description) = &self.description {
             doc.push_str(&format!("{}\n\n", description));
         }
         if let Some(params) = &self.params {
-            doc.push_str("## parameters\n\n");
+            doc.push_str("### parameters\n\n");
             // add an explanation
             doc.push_str("Make sure to add the following parameters to the command below\n");
 
@@ -137,9 +134,9 @@ impl ScriptModel {
             if !title.is_empty() {
                 let is_optional = step.approval_message.is_some();
                 if is_optional {
-                    doc.push_str(&format!("## (Optional) {}\n", step.get_title()));
+                    doc.push_str(&format!("### (Optional) {}\n", step.get_title()));
                 } else {
-                    doc.push_str(&format!("## {}\n", step.get_title()));
+                    doc.push_str(&format!("### {}\n", step.get_title()));
                 }
             }
 
@@ -197,15 +194,15 @@ impl ScriptModel {
             doc.push_str(&format!("\n\n"));
         }
 
+        doc.push_str(&format!("\n\n"));
+
         if let Some(output_file) = output_file {
-            doc.push_str(GEN_MESSAGE);
-            file_write(Path::new(&output_file), &doc, true).or_else(|e| {
+            file_write(Path::new(&output_file), &doc, false).or_else(|e| {
                 error!("Unable to write to file {}: {}", output_file, e.to_string());
                 Err(e)
             });
         } else {
             if print_as_markdown {
-                doc.push_str(GEN_MESSAGE);
                 print_md(&doc);
             } else {
                 print_text(&doc);
