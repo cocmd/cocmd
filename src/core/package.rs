@@ -277,6 +277,22 @@ impl Package {
                     supported_envs.join(", ")
                 );
 
+                // print description
+                output += &format!(
+                    "{}\n\n",
+                    envs_map
+                        .values()
+                        .next()
+                        .as_ref()
+                        .unwrap()
+                        .content
+                        .as_ref()
+                        .unwrap()
+                        .description
+                        .clone()
+                        .unwrap_or(String::from(""))
+                );
+
                 // output += &format!("{}\n", automation.get_detailed_description());
                 output += &format!(
                     "\nrun it with: `cocmd run {}.{}`\n\n",
