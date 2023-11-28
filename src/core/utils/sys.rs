@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash, Clone, Copy, PartialOrd, Ord)]
 pub enum OS {
     #[serde(alias = "windows", alias = "Windows")]
     Windows,
@@ -16,7 +16,6 @@ pub enum OS {
     Linux,
     #[serde(alias = "osx", alias = "Mac", alias = "Macos")]
     MacOS,
-    Other,
     #[serde(alias = "any")]
     Any,
 }
@@ -27,7 +26,6 @@ impl Display for OS {
             OS::Windows => write!(f, "Windows"),
             OS::Linux => write!(f, "Linux"),
             OS::MacOS => write!(f, "MacOS"),
-            OS::Other => write!(f, "Other"),
             OS::Any => write!(f, "Any"),
         }
     }
@@ -39,6 +37,6 @@ pub fn get_os() -> OS {
         "linux" => OS::Linux,
         "macos" => OS::MacOS,
         "any" => OS::Any,
-        _ => OS::Other,
+        _ => OS::Any,
     }
 }

@@ -41,7 +41,7 @@ use crate::output::set_logging_level;
 struct Cli {
     /// No-Verbose flag for less output
     #[arg(short, long, default_value_t = false)]
-    no_verbose: bool,
+    silent: bool,
 
     /// Subcommands
     #[command(subcommand)]
@@ -65,8 +65,11 @@ enum Commands {
         /// Optional name argument for specific documentation generation
         name: Option<String>,
         /// Optional flag to show raw markdown
-        #[arg(long = "raw-markdown", short = 'r', default_value_t = false)]
-        raw_markdown: bool,
+        #[arg(long = "raw", short = 'r', default_value_t = false)]
+        raw: bool,
+
+        #[arg(long = "output", short = 'o')]
+        output: Option<String>,
     },
 
     /// Run command with a name argument - Runs a specific automation
@@ -144,7 +147,7 @@ fn main() -> ExitCode {
     if let Commands::Install { .. } = cli.command {
         set_logging_level(false);
     } else {
-        set_logging_level(!cli.no_verbose);
+        set_logging_level(!cli.silent);
     }
 
     let settings = Settings::new(None, None);
@@ -179,14 +182,14 @@ fn main() -> ExitCode {
         Commands::Refresh => {
             todo!("Refresh command not implemented yet")
         }
-        Commands::Docs { name, raw_markdown } => match name {
+        Commands::Docs { name, raw, output } => match name {
             Some(name) => {
-                res = run_docs(&mut packages_manager, &name, raw_markdown);
+                res = run_docs(&mut packages_manager, &name, raw, output);
             }
             None => {
                 let markdown: String = clap_markdown::help_markdown::<Cli>();
                 let md = markdown.to_string();
-                if raw_markdown {
+                if raw {
                     println!("{}", md);
                 } else {
                     print_md(&md);
@@ -393,7 +396,6 @@ mod tests {
         assert!(res.is_ok());
 
         // use packages_manager.get_package("aws-s3".to_string()) to make sure.
-        // check we only get 0.0.1 by the uri
         let package = packages_manager.get_package("aws-s3".to_string());
         assert!(package.is_some());
         assert_eq!("0.0.1", package.unwrap().version());

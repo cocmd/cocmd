@@ -26,7 +26,6 @@ use anyhow::{anyhow, Context, Result};
 use log::{info, trace};
 use serde::{Deserialize, Serialize};
 
-use super::util::path::resolve_hub_package_locally;
 use super::PackageProvider;
 use super::{
     util::download::download_and_extract_zip_verify_sha256, util::download::read_string_from_url,
@@ -107,33 +106,19 @@ impl PackageProvider for CocmdHubPackageProvider {
     fn package(&self) -> String {
         self.package.clone()
     }
+
+    fn set_version(&mut self, version: String) {
+        self.version = version;
+    }
 }
 
 impl CocmdHubPackageProvider {
     pub fn new(package: &String, runtime_dir: &Path, version: Option<String>) -> Self {
-        let binding = runtime_dir.join(package);
-
-        let default_path = binding.as_path();
-
-        // if version not provided use the latest version you find in index
-        // if version is provided, use it
-        let mut version = version.clone();
-        if version.is_none() {
-            let index = Self::get_index(runtime_dir, false).unwrap();
-            version = index
-                .get_package(package, &None)
-                .map(|package| package.version)
-                .unwrap_or_else(|| "0.0.0".to_string())
-                .into();
-        }
-
-        let res = resolve_hub_package_locally(runtime_dir, package.as_str(), version.as_deref());
-
         Self {
             package: (*package.clone()).to_string(),
-            local_path: res.unwrap_or_else(|_| default_path.to_path_buf()),
+            local_path: runtime_dir.join(package),
             runtime_dir: runtime_dir.to_path_buf(),
-            version: version.unwrap(),
+            version: version.unwrap_or("0.0.0".to_string()),
         }
     }
 
@@ -158,7 +143,7 @@ impl CocmdHubPackageProvider {
     }
 
     fn download_index() -> Result<PackageIndex> {
-        info!("fetching from hub...");
+        info!("downloading hub index...");
         let json_body = read_string_from_url(COCMD_HUB_PACKAGE_INDEX_URL)?;
         let index: PackageIndex = serde_json::from_str(&json_body)?;
         Ok(index)
@@ -194,6 +179,18 @@ impl CocmdHubPackageProvider {
             return Err(anyhow!("unable to write package index cache: {}", err));
         }
         Ok(())
+    }
+
+    pub fn get_latest_version_of(package: &str, runtime_dir: &Path) -> Result<String> {
+        let index = Self::get_index(runtime_dir, false)?;
+
+        let latest_version = index
+            .get_package(package, &None::<String>)
+            .unwrap()
+            .version
+            .clone();
+
+        Ok(latest_version)
     }
 }
 

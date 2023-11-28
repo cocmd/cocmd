@@ -28,7 +28,10 @@ pub fn handle_step(
     let mut content = step.content.as_ref().unwrap().as_str();
     let script_params = step.get_params(script_params);
 
-    print_md_debug(&format!("## {}", &step.title));
+    let title = step.get_title();
+    if !title.is_empty() {
+        print_md_debug(&format!("## {}", title));
+    }
     if let Some(msg) = step.approval_message.clone() {
         if !Confirm::new().with_prompt(msg).interact().unwrap() {
             return true;
@@ -69,22 +72,29 @@ pub fn handle_step(
                 // if yes, download the package
                 if let Err(_err) = interactive_shell(
                     packages_manager,
-                    format!("cocmd --no-verbose install {}", &provider_name),
+                    format!("cocmd --silent install {}", &provider_name),
                 ) {
                     return false;
                 }
                 packages_manager.reload();
             }
-            if let Err(_err) = interactive_shell(
-                packages_manager,
-                format!("cocmd --no-verbose run {}", &content),
-            ) {
+            if let Err(_err) =
+                interactive_shell(packages_manager, format!("cocmd --silent run {}", &content))
+            {
                 return false;
             }
         }
         StepRunnerType::MARKDOWN => {
             // Print Markdown content
             print_md(content);
+        }
+        StepRunnerType::WELCOME => {
+            // Print Markdown content
+            print_md(content);
+            Confirm::new()
+                .with_prompt("Ready to start?")
+                .interact()
+                .unwrap();
         }
         StepRunnerType::PYTHON => {
             // make sure that "python" is installed and reachable from the command line

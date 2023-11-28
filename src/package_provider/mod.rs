@@ -36,6 +36,7 @@ pub trait PackageProvider {
     fn name(&self) -> String;
     fn package(&self) -> String;
     fn local_path(&self) -> PathBuf;
+    fn set_version(&mut self, version: String);
     fn get_installation_path(&self) -> PathBuf {
         self.local_path().clone()
     }

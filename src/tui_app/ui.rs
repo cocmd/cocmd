@@ -206,7 +206,7 @@ fn draw_steps_list<B: Backend>(f: &mut Frame<'_, B>, app: &mut App, area: Rect) 
         .steps
         .iter()
         .map(|i| {
-            let text = vec![text::Span::raw(format!("- {}", i.title))];
+            let text = vec![text::Span::raw(format!("- {}", i.get_title()))];
             ListItem::new(vec![text::Line::from(text)])
         })
         .collect();

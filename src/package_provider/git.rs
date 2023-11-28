@@ -87,6 +87,10 @@ impl PackageProvider for GitPackageProvider {
         self.package.clone()
     }
 
+    fn set_version(&mut self, _version: String) {
+        todo!("implement set_version for GitPackageProvider");
+    }
+
     fn download(&self) -> Result<PathBuf> {
         if !Self::is_git_installed() {
             bail!("unable to invoke 'git' command, please make sure it is installed and visible in PATH");
