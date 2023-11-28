@@ -21,7 +21,7 @@ pub fn install_package(
 
     let settings = &packages_manager.settings;
 
-    let (package_uri, mut version) = extract_package_name_and_version(package);
+    let (package_uri, version) = extract_package_name_and_version(package);
 
     let mut provider = get_provider(
         &package_uri.to_string(),
@@ -34,7 +34,6 @@ pub fn install_package(
         if let Ok(latest_version) =
             CocmdHubPackageProvider::get_latest_version_of(&package_uri, &settings.runtime_dir)
         {
-            version = Some(latest_version.clone());
             provider.set_version(latest_version.clone());
         }
     }

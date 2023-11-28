@@ -47,7 +47,7 @@ impl PackageProvider for LocalPackageProvider {
         self.local_path.to_path_buf()
     }
 
-    fn set_version(&mut self, version: String) {
+    fn set_version(&mut self, _version: String) {
         todo!("implement set_version for LocalPackageProvider");
     }
 

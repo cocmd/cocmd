@@ -87,7 +87,7 @@ impl PackageProvider for GitPackageProvider {
         self.package.clone()
     }
 
-    fn set_version(&mut self, version: String) {
+    fn set_version(&mut self, _version: String) {
         todo!("implement set_version for GitPackageProvider");
     }
 
