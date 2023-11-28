@@ -106,6 +106,10 @@ impl PackageProvider for CocmdHubPackageProvider {
     fn package(&self) -> String {
         self.package.clone()
     }
+
+    fn set_version(&mut self, version: String) {
+        self.version = version;
+    }
 }
 
 impl CocmdHubPackageProvider {
@@ -175,6 +179,18 @@ impl CocmdHubPackageProvider {
             return Err(anyhow!("unable to write package index cache: {}", err));
         }
         Ok(())
+    }
+
+    pub fn get_latest_version_of(package: &str, runtime_dir: &Path) -> Result<String> {
+        let index = Self::get_index(runtime_dir, false)?;
+
+        let latest_version = index
+            .get_package(package, &None::<String>)
+            .unwrap()
+            .version
+            .clone();
+
+        Ok(latest_version)
     }
 }
 

@@ -10,6 +10,7 @@ use crate::core::packages_manager::PackagesManager;
 use crate::core::utils::packages::extract_package_name_and_version;
 use crate::core::utils::repository::find_cocmd_files;
 use crate::package_provider::get_provider;
+use crate::package_provider::hub::CocmdHubPackageProvider;
 
 pub fn install_package(
     packages_manager: &mut PackagesManager,
@@ -20,9 +21,23 @@ pub fn install_package(
 
     let settings = &packages_manager.settings;
 
-    let (package_uri, version) = extract_package_name_and_version(package);
+    let (package_uri, mut version) = extract_package_name_and_version(package);
 
-    let provider = get_provider(&package_uri.to_string(), &settings.runtime_dir, version).unwrap();
+    let mut provider = get_provider(
+        &package_uri.to_string(),
+        &settings.runtime_dir,
+        version.clone(),
+    )
+    .unwrap();
+
+    if provider.is_provider_hub() && version.is_none() {
+        if let Ok(latest_version) =
+            CocmdHubPackageProvider::get_latest_version_of(&package_uri, &settings.runtime_dir)
+        {
+            version = Some(latest_version.clone());
+            provider.set_version(latest_version.clone());
+        }
+    }
 
     if !provider.is_exists_locally() {
         info!("Package not found locally. Downloading...");

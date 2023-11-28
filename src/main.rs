@@ -398,7 +398,7 @@ mod tests {
         // use packages_manager.get_package("aws-s3".to_string()) to make sure.
         let package = packages_manager.get_package("aws-s3".to_string());
         assert!(package.is_some());
-        assert_eq!("0.0.0", package.unwrap().version());
+        assert_eq!("0.0.1", package.unwrap().version());
     }
 
     // write a test that simulate two packages intsalled with the same name,
