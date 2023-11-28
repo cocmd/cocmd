@@ -307,7 +307,14 @@ mod tests {
             .get_package("docker", &Some("20.10.9".to_string()))
             .unwrap();
         assert_eq!(package.name, "docker");
-        assert_eq!(package.version, "0.0.0");
+        assert_eq!(
+            package.version,
+            CocmdHubPackageProvider::get_latest_version_of(
+                package.name.as_str(),
+                runtime_dir.to_path_buf().as_path()
+            )
+            .unwrap()
+        );
     }
 
     #[test]
