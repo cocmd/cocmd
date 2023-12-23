@@ -39,7 +39,7 @@ ratatui = "0.23.0"
 openssl = { version = "0.10", features = ["vendored"] }
 termimad = "0.26.1"
 crossterm = "0.27.0"
-env_logger = "0.10.0"
+env_logger = "0.10.1"
 log = "0.4.20"
 itertools = "0.11.0"
 maplit = "1.0.2"
