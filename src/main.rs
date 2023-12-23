@@ -22,7 +22,7 @@ use cmd::show::{show_package, show_packages};
 use cmd::uninstall::uninstall_package;
 use dialoguer::{Confirm, MultiSelect};
 use itertools::Itertools;
-use log::{error, trace};
+use log::{trace};
 use tui_app::tui_runner;
 
 pub(crate) use crate::core::models::settings::Settings;

@@ -1,6 +1,5 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use chatgpt::{prelude::*, types::CompletionResponse};
-use chatgpt_functions::{chat_gpt::ChatGPTBuilder, function_specification::FunctionSpecification};
 use dotenv::dotenv;
 use log::error;
 
@@ -12,7 +11,7 @@ pub async fn run_onboarding(_packages_manager: &mut PackagesManager) -> Result<(
 
     let client = ChatGPT::new(key)?;
 
-    /// Sending a message and getting the completion
+    // Sending a message and getting the completion
     let response = client
         .send_message("Describe in five words the Rust programming language.")
         .await;
