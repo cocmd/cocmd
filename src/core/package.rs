@@ -6,6 +6,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use log::error;
+use log::warn;
 
 use super::utils::io::file_write;
 use crate::core::consts;
@@ -55,7 +56,7 @@ impl Package {
                 );
             }
         } else {
-            error!(
+            warn!(
                 "Package Path {} does not exist.",
                 package.location.to_str().unwrap()
             )
