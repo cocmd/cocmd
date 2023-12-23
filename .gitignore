@@ -53,9 +53,6 @@ Temporary Items
 
 *.snap
 *.profraw
-<<<<<<< HEAD
 *.gguf
 .env
-=======
 PLAYBOOK.md
->>>>>>> bc7b2bd81cab1f44496c64fed965097d1924be3f
