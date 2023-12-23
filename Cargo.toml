@@ -37,7 +37,7 @@ execute = "0.2.12"
 
 ratatui = "0.23.0"
 openssl = { version = "0.10", features = ["vendored"] }
-termimad = "0.24.0"
+termimad = "0.26.1"
 crossterm = "0.27.0"
 env_logger = "0.10.0"
 log = "0.4.20"
