@@ -1,3 +1,5 @@
+#![allow(clippy::non_minimal_cfg)]
+
 use std::process::Command;
 
 pub fn check_installed(cmd: &str) -> bool {
@@ -7,13 +9,7 @@ pub fn check_installed(cmd: &str) -> bool {
         return false;
     }
 
-    let success = output.unwrap().status.success();
-
-    if success {
-        return true;
-    } else {
-        return false;
-    }
+    output.unwrap().status.success()
 }
 
 // write a test for check_installed
@@ -26,8 +22,8 @@ mod tests {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     #[test]
     fn test_check_installed() {
-        assert_eq!(check_installed("ls"), true);
-        assert_eq!(check_installed("dummy_command"), false);
+        assert!(check_installed("ls"));
+        assert!(!check_installed("dummy_command"));
     }
 
     #[cfg(any(target_os = "windows"))]

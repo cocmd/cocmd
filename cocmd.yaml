@@ -25,14 +25,14 @@ automations:
             if ! node -v &> /dev/null
             then
               echo "node not installed"
-              cocmd --no-verbose install node.setup
+              cocmd --silent install node.setup
             fi
 
             # if yarn not installed, run cocmd install yarn.setup
             if ! yarn -v &> /dev/null
             then
               echo "yarn not installed"
-              cocmd --no-verbose install node.yarn.setup
+              cocmd --silent install node.yarn.setup
             fi
         - title: install
           runner: shell

@@ -7,6 +7,8 @@ static mut LOG_LEVEL: Level = Level::Info; // Initialize with a default level.
 pub fn set_logging_level(verbose: bool) {
     let level = if verbose { Level::Debug } else { Level::Info };
 
+    std::env::set_var("RUST_LOG", "reqwest=off");
+
     // Set the desired log level using the env_logger crate or any other method.
     env_logger::builder()
         .filter_level(level.to_level_filter())

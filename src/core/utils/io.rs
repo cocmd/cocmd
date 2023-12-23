@@ -77,8 +77,21 @@ pub fn file_write_lines(file: &Path, lines: &[String]) -> Result<(), std::io::Er
 ///
 /// - `file`: The file path to write to.
 /// - `content`: The content to write to the file.
-pub fn file_write(file: &Path, content: &str) -> Result<(), std::io::Error> {
-    fs::write(file, content)
+pub fn file_write(
+    output_file: &Path,
+    content: &str,
+    overwrite: bool,
+) -> Result<(), std::io::Error> {
+    if overwrite {
+        fs::remove_file(output_file).unwrap();
+    }
+    // append content to outout_file
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(output_file)?;
+    file.write_all(content.as_bytes())?;
+    Ok(())
 }
 
 /// Gets a temporary file.

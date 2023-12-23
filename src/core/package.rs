@@ -1,13 +1,14 @@
 #![allow(clippy::format_in_format_args)]
 #![allow(dead_code)]
+use std::collections::HashMap;
 use std::fmt;
-use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
-use log::{error, warn};
+use log::error;
+use log::warn;
 
-use super::utils::io::exists;
+use super::utils::io::file_write;
 use crate::core::consts;
 use crate::core::models::package_config_model::Automation;
 use crate::core::models::package_config_model::PackageConfigModel;
@@ -55,7 +56,7 @@ impl Package {
                 );
             }
         } else {
-            error!(
+            warn!(
                 "Package Path {} does not exist.",
                 package.location.to_str().unwrap()
             )
@@ -142,112 +143,246 @@ impl Package {
         result
     }
 
-    pub fn location(&self) -> &PathBuf {
-        &self.location
-    }
+    pub fn get_automations_envs_map(&self) -> HashMap<String, HashMap<Vec<OS>, Automation>> {
+        let mut env_automations: HashMap<String, Vec<Automation>> = HashMap::new();
 
-    pub fn print_doc(&self, settings: &Settings, print_as_markdown: bool, env_specific: bool) {
-        // i want to print this content as md(with skin) or raw text(just println):
+        if let Some(package_config) = &self.cocmd_config {
+            if let Some(automations) = &package_config.automations {
+                for automation in automations.iter() {
+                    let automation_loaded = automation.load_content(&self.location);
+                    let automation_name = automation_loaded.name.clone();
 
-        let mut output = String::new();
-
-        let _name = self.name();
-
-        let automations = self.automations(settings, Some(env_specific));
-        if !automations.is_empty() {
-            output += &format!(
-                "## automations ({})\n",
-                self.get_automations_count(settings)
-            );
-
-            // write a markdown table for automation. columns are name, env, description, number of steps
-            output += "| command | env | description | how to run? |\n";
-            output += "| --- | --- | --- | --- |\n";
-
-            for automation in &automations {
-                let env = &automation.content.as_ref().unwrap().env.unwrap_or(OS::Any);
-                let package_name = self.name();
-
-                output += &format!(
-                    "| {}.{} | {} | {} | {} |\n",
-                    package_name,
-                    automation.name,
-                    env,
-                    automation.get_detailed_description(),
-                    format!(
-                        "run `{}.{}` or `cocmd run {}.{}`",
-                        package_name, automation.name, package_name, automation.name
-                    )
-                );
-            }
-            output += "\n";
-        }
-
-        if let Some(alias) = &self.aliases() {
-            output += &format!(
-                "## aliases ({}):\n```\n{}\n```\n",
-                self.get_aliases_count(),
-                alias
-            );
-        }
-
-        if !self.paths(false).is_empty() {
-            output += &format!("## PATH additions ({})\n", self.get_paths_count());
-            for (_rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
-                // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
-                // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
-
-                output += &abs_p.to_string();
-
-                if !exists(abs_p) {
-                    output += " (not exists)";
-                    continue;
-                }
-
-                output += ":\n\n";
-
-                // write a markdown table for files in fs::read_dir(abs_p).unwrap()
-                // column 1 filename
-                // column 2 desc (pick up from comment line that starts with # COCMD-DESC: ...
-                // column 3 usage (pick up from comment line that starts with # COCMD-USAGE: ...
-                // column 4 example (pick up from comment line that starts with # COCMD-EXAMPLE: ...
-                output += "| command | desc | usage \n";
-                output += "| --- | --- | --- |\n";
-
-                for entry in fs::read_dir(abs_p).unwrap() {
-                    let entry = entry.unwrap();
-                    let file_name = entry.file_name();
-                    let file_path = entry.path();
-
-                    if let Ok(file_content) = fs::read_to_string(&file_path) {
-                        let mut desc = String::new();
-                        let mut usage = String::new();
-
-                        for line in file_content.lines() {
-                            if line.starts_with("# COCMD-DESC:") {
-                                desc = line.replace("# COCMD-DESC:", "").trim().to_string();
-                            } else if line.starts_with("# COCMD-USAGE:") {
-                                usage = line.replace("# COCMD-USAGE:", "").trim().to_string();
-                            }
-                        }
-
-                        output += &format!(
-                            "| `{}` | {} | run `{}` |\n",
-                            file_name.to_str().unwrap(),
-                            desc,
-                            usage
-                        );
+                    if let Some(automation_vec) = env_automations.get_mut(&automation_name) {
+                        automation_vec.push(automation_loaded.clone());
                     } else {
-                        warn!("Unable to read file {}", file_path.to_str().unwrap());
+                        let new_automation_vec = vec![automation_loaded.clone()];
+                        env_automations.insert(automation_name.clone(), new_automation_vec);
                     }
                 }
             }
         }
 
-        if print_as_markdown {
-            print_md(&output);
+        let mut result: HashMap<String, HashMap<Vec<OS>, Automation>> = HashMap::new();
+        // convert env_automations to result, make sure
+        // that for each automation OS not appear more than once
+        for (automation_name, automation_vec) in env_automations {
+            let mut os_automation: HashMap<Vec<OS>, Automation> = HashMap::new();
+
+            for automation in automation_vec {
+                let mut os_vec: Vec<OS> = vec![];
+                if let Some(content) = &automation.content {
+                    os_vec = content.get_env();
+                }
+                if os_vec.is_empty() {
+                    os_vec.push(OS::Any);
+                }
+                os_vec.sort();
+                os_vec.dedup();
+                os_automation.insert(os_vec, automation.clone());
+            }
+            result.insert(automation_name, os_automation);
+        }
+
+        result
+    }
+
+    pub fn get_automations_envs_map_flat(&self) -> HashMap<String, HashMap<OS, Automation>> {
+        // use get_automations_envs_map and flatten the OS vector
+        let mut result: HashMap<String, HashMap<OS, Automation>> = HashMap::new();
+        let automations_envs_map = self.get_automations_envs_map();
+        for (automation_name, envs_map) in automations_envs_map {
+            let mut os_automation: HashMap<OS, Automation> = HashMap::new();
+            for (os_vec, automation) in envs_map {
+                for os in os_vec {
+                    os_automation.insert(os, automation.clone());
+                }
+            }
+            result.insert(automation_name, os_automation);
+        }
+        result
+    }
+
+    pub fn get_playbook(&self, playbook_name: String) -> Option<Automation> {
+        if let Some(package_config) = &self.cocmd_config {
+            if let Some(automations) = &package_config.automations {
+                for automation in automations.iter() {
+                    if automation.name == playbook_name {
+                        return Some(automation.clone());
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    pub fn get_playbook_envs_map(
+        &self,
+        playbook_name: String,
+    ) -> Option<HashMap<Vec<OS>, Automation>> {
+        // get key value from self.get_automations_envs_map
+        // where key is playbook_name
+
+        let automations_envs_map = self.get_automations_envs_map().clone();
+        automations_envs_map.get(&playbook_name).cloned()
+    }
+
+    pub fn get_playbook_envs_map_flat(
+        &self,
+        playbook_name: String,
+    ) -> Option<HashMap<OS, Automation>> {
+        self.get_automations_envs_map_flat()
+            .clone()
+            .get(&playbook_name)
+            .cloned()
+    }
+
+    pub fn location(&self) -> &PathBuf {
+        &self.location
+    }
+
+    pub fn print_doc(
+        &self,
+        _settings: &Settings,
+        print_as_markdown: bool,
+        _env_specific: bool,
+        output_file: Option<String>,
+    ) {
+        // i want to print this content as md(with skin) or raw text(just println):
+        let package_name = self.name();
+        let mut output = String::new();
+
+        let _name = self.name();
+
+        output += &format!("\nlocation: {}\n", self.location.to_string_lossy());
+
+        let automations_envs_map = self.get_automations_envs_map_flat();
+
+        if !automations_envs_map.is_empty() {
+            output += &format!(
+                "\nThis package contains {} playbooks:\n\n",
+                &automations_envs_map.len()
+            );
+
+            for (automation_name, envs_map) in &automations_envs_map {
+                // write more human readable for this playbook
+                // title with the name of the playbook
+                // the env, description and how to run it (with cocmd or with cocmd run)
+
+                let supported_envs: Vec<String> =
+                    envs_map.keys().cloned().map(|o| o.to_string()).collect();
+
+                output += &format!(
+                    "### {}.{} ({})\n",
+                    package_name,
+                    automation_name,
+                    supported_envs.join(", ")
+                );
+
+                // print description
+                output += &format!(
+                    "{}\n\n",
+                    envs_map
+                        .values()
+                        .next()
+                        .as_ref()
+                        .unwrap()
+                        .content
+                        .as_ref()
+                        .unwrap()
+                        .description
+                        .clone()
+                        .unwrap_or(String::from(""))
+                );
+
+                // output += &format!("{}\n", automation.get_detailed_description());
+                output += &format!(
+                    "\nrun it with: `cocmd run {}.{}`\n\n",
+                    package_name, automation_name
+                );
+            }
+            output += "\n\n";
         } else {
-            println!("{}", output);
+            output += "\nThis package contains no playbooks\n\n";
+        }
+
+        // if let Some(alias) = &self.aliases() {
+        //     output += &format!(
+        //         "## aliases ({}):\n```\n{}\n```\n",
+        //         self.get_aliases_count(),
+        //         alias
+        //     );
+        // }
+
+        // if !self.paths(false).is_empty() {
+        //     output += &format!("## PATH additions ({})\n", self.get_paths_count());
+        //     for (_rel_p, abs_p) in self.paths(false).iter().zip(self.paths(true).iter()) {
+        //         // list all files in the path p - it's supposed to be executables of shell. make sure it's shell script.
+        //         // look for comments in the beginning of each file to understand what it does. write it as a table in markdown format
+
+        //         output += &abs_p.to_string();
+
+        //         if !exists(abs_p) {
+        //             output += " (not exists)";
+        //             continue;
+        //         }
+
+        //         output += ":\n\n";
+
+        //         // write a markdown table for files in fs::read_dir(abs_p).unwrap()
+        //         // column 1 filename
+        //         // column 2 desc (pick up from comment line that starts with # COCMD-DESC: ...
+        //         // column 3 usage (pick up from comment line that starts with # COCMD-USAGE: ...
+        //         // column 4 example (pick up from comment line that starts with # COCMD-EXAMPLE: ...
+        //         output += "| command | desc | usage \n";
+        //         output += "| --- | --- | --- |\n";
+
+        //         for entry in fs::read_dir(abs_p).unwrap() {
+        //             let entry = entry.unwrap();
+        //             let file_name = entry.file_name();
+        //             let file_path = entry.path();
+
+        //             if let Ok(file_content) = fs::read_to_string(&file_path) {
+        //                 let mut desc = String::new();
+        //                 let mut usage = String::new();
+
+        //                 for line in file_content.lines() {
+        //                     if line.starts_with("# COCMD-DESC:") {
+        //                         desc = line.replace("# COCMD-DESC:", "").trim().to_string();
+        //                     } else if line.starts_with("# COCMD-USAGE:") {
+        //                         usage = line.replace("# COCMD-USAGE:", "").trim().to_string();
+        //                     }
+        //                 }
+
+        //                 output += &format!(
+        //                     "| `{}` | {} | run `{}` |\n",
+        //                     file_name.to_str().unwrap(),
+        //                     desc,
+        //                     usage
+        //                 );
+        //             } else {
+        //                 warn!("Unable to read file {}", file_path.to_str().unwrap());
+        //             }
+        //         }
+        //     }
+        // }
+
+        if let Some(output_file) = output_file {
+            // write output to output_file, if exists overwrite it
+            file_write(Path::new(&output_file), &output, true).map_err(|e| {
+                error!(
+                    "Unable to write to file {}: {}",
+                    &output_file,
+                    e.to_string()
+                );
+                e
+            });
+        } else {
+            // write to stdout
+            if print_as_markdown {
+                print_md(&output);
+            } else {
+                println!("{}", output);
+            }
         }
     }
 
