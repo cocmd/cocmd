@@ -32,7 +32,7 @@ scopeguard = "1.1.0"
 fs_extra = "1.2.0"
 sha2 = "0.10.8"
 hex = "0.4.3"
-reqwest = { version = "0.11.20", features = ["blocking", "json"]}
+reqwest = { version = "0.11.24", features = ["blocking", "json"]}
 execute = "0.2.13"
 
 ratatui = "0.23.0"
